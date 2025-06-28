@@ -185,7 +185,7 @@ export const composioTools: ComposioTool[] = [
     id: 'outlook_calendar',
     name: 'Outlook Calendar',
     category: 'calendar',
-    description: 'Manage events, meetings, and schedules in Microsoft's ecosystem',
+    description: 'Manage events, meetings, and schedules in Microsoft\'s ecosystem',
     icon: '📆',
     status: 'active',
     popularityScore: 87,
