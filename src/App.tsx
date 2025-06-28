@@ -5,7 +5,6 @@ import CRMModules from './components/CRMModules';
 import Features from './components/Features';
 import MultiAgentDemo from './components/MultiAgentDemo';
 import InteractiveGoalExplorer from './components/InteractiveGoalExplorer';
-import ApiSetupGuide from './components/ApiSetupGuide';
 import HowToUse from './components/HowToUse';
 import HowItWorks from './components/HowItWorks';
 import Integrations from './components/Integrations';
@@ -18,24 +17,17 @@ import { Settings, HelpCircle, Book, Eye, Globe } from 'lucide-react';
 
 function App() {
   const [globalRealMode, setGlobalRealMode] = useState(false);
-  const [showApiSetup, setShowApiSetup] = useState(false);
   const [showHowToUse, setShowHowToUse] = useState(false);
   const [showComposioModal, setShowComposioModal] = useState(false);
 
   // Initialize with the appropriate mode based on API configuration
   useEffect(() => {
     const defaultMode = getDefaultMode();
-    const validation = validateApiSetup();
     
     setGlobalRealMode(defaultMode);
     
     // Log API status on app start
     logApiStatus();
-    
-    // Show API setup guide if no APIs are configured and user hasn't dismissed it
-    if (!validation.canUseRealMode && !localStorage.getItem('api-setup-dismissed')) {
-      setTimeout(() => setShowApiSetup(true), 1000);
-    }
   }, []);
 
   // Auto-scroll to Goal Explorer after page loads
@@ -61,14 +53,6 @@ function App() {
   }, []);
 
   const handleModeToggle = (mode: boolean) => {
-    const validation = validateApiSetup();
-    
-    if (mode && !validation.canUseRealMode) {
-      // User wants to enable real mode but APIs aren't configured
-      setShowApiSetup(true);
-      return;
-    }
-    
     setGlobalRealMode(mode);
     
     // Log mode change
@@ -76,23 +60,6 @@ function App() {
     if (mode) {
       console.warn('⚠️ LIVE MODE: Real AI agents will execute with your actual APIs and tools');
     }
-  };
-
-  const handleApiSetupComplete = () => {
-    const validation = validateApiSetup();
-    if (validation.canUseRealMode) {
-      setGlobalRealMode(true);
-      console.log('✅ API setup complete! Switching to Live Mode.');
-    }
-  };
-
-  const handleApiSetupClose = () => {
-    setShowApiSetup(false);
-    localStorage.setItem('api-setup-dismissed', 'true');
-  };
-
-  const handleOpenApiSetup = () => {
-    setShowApiSetup(true);
   };
 
   const handleOpenHowToUse = () => {
@@ -105,18 +72,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      {/* API Setup Guide Modal */}
-      <ApiSetupGuide
-        isOpen={showApiSetup}
-        onClose={handleApiSetupClose}
-        onSetupComplete={handleApiSetupComplete}
-      />
-
       {/* How to Use Guide Modal */}
       <HowToUse
         isOpen={showHowToUse}
         onClose={() => setShowHowToUse(false)}
-        onOpenApiSetup={handleOpenApiSetup}
+        onOpenApiSetup={() => {}}
       />
 
       {/* Composio Integration Modal */}
@@ -186,21 +146,6 @@ function App() {
             
             <div className="flex items-center gap-2">
               <Tooltip 
-                content={globalRealMode ? 
-                  "Live Mode: Real AI execution with your APIs. Click to manage settings." :
-                  "Demo Mode: Safe simulation for exploring features. Click to configure APIs."
-                }
-                position="bottom"
-              >
-                <button
-                  onClick={handleOpenApiSetup}
-                  className="p-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300 group"
-                >
-                  <Settings className="h-4 w-4 group-hover:rotate-45 transition-transform duration-300" />
-                </button>
-              </Tooltip>
-
-              <Tooltip 
                 content="Switch between Demo and Live modes"
                 position="bottom"
               >
@@ -268,7 +213,7 @@ function App() {
         <InteractiveGoalExplorer 
           realMode={globalRealMode}
           onModeToggle={handleModeToggle}
-          onOpenApiSetup={handleOpenApiSetup}
+          onOpenApiSetup={() => {}}
         />
       </section>
 
