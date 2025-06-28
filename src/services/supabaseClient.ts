@@ -1,11 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import { apiConfig } from '../config/apiConfig';
 
-// Initialize Supabase client
-export const supabase = createClient(
-  apiConfig.supabase.url || '',
-  apiConfig.supabase.anonKey || ''
-);
+// Initialize Supabase client only if properly configured
+export const supabase = apiConfig.supabase.isConfigured 
+  ? createClient(apiConfig.supabase.url, apiConfig.supabase.anonKey)
+  : null;
 
 // Database table interfaces based on your schema
 export interface Contact {
@@ -89,11 +88,20 @@ export interface Customer {
   lifecycle?: any;
 }
 
+// Helper function to check if Supabase is available
+const checkSupabaseAvailable = () => {
+  if (!supabase) {
+    throw new Error('Supabase is not configured. Please set up VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.');
+  }
+  return supabase;
+};
+
 // Supabase service functions
 export const supabaseService = {
   // Contact operations
   async createContact(contact: Partial<Contact>) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('contacts')
       .insert(contact)
       .select()
@@ -104,7 +112,8 @@ export const supabaseService = {
   },
 
   async getContacts(customerId: string) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('contacts')
       .select('*')
       .eq('customer_id', customerId)
@@ -115,7 +124,8 @@ export const supabaseService = {
   },
 
   async updateContact(id: string, updates: Partial<Contact>) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('contacts')
       .update(updates)
       .eq('id', id)
@@ -128,7 +138,8 @@ export const supabaseService = {
 
   // Deal operations
   async createDeal(deal: Partial<Deal>) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('deals')
       .insert(deal)
       .select()
@@ -139,7 +150,8 @@ export const supabaseService = {
   },
 
   async getDeals(customerId: string) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('deals')
       .select(`
         *,
@@ -153,7 +165,8 @@ export const supabaseService = {
   },
 
   async updateDeal(id: string, updates: Partial<Deal>) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('deals')
       .update(updates)
       .eq('id', id)
@@ -166,7 +179,8 @@ export const supabaseService = {
 
   // Customer operations
   async createCustomer(customer: Partial<Customer>) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('customers')
       .insert(customer)
       .select()
@@ -177,7 +191,8 @@ export const supabaseService = {
   },
 
   async getCustomer(id: string) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('customers')
       .select('*')
       .eq('id', id)
@@ -197,7 +212,8 @@ export const supabaseService = {
     deal_id?: string;
     metadata?: any;
   }) {
-    const { data, error } = await supabase
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client
       .from('sales_activities')
       .insert({
         ...activity,
@@ -214,7 +230,8 @@ export const supabaseService = {
 
   // Real-time subscriptions
   subscribeToContacts(customerId: string, callback: (payload: any) => void) {
-    return supabase
+    const client = checkSupabaseAvailable();
+    return client
       .channel(`contacts:${customerId}`)
       .on(
         'postgres_changes',
@@ -230,7 +247,8 @@ export const supabaseService = {
   },
 
   subscribeToDeals(customerId: string, callback: (payload: any) => void) {
-    return supabase
+    const client = checkSupabaseAvailable();
+    return client
       .channel(`deals:${customerId}`)
       .on(
         'postgres_changes',
@@ -248,6 +266,10 @@ export const supabaseService = {
   // Connection test
   async testConnection() {
     try {
+      if (!supabase) {
+        return false;
+      }
+      
       const { data, error } = await supabase
         .from('customers')
         .select('count')
@@ -259,6 +281,11 @@ export const supabaseService = {
       console.error('Supabase connection test failed:', error);
       return false;
     }
+  },
+
+  // Check if Supabase is available
+  isAvailable() {
+    return !!supabase;
   }
 };
 
