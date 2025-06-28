@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { Goal } from '../types/goals';
 import LiveGoalExecution from './LiveGoalExecution';
-import { X, Maximize2, Minimize2 } from 'lucide-react';
+import { X, Maximize2, Minimize2, HelpCircle, AlertTriangle } from 'lucide-react';
+import Tooltip from './Tooltip';
 
 interface GoalExecutionModalProps {
   goal: Goal | null;
@@ -72,7 +73,13 @@ const GoalExecutionModal: React.FC<GoalExecutionModalProps> = ({
                 <Maximize2 className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">{goal.title}</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-white">{goal.title}</h1>
+                  <Tooltip 
+                    content="Watch AI agents work together to execute this goal in real-time"
+                    position="top"
+                  />
+                </div>
                 <p className="text-gray-300 text-sm">Watch AI agents work in real-time</p>
               </div>
             </div>
@@ -82,6 +89,10 @@ const GoalExecutionModal: React.FC<GoalExecutionModalProps> = ({
                 <div className="flex items-center gap-2 bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30">
                   <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
                   <span className="text-red-300 font-medium text-xs">LIVE MODE</span>
+                  <Tooltip 
+                    content="Live Mode: Real AI execution with your APIs. Actions will affect your actual business tools."
+                    position="left"
+                  />
                 </div>
               )}
               

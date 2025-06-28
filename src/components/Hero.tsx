@@ -35,10 +35,12 @@ import {
   Database,
   Presentation,
   AlertTriangle,
-  Info
+  Info,
+  HelpCircle
 } from 'lucide-react';
 import { executeAgentWithTools, composioToolPickerOptions, composioAuthMap } from '../agents/useOpenAIAgentSuite';
 import ModeToggle from './ModeToggle';
+import Tooltip from './Tooltip';
 
 interface Message {
   id: string;
@@ -174,6 +176,7 @@ const Hero = () => {
   const [connectedTools, setConnectedTools] = useState<ConnectedTool[]>([]);
   const [showToolPicker, setShowToolPicker] = useState(false);
   const [realMode, setRealMode] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -255,6 +258,19 @@ const Hero = () => {
       })));
     }, 8000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Show tooltip for new users
+  useEffect(() => {
+    if (!localStorage.getItem('console-tooltip-seen')) {
+      setTimeout(() => {
+        setShowTooltip(true);
+        setTimeout(() => {
+          setShowTooltip(false);
+          localStorage.setItem('console-tooltip-seen', 'true');
+        }, 8000);
+      }, 3000);
+    }
   }, []);
 
   const scrollToBottom = () => {
@@ -537,6 +553,13 @@ const Hero = () => {
                   }`}>
                     {realMode ? '🔴 LIVE MODE' : '🔵 DEMO MODE'}
                   </span>
+                  <Tooltip 
+                    content={realMode ? 
+                      "Live Mode: Real AI execution with your APIs. Use carefully!" : 
+                      "Demo Mode: Safe simulation for exploring features"
+                    }
+                    position="top"
+                  />
                 </div>
                 <button
                   onClick={() => setRealMode(!realMode)}
@@ -560,7 +583,7 @@ const Hero = () => {
             </div>
 
             {/* Compact Interactive Console */}
-            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 h-96 flex flex-col">
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 h-96 flex flex-col relative">
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
@@ -568,6 +591,10 @@ const Hero = () => {
                   <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                 </div>
                 <span className="text-white font-semibold">AI Agent Console</span>
+                <Tooltip 
+                  content="Interact with AI agents using natural language. Try typing or using voice commands."
+                  position="top"
+                />
                 <div className="ml-auto flex items-center gap-2">
                   <Activity className="h-4 w-4 text-green-400 animate-pulse" />
                   <span className="text-sm text-green-400">Live</span>
@@ -645,7 +672,7 @@ const Hero = () => {
               </div>
 
               {/* Compact Input */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 relative">
                 <div className="flex-1 relative">
                   <input
                     type="text"
@@ -677,6 +704,28 @@ const Hero = () => {
                 >
                   <Send className="h-5 w-5" />
                 </button>
+
+                {/* Interactive Tooltip for New Users */}
+                {showTooltip && (
+                  <div className="absolute -top-24 right-0 bg-blue-500/20 border border-blue-400/30 rounded-lg p-3 w-64 animate-fadeIn">
+                    <div className="flex items-start gap-2">
+                      <HelpCircle className="h-5 w-5 text-blue-400 flex-shrink-0 mt-1" />
+                      <div>
+                        <p className="text-blue-300 text-sm">Try typing a command or click the microphone to use voice!</p>
+                        <button 
+                          className="text-xs text-blue-400 hover:text-blue-300 mt-2"
+                          onClick={() => {
+                            setShowTooltip(false);
+                            handleTryExample();
+                          }}
+                        >
+                          Try an example →
+                        </button>
+                      </div>
+                    </div>
+                    <div className="absolute bottom-[-8px] right-12 w-4 h-4 bg-blue-500/20 border border-blue-400/30 transform rotate-45"></div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -703,6 +752,13 @@ const Hero = () => {
                   </div>
                   <h3 className="font-semibold text-white mb-2">{feature.title}</h3>
                   <p className="text-sm text-gray-300">{feature.description}</p>
+                  <Tooltip 
+                    content={feature.demo}
+                    position="bottom"
+                    className="mt-2 inline-block"
+                  >
+                    <Info className="h-4 w-4 text-gray-400 hover:text-blue-400 transition-colors" />
+                  </Tooltip>
                 </div>
               );
             })}

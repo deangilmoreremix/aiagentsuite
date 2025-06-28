@@ -3,6 +3,7 @@ import { Goal } from '../types/goals';
 import { runComposioAgent } from '../agents/composioAgentRunner';
 import { executeAgentWithTools } from '../agents/useOpenAIAgentSuite';
 import CRMWorkspace from './CRMWorkspace';
+import Tooltip from './Tooltip';
 import { 
   Play, 
   Pause, 
@@ -27,7 +28,10 @@ import {
   Presentation,
   TrendingUp,
   Award,
-  Lightbulb
+  Lightbulb,
+  Info,
+  AlertTriangle,
+  HelpCircle
 } from 'lucide-react';
 
 interface ExecutionStep {
@@ -71,6 +75,7 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
   const [liveActivity, setLiveActivity] = useState<string[]>([]);
   const [showCRMView, setShowCRMView] = useState(true);
   const [goalResults, setGoalResults] = useState<any>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   // Generate execution steps based on goal and required agents
   useEffect(() => {
@@ -297,6 +302,76 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
 
   return (
     <div className="space-y-8">
+      {/* Help Overlay */}
+      {showHelp && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 max-w-2xl w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <HelpCircle className="h-6 w-6 text-blue-400" />
+                <h3 className="text-xl font-bold text-white">Goal Execution Guide</h3>
+              </div>
+              <button 
+                onClick={() => setShowHelp(false)}
+                className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">Understanding the Execution Flow</h4>
+                <p className="text-gray-300 text-sm">
+                  You're watching AI agents work together to execute a business goal. Each agent specializes in a specific task and passes work to the next agent in the workflow.
+                </p>
+              </div>
+              
+              <div className="bg-slate-700/30 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">What You're Seeing</h4>
+                <ul className="text-gray-300 text-sm space-y-2">
+                  <li>• <strong>Agent Execution Flow:</strong> Step-by-step progress of each agent's work</li>
+                  <li>• <strong>Live Activity Stream:</strong> Real-time updates from the AI system</li>
+                  <li>• <strong>CRM Workspace:</strong> See how data changes in your CRM</li>
+                  <li>• <strong>Progress Bar:</strong> Overall completion percentage</li>
+                </ul>
+              </div>
+              
+              <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">Demo vs. Live Mode</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="font-medium text-blue-300 mb-1">🔵 Demo Mode</div>
+                    <p className="text-gray-300">Simulated responses for safe exploration. No real actions performed.</p>
+                  </div>
+                  <div>
+                    <div className="font-medium text-red-300 mb-1">🔴 Live Mode</div>
+                    <p className="text-gray-300">Real API execution with actual business impact. Requires API setup.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">Tips for Best Results</h4>
+                <ul className="text-gray-300 text-sm space-y-1">
+                  <li>• Watch the entire execution to understand the workflow</li>
+                  <li>• Toggle between agent flow and CRM view to see both perspectives</li>
+                  <li>• Check the success metrics at the end to measure impact</li>
+                  <li>• In Live Mode, ensure all required APIs are properly configured</li>
+                </ul>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setShowHelp(false)}
+              className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Execution Header */}
       <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-8">
         <div className="flex items-center justify-between mb-6">
@@ -308,7 +383,19 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
               )}
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-white">{goal.title}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-3xl font-bold text-white">{goal.title}</h2>
+                <Tooltip 
+                  content={`${goal.complexity} complexity, ${goal.priority} priority goal`}
+                  position="top"
+                />
+                <button
+                  onClick={() => setShowHelp(true)}
+                  className="p-1 rounded-full bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 hover:text-blue-300 transition-colors"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                </button>
+              </div>
               <p className="text-gray-300 text-lg">{goal.description}</p>
             </div>
           </div>
@@ -316,6 +403,27 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
           <div className="text-right">
             <div className="text-4xl font-bold text-blue-400 mb-1">{Math.round(overallProgress)}%</div>
             <div className="text-sm text-gray-400">Complete</div>
+          </div>
+        </div>
+
+        {/* Mode Indicator */}
+        <div className="mb-4">
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
+            realMode 
+              ? 'bg-red-500/20 border border-red-400/30 text-red-300' 
+              : 'bg-blue-500/20 border border-blue-400/30 text-blue-300'
+          }`}>
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{
+              backgroundColor: realMode ? '#f87171' : '#60a5fa'
+            }}></div>
+            <span className="font-medium">{realMode ? 'Live Mode' : 'Demo Mode'}</span>
+            <Tooltip 
+              content={realMode ? 
+                "Real AI agents are executing actual business actions with your configured APIs." :
+                "Simulated AI responses for safe exploration. No real actions are performed."
+              }
+              position="right"
+            />
           </div>
         </div>
 
@@ -400,6 +508,20 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
             </span>
           </button>
         </div>
+
+        {/* Mode-specific information */}
+        {realMode && (
+          <div className="mt-4 p-3 bg-red-500/10 border border-red-400/30 rounded-lg">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-400" />
+              <span className="text-red-300 text-sm font-medium">Live Mode Active</span>
+            </div>
+            <p className="text-red-200 text-xs">
+              AI agents are performing real actions in your connected business tools. These actions may include sending emails, 
+              creating calendar events, or updating CRM records.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Two-Panel Layout: Execution Flow + CRM Workspace */}
@@ -411,6 +533,10 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
             <div className="flex items-center gap-3 mb-6">
               <GitBranch className="h-6 w-6 text-purple-400" />
               <h3 className="text-xl font-semibold text-white">Agent Execution Flow</h3>
+              <Tooltip 
+                content="Watch AI agents collaborate to execute your goal step-by-step"
+                position="top"
+              />
               <div className="ml-auto flex items-center gap-2">
                 <Network className="h-5 w-5 text-green-400" />
                 <span className="text-sm text-green-400">
@@ -446,7 +572,13 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
                     {/* Step Content */}
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-white">{step.agentName}</h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-white">{step.agentName}</h4>
+                          <Tooltip 
+                            content={`${step.agentName} specializes in ${step.action.toLowerCase()}`}
+                            position="top"
+                          />
+                        </div>
                         <div className="flex items-center gap-2">
                           {step.status === 'running' && (
                             <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full animate-pulse">
@@ -521,6 +653,10 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
             <div className="flex items-center gap-3 mb-6">
               <Activity className="h-6 w-6 text-orange-400" />
               <h3 className="text-xl font-semibold text-white">Live Activity Stream</h3>
+              <Tooltip 
+                content="Real-time updates from the AI agent network"
+                position="top"
+              />
             </div>
 
             <div className="space-y-2 max-h-64 overflow-y-auto">

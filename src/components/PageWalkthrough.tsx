@@ -16,7 +16,12 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowLeftIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  Settings,
+  AlertTriangle,
+  Info,
+  Brain,
+  MessageSquare
 } from 'lucide-react';
 
 interface WalkthroughStep {
@@ -29,103 +34,138 @@ interface WalkthroughStep {
   highlight?: boolean;
   actionText?: string;
   offset?: { x: number; y: number };
+  tip?: string;
+  warning?: string;
 }
 
 interface PageWalkthroughProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
+  onOpenApiSetup?: () => void;
 }
 
 const walkthroughSteps: WalkthroughStep[] = [
   {
     id: 'welcome',
     title: 'Welcome to AI Goal Explorer! 🚀',
-    description: 'This interactive page lets you discover, select, and execute business goals using AI agents. Let me show you around!',
+    description: 'This interactive page lets you discover, select, and execute business goals using AI agents. You can experience it in two different modes - let me explain the difference!',
     targetSelector: '[data-walkthrough="header"]',
     position: 'bottom',
     icon: Sparkles,
     highlight: true,
     actionText: 'Start Tour',
-    offset: { x: 0, y: 20 }
+    offset: { x: 0, y: 20 },
+    tip: 'This tour will guide you through all the key features. You can restart it anytime by clicking the "?" button.'
+  },
+  {
+    id: 'mode-explanation',
+    title: 'Two Modes: Demo vs Live 🔄',
+    description: 'SmartCRM operates in two distinct modes. Demo Mode shows simulated AI responses (safe to explore), while Live Mode executes real actions with your APIs (requires setup).',
+    targetSelector: '[data-walkthrough="mode-toggle"]',
+    position: 'left',
+    icon: Brain,
+    highlight: true,
+    offset: { x: -20, y: 0 },
+    tip: 'Always start with Demo Mode to understand how everything works before switching to Live Mode.',
+    warning: 'Live Mode performs real actions - only enable after setting up your API keys!'
   },
   {
     id: 'live-dashboard',
     title: 'Live System Dashboard 📊',
-    description: 'Watch real-time metrics as AI agents work on your goals. See active executions, completed goals, and business value generated.',
+    description: 'Watch real-time metrics as AI agents work on your goals. Track active executions, completed goals, business value generated, and agent activity across your entire system.',
     targetSelector: '[data-walkthrough="dashboard"]',
     position: 'bottom',
     icon: Target,
     highlight: true,
-    offset: { x: 0, y: 20 }
+    offset: { x: 0, y: 20 },
+    tip: 'These metrics update in real-time as you execute goals. In Live Mode, these represent actual business results!'
   },
   {
     id: 'search-filters',
     title: 'Smart Goal Discovery 🔍',
-    description: 'Use the search bar and filters to find goals that match your business needs. Filter by category, priority, or complexity.',
+    description: 'Use the search bar and filters to find goals that match your business needs. Filter by category (Sales, Marketing, etc.), priority level, or complexity to find the perfect automation.',
     targetSelector: '[data-walkthrough="filters"]',
     position: 'bottom',
     icon: Lightbulb,
     highlight: true,
-    offset: { x: 0, y: 20 }
+    offset: { x: 0, y: 20 },
+    tip: 'Start with "High Priority" + "Simple" complexity for quick wins!'
   },
   {
     id: 'goal-cards',
     title: 'Interactive Goal Cards ⚡',
-    description: 'Each goal card shows business impact, required agents, and setup time. Hover to see live metrics and click to execute!',
+    description: 'Each goal card shows business impact, required agents, and setup time. Hover to see live metrics like estimated value and success probability. Each card is a complete automation workflow.',
     targetSelector: '[data-walkthrough="goal-card"]:first-child',
     position: 'right',
     icon: Zap,
     highlight: true,
-    offset: { x: 20, y: 0 }
+    offset: { x: 20, y: 0 },
+    tip: 'Try hovering over this goal card to see additional metrics and details appear!'
   },
   {
     id: 'execution-demo',
-    title: 'Live Goal Execution 🤖',
-    description: 'Click "Start Interactive Demo" to watch AI agents work in real-time on a live CRM interface. See step-by-step progress!',
+    title: 'Goal Execution Experience 🤖',
+    description: 'Click "Start Interactive Demo" to watch AI agents work step-by-step on a live CRM interface. In Demo Mode, you\'ll see simulated responses. In Live Mode, real actions are performed!',
     targetSelector: '[data-walkthrough="goal-card"]:first-child button',
     position: 'top',
     icon: Bot,
     highlight: true,
-    offset: { x: 0, y: -20 }
+    offset: { x: 0, y: -20 },
+    tip: 'This opens a full-screen execution modal where you can watch agents collaborate in real-time.'
+  },
+  {
+    id: 'ai-console-intro',
+    title: 'AI Console & Voice Interaction 💬',
+    description: 'The AI console in the header lets you interact with agents using natural language - either by typing or speaking. Try commands like "Create contact for John Smith" or "Schedule demo for Friday".',
+    targetSelector: '.hero input[type="text"]',
+    position: 'bottom',
+    icon: MessageSquare,
+    highlight: true,
+    offset: { x: 0, y: 20 },
+    tip: 'You can use voice commands by clicking the microphone icon! The AI understands natural speech patterns.'
   },
   {
     id: 'quick-actions',
     title: 'Smart Quick Actions 🎯',
-    description: 'Execute multiple goals at once with pre-built strategies. Choose high priority, quick wins, or sales-focused batches.',
+    description: 'Execute multiple goals at once with pre-built strategies. Choose "High Priority" for maximum impact, "Quick Wins" for fast results, or "Sales Focus" for revenue generation.',
     targetSelector: '[data-walkthrough="quick-actions"]',
     position: 'top',
     icon: Star,
     highlight: true,
-    offset: { x: 0, y: -20 }
+    offset: { x: 0, y: -20 },
+    tip: 'These batch actions let you automate entire workflows with a single click!'
   },
   {
-    id: 'mode-toggle',
-    title: 'Demo vs Live Mode 🔴',
-    description: 'Switch between Demo Mode (safe simulation) and Live Mode (real AI execution with your tools and APIs).',
+    id: 'api-setup',
+    title: 'Live Mode Setup 🔴',
+    description: 'To use Live Mode, you\'ll need to configure API keys for OpenAI (required), Composio (tool integrations), and optionally ElevenLabs (voice). Click "Settings" next to the mode toggle to begin setup.',
     targetSelector: '[data-walkthrough="mode-toggle"]',
     position: 'left',
-    icon: Eye,
+    icon: Settings,
     highlight: true,
-    offset: { x: -20, y: 0 }
+    offset: { x: -20, y: 0 },
+    warning: 'Only set up Live Mode when you\'re ready for real AI execution in your business tools!'
   },
   {
     id: 'complete',
     title: 'You\'re Ready to Go! 🎉',
-    description: 'Start by selecting a goal that matches your business needs, then watch AI agents execute it in real-time. Welcome to the future of business automation!',
+    description: 'Start by selecting a goal that matches your business needs, then watch AI agents execute it in real-time. Remember: Demo Mode for safe exploration, Live Mode for actual business automation!',
     targetSelector: '[data-walkthrough="goal-cards"]',
     position: 'top',
     icon: CheckCircle,
     highlight: true,
     actionText: 'Start Exploring',
-    offset: { x: 0, y: -20 }
+    offset: { x: 0, y: -20 },
+    tip: 'Pro tip: Begin with "Score and prioritize leads" - it\'s simple but provides immediate value!'
   }
 ];
 
 const PageWalkthrough: React.FC<PageWalkthroughProps> = ({
   isOpen,
   onClose,
-  onComplete
+  onComplete,
+  onOpenApiSetup
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
@@ -441,6 +481,27 @@ const PageWalkthrough: React.FC<PageWalkthroughProps> = ({
             {/* Description */}
             <p className="text-gray-300 mb-6 leading-relaxed">{step.description}</p>
 
+            {/* Warning or Tip */}
+            {step.warning && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-400/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-400" />
+                  <span className="text-red-300 text-sm font-medium">Warning:</span>
+                </div>
+                <p className="text-red-200 text-sm mt-1">{step.warning}</p>
+              </div>
+            )}
+
+            {step.tip && (
+              <div className="mb-4 p-3 bg-blue-500/10 border border-blue-400/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-blue-400" />
+                  <span className="text-blue-300 text-sm font-medium">Pro Tip:</span>
+                </div>
+                <p className="text-blue-200 text-sm mt-1">{step.tip}</p>
+              </div>
+            )}
+
             {/* Enhanced Progress Bar */}
             <div className="mb-6">
               <div className="w-full bg-slate-700/50 rounded-full h-3 relative overflow-hidden">
@@ -480,6 +541,20 @@ const PageWalkthrough: React.FC<PageWalkthroughProps> = ({
                   Skip Tour
                 </button>
                 
+                {/* Special action for API setup step */}
+                {step.id === 'api-setup' && onOpenApiSetup && (
+                  <button
+                    onClick={() => {
+                      onOpenApiSetup();
+                      onClose();
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-all duration-300"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Open Setup
+                  </button>
+                )}
+                
                 <button
                   onClick={nextStep}
                   disabled={isTransitioning}
@@ -492,16 +567,17 @@ const PageWalkthrough: React.FC<PageWalkthroughProps> = ({
               </div>
             </div>
 
-            {/* Context-specific tips */}
-            {isFirstStep && (
-              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-400/30 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 text-sm font-medium">Pro Tip:</span>
+            {/* Special mode explanation for mode steps */}
+            {step.id === 'mode-explanation' && (
+              <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                <div className="p-2 bg-blue-500/10 border border-blue-400/30 rounded">
+                  <div className="font-medium text-blue-300 mb-1">🔵 Demo Mode</div>
+                  <div className="text-blue-200">Safe simulation - perfect for learning</div>
                 </div>
-                <p className="text-blue-200 text-sm mt-1">
-                  You can restart this tour anytime by clicking the "?" button in the top right corner.
-                </p>
+                <div className="p-2 bg-red-500/10 border border-red-400/30 rounded">
+                  <div className="font-medium text-red-300 mb-1">🔴 Live Mode</div>
+                  <div className="text-red-200">Real execution - requires API setup</div>
+                </div>
               </div>
             )}
 
@@ -513,31 +589,6 @@ const PageWalkthrough: React.FC<PageWalkthroughProps> = ({
                 </div>
                 <p className="text-green-200 text-sm mt-1">
                   Start with a simple goal to see the magic happen. Every goal shows real business impact!
-                </p>
-              </div>
-            )}
-
-            {/* Special tips for specific steps */}
-            {step.id === 'goal-cards' && (
-              <div className="mt-4 p-3 bg-purple-500/10 border border-purple-400/30 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-purple-400" />
-                  <span className="text-purple-300 text-sm font-medium">Try hovering!</span>
-                </div>
-                <p className="text-purple-200 text-sm mt-1">
-                  Hover over this goal card to see live metrics and additional details appear.
-                </p>
-              </div>
-            )}
-
-            {step.id === 'mode-toggle' && (
-              <div className="mt-4 p-3 bg-red-500/10 border border-red-400/30 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Eye className="h-4 w-4 text-red-400" />
-                  <span className="text-red-300 text-sm font-medium">Live Mode Warning:</span>
-                </div>
-                <p className="text-red-200 text-sm mt-1">
-                  Live Mode executes real actions with your actual tools and APIs. Use Demo Mode for safe testing.
                 </p>
               </div>
             )}

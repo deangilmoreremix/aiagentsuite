@@ -16,9 +16,12 @@ import {
   Settings,
   ExternalLink,
   Sparkles,
-  GitBranch
+  GitBranch,
+  Info,
+  HelpCircle
 } from 'lucide-react';
 import { runComposioAgent } from '../agents/composioAgentRunner';
+import Tooltip from './Tooltip';
 
 interface InteractiveGoalCardProps {
   goal: Goal;
@@ -121,6 +124,10 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
                 {goal.priority} Priority
               </span>
               {getComplexityIcon(goal.complexity)}
+              <Tooltip 
+                content={`${goal.complexity} complexity, ${goal.priority} priority goal`}
+                position="top"
+              />
             </div>
             
             {isExecuting && (
@@ -144,6 +151,10 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
           <div className="text-xs font-medium text-green-400 mb-1 flex items-center gap-2">
             <TrendingUp className="h-3 w-3" />
             Business Impact
+            <Tooltip 
+              content="The measurable business outcome this goal delivers"
+              position="top"
+            />
           </div>
           <div className="text-sm text-gray-300">{goal.businessImpact}</div>
         </div>
@@ -173,6 +184,10 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
           <div className="flex items-center gap-2 mb-2">
             <Users className="h-4 w-4 text-purple-400" />
             <span className="text-xs font-medium text-purple-300">AI Agents Required</span>
+            <Tooltip 
+              content="Specialized AI agents that collaborate to execute this goal"
+              position="top"
+            />
           </div>
           <div className="flex flex-wrap gap-1">
             {goal.agentsRequired.slice(0, 3).map((agent, index) => (
@@ -192,14 +207,30 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
         {/* Tools & ROI */}
         <div className="relative z-10 mb-6 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <div className="text-gray-400 mb-1">Setup Time</div>
+            <div className="text-gray-400 mb-1 flex items-center gap-1">
+              Setup Time
+              <Tooltip 
+                content="Time required to configure this automation"
+                position="top"
+              >
+                <Info className="h-3 w-3 text-gray-500" />
+              </Tooltip>
+            </div>
             <div className="flex items-center gap-1 text-blue-400">
               <Clock className="h-4 w-4" />
               {goal.estimatedSetupTime}
             </div>
           </div>
           <div>
-            <div className="text-gray-400 mb-1">Expected ROI</div>
+            <div className="text-gray-400 mb-1 flex items-center gap-1">
+              Expected ROI
+              <Tooltip 
+                content="Return on investment based on time saved and value generated"
+                position="top"
+              >
+                <Info className="h-3 w-3 text-gray-500" />
+              </Tooltip>
+            </div>
             <div className="text-green-400 font-medium">{goal.roi}</div>
           </div>
         </div>
@@ -279,6 +310,26 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
             <GitBranch className="h-4 w-4 text-gray-400" />
           </div>
         )}
+
+        {/* Mode Indicator for Live Mode */}
+        {realMode && (
+          <div className="absolute top-4 right-4">
+            <div className="flex items-center gap-2 bg-red-500/20 px-2 py-1 rounded-full border border-red-400/30">
+              <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-red-300">Live</span>
+            </div>
+          </div>
+        )}
+
+        {/* Help Button */}
+        <div className="absolute bottom-4 left-4">
+          <Tooltip 
+            content={`${goal.complexity} complexity goal with ${goal.agentsRequired.length} agents. Expected ROI: ${goal.roi}`}
+            position="top"
+            trigger="hover"
+            icon="help"
+          />
+        </div>
       </div>
 
       {/* Expanded Details Panel */}
@@ -286,12 +337,24 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
         <div className="mt-4 p-6 bg-slate-800/80 backdrop-blur-xl rounded-xl border border-slate-700/50 animate-slideDown">
           <div className="space-y-4">
             <div>
-              <h4 className="font-semibold text-white mb-2">Real-World Example</h4>
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                Real-World Example
+                <Tooltip 
+                  content="How this goal works in an actual business scenario"
+                  position="top"
+                />
+              </h4>
               <p className="text-sm text-gray-300">{goal.realWorldExample}</p>
             </div>
 
             <div>
-              <h4 className="font-semibold text-white mb-2">Success Metrics</h4>
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                Success Metrics
+                <Tooltip 
+                  content="Measurable outcomes that indicate successful execution"
+                  position="top"
+                />
+              </h4>
               <div className="grid grid-cols-1 gap-2">
                 {goal.successMetrics.map((metric, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -303,7 +366,13 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
             </div>
 
             <div>
-              <h4 className="font-semibold text-white mb-2">Tools Integration</h4>
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                Tools Integration
+                <Tooltip 
+                  content="Business tools required for this automation"
+                  position="top"
+                />
+              </h4>
               <div className="flex flex-wrap gap-2">
                 {goal.toolsNeeded.map((tool, index) => (
                   <span key={index} className="text-xs bg-slate-600/30 text-gray-400 px-2 py-1 rounded-full">
@@ -312,6 +381,31 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Mode-specific information */}
+            {realMode ? (
+              <div className="p-3 bg-red-500/10 border border-red-400/30 rounded-lg">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertTriangle className="h-4 w-4 text-red-400" />
+                  <span className="text-red-300 text-sm font-medium">Live Mode Warning</span>
+                </div>
+                <p className="text-red-200 text-xs">
+                  This goal will execute real actions using your configured APIs and business tools.
+                  Make sure you've set up the required integrations before proceeding.
+                </p>
+              </div>
+            ) : (
+              <div className="p-3 bg-blue-500/10 border border-blue-400/30 rounded-lg">
+                <div className="flex items-center gap-2 mb-1">
+                  <Info className="h-4 w-4 text-blue-400" />
+                  <span className="text-blue-300 text-sm font-medium">Demo Mode Info</span>
+                </div>
+                <p className="text-blue-200 text-xs">
+                  In Demo Mode, this goal will simulate execution with realistic responses, but no real actions will be performed.
+                  Perfect for exploring how this automation works.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

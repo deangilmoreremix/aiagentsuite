@@ -4,6 +4,8 @@ import { goalCategories, allGoals } from '../data/goalsData';
 import InteractiveGoalCard from './InteractiveGoalCard';
 import GoalExecutionModal from './GoalExecutionModal';
 import PageWalkthrough from './PageWalkthrough';
+import EnhancedModeToggle from './EnhancedModeToggle';
+import Tooltip from './Tooltip';
 import { 
   Target, 
   Filter, 
@@ -23,17 +25,21 @@ import {
   Bot,
   Award,
   Lightbulb,
-  HelpCircle
+  HelpCircle,
+  Settings,
+  Info
 } from 'lucide-react';
 
 interface InteractiveGoalExplorerProps {
   realMode?: boolean;
   onModeToggle?: (mode: boolean) => void;
+  onOpenApiSetup?: () => void;
 }
 
 const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
   realMode = false,
-  onModeToggle
+  onModeToggle,
+  onOpenApiSetup
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
@@ -84,6 +90,14 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
 
       return () => observer.disconnect();
     }
+
+    // Listen for global walkthrough trigger
+    const handleTriggerWalkthrough = () => {
+      setShowWalkthrough(true);
+    };
+
+    document.addEventListener('trigger-walkthrough', handleTriggerWalkthrough);
+    return () => document.removeEventListener('trigger-walkthrough', handleTriggerWalkthrough);
   }, []);
 
   // Filter goals based on selected criteria
@@ -205,14 +219,19 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
             <Brain className="h-10 w-10 text-purple-400" />
           </div>
           
-          {/* Walkthrough Trigger Button */}
-          <button
-            onClick={handleStartWalkthrough}
-            className="absolute top-0 right-0 p-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-full text-blue-400 hover:text-blue-300 transition-all duration-300 group"
-            title="Take a guided tour"
+          {/* Enhanced Walkthrough Trigger Button */}
+          <Tooltip 
+            content="Take a guided tour of the Goal Explorer interface"
+            position="bottom"
           >
-            <HelpCircle className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
-          </button>
+            <button
+              onClick={handleStartWalkthrough}
+              className="absolute top-0 right-0 p-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-full text-blue-400 hover:text-blue-300 transition-all duration-300 group"
+              title="Take a guided tour"
+            >
+              <HelpCircle className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
+            </button>
+          </Tooltip>
         </div>
         
         <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
@@ -235,6 +254,10 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
               <Network className="h-8 w-8 text-blue-400" />
               <h2 className="text-2xl font-bold text-white">Live System Dashboard</h2>
               <Activity className="h-6 w-6 text-green-400 animate-pulse" />
+              <Tooltip 
+                content="Real-time metrics showing system activity and business impact"
+                position="top"
+              />
             </div>
 
             <div className="grid md:grid-cols-6 gap-6">
@@ -334,14 +357,23 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
                 ✕
               </button>
             )}
+            <Tooltip 
+              content="Search through all 50+ business goals by keywords, categories, or business impact"
+              position="top"
+              className="absolute right-14 top-1/2 transform -translate-y-1/2"
+            />
           </div>
 
           {/* Enhanced Category Filters */}
           <div>
-            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+            <div className="flex items-center gap-3 mb-4">
               <Filter className="h-5 w-5 text-blue-400" />
-              Goal Categories
-            </h3>
+              <h3 className="text-white font-semibold">Goal Categories</h3>
+              <Tooltip 
+                content="Filter goals by business category to find automations for your specific needs"
+                position="top"
+              />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
               <button
                 onClick={() => setSelectedCategory('all')}
@@ -381,10 +413,14 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
           {/* Enhanced Priority & Complexity Filters */}
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h4 className="text-white font-medium mb-4 flex items-center gap-2">
+              <div className="flex items-center gap-3 mb-4">
                 <TrendingUp className="h-5 w-5 text-red-400" />
-                Priority Level
-              </h4>
+                <h4 className="text-white font-medium">Priority Level</h4>
+                <Tooltip 
+                  content="High priority goals offer maximum business impact and ROI"
+                  position="top"
+                />
+              </div>
               <div className="flex gap-3">
                 {['all', 'High', 'Medium', 'Low'].map(priority => (
                   <button
@@ -408,10 +444,14 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
             </div>
 
             <div>
-              <h4 className="text-white font-medium mb-4 flex items-center gap-2">
+              <div className="flex items-center gap-3 mb-4">
                 <Star className="h-5 w-5 text-purple-400" />
-                Complexity Level
-              </h4>
+                <h4 className="text-white font-medium">Complexity Level</h4>
+                <Tooltip 
+                  content="Simple goals can be set up in minutes, while advanced goals offer more sophisticated automation"
+                  position="top"
+                />
+              </div>
               <div className="flex gap-3">
                 {['all', 'Simple', 'Intermediate', 'Advanced'].map(complexity => (
                   <button
@@ -435,34 +475,66 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
         </div>
       </div>
 
-      {/* Enhanced Results Summary */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-xl p-6 border border-slate-700/50">
-        <div className="text-gray-300">
-          Showing <span className="text-white font-bold text-lg">{filteredGoals.length}</span> of{' '}
-          <span className="text-white font-bold text-lg">{allGoals.length}</span> goals
-          {searchQuery && (
-            <span> matching "<span className="text-blue-400 font-medium">{searchQuery}</span>"</span>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-4" data-walkthrough="mode-toggle">
-          {realMode && (
-            <div className="flex items-center gap-2 bg-red-500/20 px-4 py-2 rounded-full border border-red-400/30">
-              <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
-              <span className="text-red-300 font-medium">Live Mode Active</span>
+      {/* Enhanced Results Summary with Mode Toggle */}
+      <div className="grid lg:grid-cols-3  gap-6">
+        <div className="lg:col-span-2 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-xl p-6 border border-slate-700/50">
+          <div className="flex items-center justify-between">
+            <div className="text-gray-300">
+              Showing <span className="text-white font-bold text-lg">{filteredGoals.length}</span> of{' '}
+              <span className="text-white font-bold text-lg">{allGoals.length}</span> goals
+              {searchQuery && (
+                <span> matching "<span className="text-blue-400 font-medium">{searchQuery}</span>"</span>
+              )}
             </div>
-          )}
-          
-          <button
-            onClick={() => onModeToggle?.(!realMode)}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-              realMode
-                ? 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white'
-                : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
-            }`}
-          >
-            Switch to {realMode ? 'Demo' : 'Live'} Mode
-          </button>
+            
+            <div className="flex items-center gap-2">
+              <Tooltip 
+                content={realMode ? 
+                  "Live Mode is active - AI agents will execute real actions in your business tools" :
+                  "Demo Mode is active - AI responses are simulated for safe exploration"
+                }
+                position="top"
+              >
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
+                  realMode 
+                    ? 'bg-red-500/20 border-red-400/30 text-red-300' 
+                    : 'bg-blue-500/20 border-blue-400/30 text-blue-300'
+                }`}>
+                  <div className="w-3 h-3 rounded-full animate-pulse" style={{
+                    backgroundColor: realMode ? '#f87171' : '#60a5fa'
+                  }}></div>
+                  <span className="font-medium">{realMode ? 'Live Mode' : 'Demo Mode'}</span>
+                </div>
+              </Tooltip>
+              
+              <Tooltip 
+                content="Click to switch between Demo and Live modes"
+                position="top"
+              >
+                <button
+                  onClick={() => onModeToggle?.(!realMode)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
+                    realMode
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-red-600 hover:bg-red-700 text-white'
+                  }`}
+                >
+                  Switch to {realMode ? 'Demo' : 'Live'} Mode
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced Mode Toggle Panel */}
+        <div className="lg:col-span-1" data-walkthrough="mode-toggle">
+          <EnhancedModeToggle 
+            realMode={realMode}
+            onToggle={(mode) => onModeToggle?.(mode)}
+            onOpenApiSetup={() => onOpenApiSetup?.()}
+            size="medium"
+            showFullDetails={false}
+          />
         </div>
       </div>
 
@@ -508,10 +580,14 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
       {/* Enhanced Quick Actions */}
       {filteredGoals.length > 0 && (
         <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-8" data-walkthrough="quick-actions">
-          <h3 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-6">
             <Lightbulb className="h-8 w-8 text-yellow-400" />
-            Smart Quick Actions
-          </h3>
+            <h3 className="text-2xl font-semibold text-white">Smart Quick Actions</h3>
+            <Tooltip 
+              content="Execute multiple goals at once with these pre-built strategies"
+              position="top"
+            />
+          </div>
           
           <div className="grid md:grid-cols-3 gap-6">
             <button
@@ -585,6 +661,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
         isOpen={showWalkthrough}
         onClose={handleWalkthroughClose}
         onComplete={handleWalkthroughComplete}
+        onOpenApiSetup={onOpenApiSetup}
       />
     </div>
   );
