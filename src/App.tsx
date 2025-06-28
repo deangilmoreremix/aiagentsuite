@@ -9,16 +9,18 @@ import ApiSetupGuide from './components/ApiSetupGuide';
 import HowToUse from './components/HowToUse';
 import HowItWorks from './components/HowItWorks';
 import Integrations from './components/Integrations';
+import ComposioIntegrationModal from './components/ComposioIntegrationModal';
 import Pricing from './components/Pricing';
 import Footer from './components/Footer';
 import Tooltip from './components/Tooltip';
 import { getDefaultMode, validateApiSetup, logApiStatus } from './config/apiConfig';
-import { Settings, HelpCircle, Book, Eye } from 'lucide-react';
+import { Settings, HelpCircle, Book, Eye, Globe } from 'lucide-react';
 
 function App() {
   const [globalRealMode, setGlobalRealMode] = useState(false);
   const [showApiSetup, setShowApiSetup] = useState(false);
   const [showHowToUse, setShowHowToUse] = useState(false);
+  const [showComposioModal, setShowComposioModal] = useState(false);
 
   // Initialize with the appropriate mode based on API configuration
   useEffect(() => {
@@ -97,6 +99,10 @@ function App() {
     setShowHowToUse(true);
   };
 
+  const handleOpenComposioModal = () => {
+    setShowComposioModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* API Setup Guide Modal */}
@@ -113,10 +119,28 @@ function App() {
         onOpenApiSetup={handleOpenApiSetup}
       />
 
+      {/* Composio Integration Modal */}
+      <ComposioIntegrationModal
+        isOpen={showComposioModal}
+        onClose={() => setShowComposioModal(false)}
+      />
+
       {/* Enhanced Global Status Header */}
       <div className="fixed top-4 right-4 z-40 flex items-center gap-3">
         {/* Help & Documentation Buttons */}
         <div className="flex items-center gap-2">
+          <Tooltip 
+            content="View all 250+ Composio integrations"
+            position="bottom"
+          >
+            <button
+              onClick={handleOpenComposioModal}
+              className="p-3 rounded-xl bg-purple-500/20 border border-purple-400/30 text-purple-300 hover:text-purple-200 hover:bg-purple-500/30 transition-all duration-300 group"
+            >
+              <Globe className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+            </button>
+          </Tooltip>
+          
           <Tooltip 
             content="Complete guide on how to use SmartCRM AI Agent Suite"
             position="bottom"
@@ -139,7 +163,7 @@ function App() {
                 const event = new CustomEvent('trigger-walkthrough');
                 document.dispatchEvent(event);
               }}
-              className="p-3 rounded-xl bg-purple-500/20 border border-purple-400/30 text-purple-300 hover:text-purple-200 hover:bg-purple-500/30 transition-all duration-300 group"
+              className="p-3 rounded-xl bg-green-500/20 border border-green-400/30 text-green-300 hover:text-green-200 hover:bg-green-500/30 transition-all duration-300 group"
             >
               <HelpCircle className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
             </button>
@@ -264,7 +288,7 @@ function App() {
       <HowItWorks />
 
       {/* Tool Integrations */}
-      <Integrations />
+      <Integrations onOpenComposioModal={handleOpenComposioModal} />
 
       {/* Pricing */}
       <Pricing />

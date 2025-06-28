@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Check, ExternalLink } from 'lucide-react';
+import { Check, ExternalLink, Search, Filter, Grid, List, Globe } from 'lucide-react';
+import { composioToolCategories } from '../data/composioToolsData';
+import ComposioIntegrationModal from './ComposioIntegrationModal';
+import Tooltip from './Tooltip';
 
 const integrations = [
   {
@@ -92,6 +95,7 @@ const categories = ['All', 'Email', 'Communication', 'Video', 'Calendar', 'Proje
 
 const Integrations = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showAllIntegrations, setShowAllIntegrations] = useState(false);
 
   const filteredIntegrations = selectedCategory === 'All' 
     ? integrations 
@@ -101,12 +105,21 @@ const Integrations = () => {
     <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-16">
         <h2 className="text-4xl font-bold text-white mb-4">
-          50+ Tool Integrations
+          250+ Tool Integrations
         </h2>
         <p className="text-xl text-gray-300 max-w-3xl mx-auto">
           Your agents work across your entire tech stack. One-click OAuth setup 
           connects to all your favorite business tools.
         </p>
+        
+        {/* View All Integrations Button */}
+        <button
+          onClick={() => setShowAllIntegrations(true)}
+          className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300"
+        >
+          <Globe className="h-5 w-5" />
+          Explore All 250+ Integrations
+        </button>
       </div>
 
       {/* Category Filter */}
@@ -173,6 +186,7 @@ const Integrations = () => {
                   : 'bg-gray-600/20 text-gray-400 border border-gray-500/30 cursor-not-allowed'
               }`}
               disabled={integration.status !== 'active'}
+              onClick={() => setShowAllIntegrations(true)}
             >
               {integration.status === 'active' ? (
                 <span className="flex items-center justify-center gap-2">
@@ -185,6 +199,21 @@ const Integrations = () => {
             </button>
           </div>
         ))}
+      </div>
+
+      {/* View All Integrations Button */}
+      <div className="mt-12 text-center">
+        <button
+          onClick={() => setShowAllIntegrations(true)}
+          className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300"
+        >
+          <Globe className="h-5 w-5" />
+          View All 250+ Integrations
+          <Tooltip 
+            content="Browse our complete catalog of tool integrations by category"
+            position="top"
+          />
+        </button>
       </div>
 
       {/* OAuth Setup Info */}
@@ -214,6 +243,12 @@ const Integrations = () => {
           </div>
         </div>
       </div>
+
+      {/* Composio Integration Modal */}
+      <ComposioIntegrationModal 
+        isOpen={showAllIntegrations} 
+        onClose={() => setShowAllIntegrations(false)}
+      />
     </section>
   );
 };
