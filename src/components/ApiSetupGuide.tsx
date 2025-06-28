@@ -15,7 +15,8 @@ import {
   HelpCircle,
   Shield,
   Database,
-  Globe
+  Globe,
+  Brain
 } from 'lucide-react';
 import { apiConfig, validateApiSetup, logApiStatus } from '../config/apiConfig';
 import { realApiService } from '../services/realApiService';
@@ -67,7 +68,7 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
     {
       name: 'OpenAI',
       key: 'VITE_OPENAI_API_KEY',
-      description: 'Required for AI agent intelligence and natural language processing',
+      description: 'Powers AI agent intelligence with GPT-4 or other OpenAI models',
       setupUrl: 'https://platform.openai.com/api-keys',
       isConfigured: apiConfig.openai.isConfigured,
       currentValue: apiConfig.openai.apiKey,
@@ -78,7 +79,23 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
         'Create a new secret key',
         'Copy and paste it into your .env file'
       ],
-      helpText: 'This is the core API that powers all AI agent intelligence. Without this, Live Mode cannot function.'
+      helpText: 'OpenAI provides powerful LLM capabilities for AI agents. You need either OpenAI or Gemini for Live Mode.'
+    },
+    {
+      name: 'Gemini',
+      key: 'VITE_GEMINI_API_KEY',
+      description: 'Alternative LLM provider using Google\'s Gemini models',
+      setupUrl: 'https://aistudio.google.com/app/apikey',
+      isConfigured: apiConfig.gemini.isConfigured,
+      currentValue: apiConfig.gemini.apiKey,
+      instructions: [
+        'Go to Google AI Studio',
+        'Sign in with your Google account',
+        'Navigate to the API Keys section',
+        'Create a new API key',
+        'Copy and paste it into your .env file'
+      ],
+      helpText: 'Gemini is Google\'s alternative to OpenAI, providing advanced LLM capabilities. You need either OpenAI or Gemini for Live Mode.'
     },
     {
       name: 'Composio',
@@ -222,8 +239,31 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                     />
                   </div>
                   
+                  <div className="bg-slate-800/50 rounded-lg p-3 mt-3">
+                    <div className="text-sm text-blue-300 mb-2 font-medium">Available LLM Providers:</div>
+                    <div className="flex flex-wrap gap-3">
+                      <div className={`px-3 py-1 rounded-full text-xs flex items-center gap-1 ${
+                        validation.hasOpenAI ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-400'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          validation.hasOpenAI ? 'bg-green-400' : 'bg-gray-400'
+                        }`}></div>
+                        OpenAI {validation.hasOpenAI ? 'Connected' : 'Not Configured'}
+                      </div>
+                      
+                      <div className={`px-3 py-1 rounded-full text-xs flex items-center gap-1 ${
+                        validation.hasGemini ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-400'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          validation.hasGemini ? 'bg-green-400' : 'bg-gray-400'
+                        }`}></div>
+                        Gemini {validation.hasGemini ? 'Connected' : 'Not Configured'}
+                      </div>
+                    </div>
+                  </div>
+                  
                   {!validation.isValid && (
-                    <div className="space-y-1">
+                    <div className="space-y-1 mt-3">
                       {validation.issues.map((issue, index) => (
                         <div key={index} className="text-red-200 text-sm">• {issue}</div>
                       ))}
@@ -231,7 +271,7 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                   )}
                   
                   {validation.isValid && (
-                    <div className="text-green-200 text-sm">
+                    <div className="text-green-200 text-sm mt-3">
                       Your app is ready to use real AI agents! Switch to Live Mode to start executing with real APIs.
                     </div>
                   )}
@@ -320,6 +360,20 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                         </ol>
                       </div>
 
+                      {/* LLM Provider Info for Gemini */}
+                      {service.name === 'Gemini' && (
+                        <div className="mt-4 p-3 bg-purple-500/10 border border-purple-400/30 rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Brain className="h-4 w-4 text-purple-400" />
+                            <span className="font-medium text-purple-300 text-sm">New Alternative to OpenAI</span>
+                          </div>
+                          <p className="text-purple-200 text-xs">
+                            Gemini is Google's alternative to OpenAI's models. You can use either Gemini or OpenAI for your 
+                            AI agent intelligence - only one LLM provider is required. Each has different strengths and pricing.
+                          </p>
+                        </div>
+                      )}
+
                       {/* Test Connection */}
                       {service.isConfigured && (
                         <div className="mt-4 pt-4 border-t border-slate-700">
@@ -383,18 +437,22 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                   
                   <div className="space-y-4">
                     <div className="bg-slate-700/30 rounded-lg p-4">
-                      <h4 className="font-semibold text-white mb-2">What's the difference between Demo and Live Mode?</h4>
+                      <h4 className="font-semibold text-white mb-2">What's the difference between OpenAI and Gemini?</h4>
                       <p className="text-gray-300 text-sm">
-                        <strong>Demo Mode</strong> provides simulated AI responses without making real API calls. It's perfect for exploring the interface safely.
+                        <strong>OpenAI</strong> and <strong>Gemini</strong> are both powerful LLM providers with some key differences:
                         <br /><br />
-                        <strong>Live Mode</strong> uses your configured APIs to execute real actions in your business tools. This requires proper API setup but provides actual business automation.
+                        • <strong>OpenAI</strong> offers GPT-4 and other models with strong tool usage capabilities<br />
+                        • <strong>Gemini</strong> is Google's alternative with strong reasoning abilities<br />
+                        • You only need to configure one of them (not both)<br />
+                        • They have different pricing models and capabilities<br />
+                        • Our system supports seamless switching between them
                       </p>
                     </div>
                     
                     <div className="bg-slate-700/30 rounded-lg p-4">
                       <h4 className="font-semibold text-white mb-2">Which API keys are absolutely required?</h4>
                       <p className="text-gray-300 text-sm">
-                        <strong>OpenAI</strong> is the only strictly required API for Live Mode to function. However, for full functionality:
+                        <strong>Either OpenAI or Gemini</strong> is required for Live Mode to function. For full functionality:
                         <br /><br />
                         • <strong>Composio</strong> enables integration with business tools<br />
                         • <strong>ElevenLabs</strong> provides voice capabilities<br />
@@ -405,7 +463,7 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                     <div className="bg-slate-700/30 rounded-lg p-4">
                       <h4 className="font-semibold text-white mb-2">How do I get started with minimal setup?</h4>
                       <p className="text-gray-300 text-sm">
-                        1. Start with <strong>OpenAI API key</strong> only - this enables basic Live Mode<br />
+                        1. Start with <strong>either OpenAI or Gemini API key</strong> only - this enables basic Live Mode<br />
                         2. Begin with simple goals like "Score and prioritize leads"<br />
                         3. Add more API integrations as you get comfortable<br />
                         4. Gradually move to more complex goals
@@ -441,10 +499,10 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                     <div className="bg-slate-700/30 rounded-lg p-4">
                       <h4 className="font-semibold text-white mb-2">Rate Limit Errors</h4>
                       <ul className="text-gray-300 text-sm space-y-2">
-                        <li>• OpenAI has rate limits based on your account tier</li>
+                        <li>• Both OpenAI and Gemini have rate limits based on your account tier</li>
                         <li>• Avoid executing multiple complex goals simultaneously</li>
                         <li>• Wait a minute before retrying if you hit a rate limit</li>
-                        <li>• Consider upgrading your OpenAI plan for higher limits</li>
+                        <li>• Consider upgrading your LLM provider plan for higher limits</li>
                       </ul>
                     </div>
                     
@@ -512,18 +570,28 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                   
                   <div className="space-y-4">
                     <div className="bg-slate-700/30 rounded-lg p-4">
-                      <h4 className="font-semibold text-white mb-2">OpenAI Data Usage</h4>
+                      <h4 className="font-semibold text-white mb-2">LLM Provider Data Usage</h4>
                       <p className="text-gray-300 text-sm">
-                        Data sent to OpenAI is subject to their data usage policies. By default, OpenAI may use your data for service improvement. If this is a concern, you can request data opt-out through OpenAI's platform.
+                        Data sent to OpenAI or Gemini is subject to their respective data usage policies. By default, these providers may use your data for service improvement. If this is a concern, you can request data opt-out through their respective platforms.
                       </p>
-                      <a 
-                        href="https://platform.openai.com/docs/data-usage-policies" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 text-sm inline-flex items-center gap-1 mt-2"
-                      >
-                        OpenAI Data Usage Policies <ExternalLink className="h-3 w-3" />
-                      </a>
+                      <div className="flex gap-4 mt-2">
+                        <a 
+                          href="https://platform.openai.com/docs/data-usage-policies" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 text-sm inline-flex items-center gap-1"
+                        >
+                          OpenAI Policies <ExternalLink className="h-3 w-3" />
+                        </a>
+                        <a 
+                          href="https://ai.google.dev/docs/safety_guidance" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-purple-400 hover:text-purple-300 text-sm inline-flex items-center gap-1"
+                        >
+                          Gemini Policies <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
                     </div>
                     
                     <div className="bg-slate-700/30 rounded-lg p-4">

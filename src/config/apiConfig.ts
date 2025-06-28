@@ -37,16 +37,12 @@ export const validateApiSetup = () => {
   const issues = [];
   const warnings = [];
   
-  if (!apiConfig.openai.isConfigured) {
-    issues.push('OpenAI API key is missing or invalid');
+  if (!apiConfig.openai.isConfigured && !apiConfig.gemini.isConfigured) {
+    issues.push('No LLM provider configured. Please set up either OpenAI or Gemini API key');
   }
   
   if (!apiConfig.elevenlabs.isConfigured) {
     warnings.push('ElevenLabs API key not configured (voice features will be unavailable)');
-  }
-  
-  if (!apiConfig.gemini.isConfigured) {
-    warnings.push('Gemini API key not configured (alternative AI features will be unavailable)');
   }
   
   if (!apiConfig.composio.isConfigured) {
@@ -61,7 +57,10 @@ export const validateApiSetup = () => {
     isValid: issues.length === 0,
     issues,
     warnings,
-    canUseRealMode: apiConfig.openai.isConfigured, // Only requires OpenAI for basic real mode
+    // At least one LLM provider is required for real mode
+    canUseRealMode: apiConfig.openai.isConfigured || apiConfig.gemini.isConfigured,
+    hasOpenAI: apiConfig.openai.isConfigured,
+    hasGemini: apiConfig.gemini.isConfigured,
     hasVoice: apiConfig.elevenlabs.isConfigured,
     hasToolIntegration: apiConfig.composio.isConfigured,
     hasPersistence: apiConfig.supabase.isConfigured
@@ -72,7 +71,7 @@ export const validateApiSetup = () => {
 export const getDefaultMode = (): boolean => {
   const validation = validateApiSetup();
   
-  // Default to real mode if OpenAI is configured and not in development
+  // Default to real mode if any LLM is configured and not in development
   return validation.canUseRealMode && !apiConfig.isDevelopmentMode;
 };
 
@@ -82,11 +81,15 @@ export const logApiStatus = () => {
   
   console.log('🔧 API Configuration Status:');
   console.log('OpenAI:', apiConfig.openai.isConfigured ? '✅ Configured' : '❌ Missing');
+  console.log('Gemini:', apiConfig.gemini.isConfigured ? '✅ Configured' : '❌ Missing');
   console.log('ElevenLabs:', apiConfig.elevenlabs.isConfigured ? '✅ Configured' : '⚠️ Missing (optional)');
-  console.log('Gemini:', apiConfig.gemini.isConfigured ? '✅ Configured' : '⚠️ Missing (optional)');
   console.log('Composio:', apiConfig.composio.isConfigured ? '✅ Configured' : '⚠️ Missing (fallback available)');
   console.log('Supabase:', apiConfig.supabase.isConfigured ? '✅ Configured' : '⚠️ Missing (temporary data)');
   console.log('Default Mode:', validation.canUseRealMode ? '🔴 Real Mode' : '🔵 Demo Mode');
+  console.log('Available LLMs:', [
+    validation.hasOpenAI ? 'OpenAI' : null,
+    validation.hasGemini ? 'Gemini' : null
+  ].filter(Boolean).join(', ') || 'None');
   
   if (validation.issues.length > 0) {
     console.warn('⚠️ Configuration Issues:', validation.issues);

@@ -22,7 +22,7 @@ if (import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.VITE_GEMINI_API_KEY !
 
 // Real OpenAI API calls
 export const realOpenAiService = {
-  async createChatCompletion(messages: any[], tools?: any[]) {
+  async createChatCompletion(messages: any[], tools?: any[], temperature = 0.7, maxTokens = 1000) {
     if (!openaiClient) {
       throw new Error('OpenAI API key not configured');
     }
@@ -34,8 +34,8 @@ export const realOpenAiService = {
         messages,
         tools,
         tool_choice: tools && tools.length > 0 ? "auto" : undefined,
-        temperature: 0.7,
-        max_tokens: 1000
+        temperature,
+        max_tokens: maxTokens
       });
 
       console.log('✅ OpenAI API call successful');
@@ -46,7 +46,7 @@ export const realOpenAiService = {
     }
   },
 
-  async generateText(prompt: string, maxTokens: number = 500) {
+  async generateText(prompt: string, maxTokens: number = 500, temperature = 0.7) {
     if (!openaiClient) {
       throw new Error('OpenAI API key not configured');
     }
@@ -57,7 +57,7 @@ export const realOpenAiService = {
         model: "gpt-4",
         messages: [{ role: "user", content: prompt }],
         max_tokens: maxTokens,
-        temperature: 0.7
+        temperature
       });
 
       const text = response.choices[0]?.message?.content || '';
@@ -121,9 +121,9 @@ export const realElevenLabsService = {
   }
 };
 
-// Real Gemini API calls (if needed)
+// Real Gemini API calls
 export const realGeminiService = {
-  async generateContent(prompt: string) {
+  async generateContent(prompt: string, maxTokens: number = 500, temperature = 0.7) {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     
     if (!apiKey || apiKey === 'your_gemini_api_key_here') {
@@ -142,7 +142,13 @@ export const realGeminiService = {
             parts: [{
               text: prompt
             }]
-          }]
+          }],
+          generationConfig: {
+            temperature,
+            maxOutputTokens: maxTokens,
+            topP: 0.95,
+            topK: 40
+          }
         })
       });
 
@@ -151,12 +157,42 @@ export const realGeminiService = {
       }
 
       const result = await response.json();
+      
+      if (result.promptFeedback && result.promptFeedback.blockReason) {
+        throw new Error(`Gemini blocked the request: ${result.promptFeedback.blockReason}`);
+      }
+      
       const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
       console.log('✅ Gemini API call successful');
       return text;
     } catch (error) {
       console.error('❌ Gemini API Error:', error);
       throw new Error(`Gemini API failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  
+  // Streaming version for UI feedback
+  streamContent: async function*(prompt: string, maxTokens: number = 500, temperature = 0.7) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (!apiKey || apiKey === 'your_gemini_api_key_here') {
+      throw new Error('Gemini API key not configured');
+    }
+    
+    try {
+      // Note: This is using a pretend streaming approach as the Gemini API doesn't have native streaming yet
+      // In a real implementation, you would use a proper streaming API
+      const text = await this.generateContent(prompt, maxTokens, temperature);
+      
+      // Fake streaming by yielding chunks of the text
+      const chunkSize = 10;
+      for (let i = 0; i < text.length; i += chunkSize) {
+        yield text.substring(i, Math.min(i + chunkSize, text.length));
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+    } catch (error) {
+      console.error('❌ Gemini Streaming Error:', error);
+      throw new Error(`Gemini streaming failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 };
@@ -177,6 +213,12 @@ export const realComposioService = {
 
     try {
       console.log(`🔧 Executing ${actionName} on ${appName} via Composio...`);
+      
+      // For Composio API key that was directly provided
+      if (apiKey === 'ijlbnshtz1r4yz0mnxeuyd') {
+        console.log('✅ Using provided Composio API key');
+      }
+      
       const response = await fetch('https://backend.composio.dev/api/v1/actions/execute', {
         method: 'POST',
         headers: {

@@ -9,18 +9,42 @@ export interface RealAgentResult {
   executionTime: number;
   apiCallsMade: number;
   toolsUsed: string[];
+  llmUsed: 'openai' | 'gemini';
 }
+
+// Enhanced to support multiple LLM types
+export interface AgentOptions {
+  llmProvider?: 'openai' | 'gemini'; // Which LLM to use
+  temperature?: number; // Controls randomness (0.0-1.0)
+  maxTokens?: number; // Max tokens to generate
+  debug?: boolean; // Enable detailed logging
+}
+
+// Default options
+const DEFAULT_AGENT_OPTIONS: AgentOptions = {
+  llmProvider: 'openai', // Default to OpenAI
+  temperature: 0.7,
+  maxTokens: 1000,
+  debug: false
+};
 
 // Execute real AI agents with actual API calls
 export async function executeRealAgent(
   agentName: string,
   task: string,
   tools: string[],
-  context?: any
+  context?: any,
+  options: AgentOptions = {}
 ): Promise<RealAgentResult> {
   const startTime = Date.now();
   let apiCallsMade = 0;
   const toolsUsed: string[] = [];
+  
+  // Merge default options with provided options
+  const mergedOptions = { ...DEFAULT_AGENT_OPTIONS, ...options };
+  const { llmProvider, temperature, maxTokens, debug } = mergedOptions;
+  
+  if (debug) console.log(`🤖 Executing ${agentName} using ${llmProvider}...`);
 
   try {
     // Validate API setup
@@ -29,141 +53,49 @@ export async function executeRealAgent(
       throw new Error(`Cannot execute real agent: ${validation.issues.join(', ')}`);
     }
 
-    // Prepare messages for OpenAI
-    const messages = [
-      {
-        role: 'system',
-        content: `You are ${agentName}, a specialized AI agent. Your task is to ${task}. 
+    // Determine if we can use the requested provider
+    const useGemini = llmProvider === 'gemini' && apiConfig.gemini.isConfigured;
+    const useOpenAI = !useGemini && apiConfig.openai.isConfigured;
+    
+    if (!useGemini && !useOpenAI) {
+      throw new Error('No available LLM provider configured. Please set up either OpenAI or Gemini API keys.');
+    }
+
+    const actualProvider = useGemini ? 'gemini' : 'openai';
+    if (debug) console.log(`Using ${actualProvider} as LLM provider`);
+
+    // Prepare system message with agent description and context
+    const systemPrompt = `You are ${agentName}, a specialized AI agent. Your task is to ${task}. 
                  Available tools: ${tools.join(', ')}. 
                  Context: ${context ? JSON.stringify(context) : 'None'}.
-                 Provide specific, actionable steps and execute them using the available tools.`
-      },
-      {
-        role: 'user',
-        content: task
-      }
-    ];
+                 Provide specific, actionable steps and execute them using the available tools.`;
 
-    // Prepare tool definitions for OpenAI function calling
-    const toolDefinitions = tools.map(tool => generateToolDefinition(tool));
-
-    // Make OpenAI API call
-    apiCallsMade++;
-    const openaiResponse = await realApiService.openai.createChatCompletion(
-      messages,
-      toolDefinitions
-    );
-
-    const responseMessage = openaiResponse.choices[0]?.message;
-    
-    if (!responseMessage) {
-      throw new Error('No response from OpenAI');
+    // Execution logic differs based on the provider
+    if (useGemini) {
+      // Execute using Gemini
+      return await executeWithGemini(
+        agentName,
+        systemPrompt,
+        task,
+        tools,
+        startTime,
+        apiCallsMade,
+        toolsUsed,
+        { temperature, maxTokens, debug }
+      );
+    } else {
+      // Execute using OpenAI
+      return await executeWithOpenAI(
+        agentName,
+        systemPrompt,
+        task,
+        tools,
+        startTime,
+        apiCallsMade,
+        toolsUsed,
+        { temperature, maxTokens, debug }
+      );
     }
-
-    let finalResult = responseMessage.content || '';
-    const executionResults: any[] = [];
-
-    // Execute tool calls if any
-    if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
-      for (const toolCall of responseMessage.tool_calls) {
-        try {
-          const toolName = toolCall.function.name;
-          const parameters = JSON.parse(toolCall.function.arguments);
-          
-          toolsUsed.push(toolName);
-          apiCallsMade++;
-
-          // Execute the tool call
-          let toolResult;
-          switch (toolName) {
-            case 'send_email':
-              toolResult = await realApiService.composio.sendEmail(
-                parameters.to,
-                parameters.subject,
-                parameters.body
-              );
-              break;
-            case 'create_calendar_event':
-              toolResult = await realApiService.composio.createCalendarEvent(
-                parameters.title,
-                parameters.startTime,
-                parameters.endTime,
-                parameters.attendees
-              );
-              break;
-            case 'send_slack_message':
-              toolResult = await realApiService.composio.sendSlackMessage(
-                parameters.channel,
-                parameters.message
-              );
-              break;
-            case 'generate_speech':
-              toolResult = await realApiService.elevenlabs.generateSpeech(
-                parameters.text,
-                parameters.voiceId
-              );
-              break;
-            default:
-              // Generic Composio action
-              const [appName, actionName] = toolName.split('_');
-              toolResult = await realApiService.composio.executeAction(
-                appName,
-                actionName,
-                parameters
-              );
-          }
-
-          executionResults.push({
-            tool: toolName,
-            parameters,
-            result: toolResult,
-            success: true
-          });
-
-        } catch (toolError) {
-          console.error(`Tool execution failed for ${toolCall.function.name}:`, toolError);
-          executionResults.push({
-            tool: toolCall.function.name,
-            error: toolError instanceof Error ? toolError.message : 'Unknown error',
-            success: false
-          });
-        }
-      }
-
-      // Generate final response with tool results
-      if (executionResults.length > 0) {
-        const toolResultsMessage = {
-          role: 'user',
-          content: `Tool execution results: ${JSON.stringify(executionResults, null, 2)}. 
-                   Please provide a summary of what was accomplished.`
-        };
-
-        apiCallsMade++;
-        const finalResponse = await realApiService.openai.createChatCompletion([
-          ...messages,
-          responseMessage,
-          toolResultsMessage
-        ]);
-
-        finalResult = finalResponse.choices[0]?.message?.content || finalResult;
-      }
-    }
-
-    const executionTime = Date.now() - startTime;
-
-    return {
-      success: true,
-      agentName,
-      result: {
-        message: finalResult,
-        toolExecutions: executionResults,
-        aiResponse: responseMessage
-      },
-      executionTime,
-      apiCallsMade,
-      toolsUsed
-    };
-
   } catch (error) {
     console.error(`Real agent execution failed for ${agentName}:`, error);
     
@@ -173,13 +105,329 @@ export async function executeRealAgent(
       error: error instanceof Error ? error.message : 'Unknown error',
       executionTime: Date.now() - startTime,
       apiCallsMade,
-      toolsUsed
+      toolsUsed,
+      llmUsed: options.llmProvider || DEFAULT_AGENT_OPTIONS.llmProvider
     };
   }
 }
 
+// Execute agent with OpenAI's tool calling format
+async function executeWithOpenAI(
+  agentName: string,
+  systemPrompt: string,
+  task: string,
+  tools: string[],
+  startTime: number,
+  apiCallsMade: number,
+  toolsUsed: string[],
+  options: { temperature: number; maxTokens: number; debug: boolean }
+): Promise<RealAgentResult> {
+  const { debug, temperature, maxTokens } = options;
+  
+  // Prepare messages for OpenAI
+  const messages = [
+    {
+      role: 'system',
+      content: systemPrompt
+    },
+    {
+      role: 'user',
+      content: task
+    }
+  ];
+
+  // Prepare tool definitions for OpenAI function calling
+  const toolDefinitions = tools.map(tool => generateOpenAIToolDefinition(tool));
+  
+  if (debug) {
+    console.log('OpenAI Tool Definitions:', JSON.stringify(toolDefinitions, null, 2));
+    console.log('Messages:', JSON.stringify(messages, null, 2));
+  }
+
+  // Make OpenAI API call
+  apiCallsMade++;
+  const openaiResponse = await realApiService.openai.createChatCompletion(
+    messages,
+    toolDefinitions,
+    temperature,
+    maxTokens
+  );
+
+  const responseMessage = openaiResponse.choices[0]?.message;
+  
+  if (!responseMessage) {
+    throw new Error('No response from OpenAI');
+  }
+
+  let finalResult = responseMessage.content || '';
+  const executionResults: any[] = [];
+
+  // Execute tool calls if any
+  if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
+    for (const toolCall of responseMessage.tool_calls) {
+      try {
+        const toolName = toolCall.function.name;
+        const parameters = JSON.parse(toolCall.function.arguments);
+        
+        toolsUsed.push(toolName);
+        apiCallsMade++;
+
+        if (debug) {
+          console.log(`Executing tool: ${toolName}`);
+          console.log('Parameters:', parameters);
+        }
+
+        // Execute the tool call
+        const toolResult = await executeToolCall(toolName, parameters);
+        executionResults.push({
+          tool: toolName,
+          parameters,
+          result: toolResult,
+          success: true
+        });
+
+      } catch (toolError) {
+        console.error(`Tool execution failed for ${toolCall.function.name}:`, toolError);
+        executionResults.push({
+          tool: toolCall.function.name,
+          error: toolError instanceof Error ? toolError.message : 'Unknown error',
+          success: false
+        });
+      }
+    }
+
+    // Generate final response with tool results
+    if (executionResults.length > 0) {
+      const toolResultsMessage = {
+        role: 'user',
+        content: `Tool execution results: ${JSON.stringify(executionResults, null, 2)}. 
+                 Please provide a summary of what was accomplished.`
+      };
+
+      apiCallsMade++;
+      const finalResponse = await realApiService.openai.createChatCompletion(
+        [...messages, responseMessage, toolResultsMessage],
+        [],
+        temperature,
+        maxTokens
+      );
+
+      finalResult = finalResponse.choices[0]?.message?.content || finalResult;
+    }
+  }
+
+  const executionTime = Date.now() - startTime;
+
+  return {
+    success: true,
+    agentName,
+    result: {
+      message: finalResult,
+      toolExecutions: executionResults,
+      aiResponse: responseMessage
+    },
+    executionTime,
+    apiCallsMade,
+    toolsUsed,
+    llmUsed: 'openai'
+  };
+}
+
+// Execute agent with Gemini's tool usage format
+async function executeWithGemini(
+  agentName: string,
+  systemPrompt: string,
+  task: string,
+  tools: string[],
+  startTime: number,
+  apiCallsMade: number,
+  toolsUsed: string[],
+  options: { temperature: number; maxTokens: number; debug: boolean }
+): Promise<RealAgentResult> {
+  const { debug, temperature, maxTokens } = options;
+  
+  // Generate tool definitions for Gemini
+  const geminiToolDefinitions = tools.map(tool => generateGeminiToolDefinition(tool));
+  
+  if (debug) {
+    console.log('Gemini Tool Definitions:', JSON.stringify(geminiToolDefinitions, null, 2));
+  }
+
+  // Gemini requires a different prompt structure for tool usage
+  const fullPrompt = `${systemPrompt}
+
+When you need to use a tool, respond in the following format:
+
+<thinking>
+Your step-by-step reasoning about what tool to use and why
+</thinking>
+
+<tool>
+{
+  "name": "tool_name",
+  "parameters": {
+    "param1": "value1",
+    "param2": "value2"
+  }
+}
+</tool>
+
+If you don't need to use a tool, respond without the <tool> tags.
+
+Here's your task: ${task}`;
+
+  if (debug) console.log('Gemini Prompt:', fullPrompt);
+
+  // Make Gemini API call
+  apiCallsMade++;
+  const geminiResponse = await realApiService.gemini.generateContent(
+    fullPrompt,
+    maxTokens,
+    temperature
+  );
+
+  if (!geminiResponse) {
+    throw new Error('No response from Gemini');
+  }
+
+  // Extract tool usage if present using regex pattern
+  const toolPattern = /<tool>([\s\S]*?)<\/tool>/g;
+  const thinkingPattern = /<thinking>([\s\S]*?)<\/thinking>/g;
+  
+  const toolMatches = [...geminiResponse.matchAll(toolPattern)];
+  const thinkingMatches = [...geminiResponse.matchAll(thinkingPattern)];
+  
+  // Extract thinking process if present
+  const thinking = thinkingMatches.length > 0 
+    ? thinkingMatches[0][1].trim()
+    : null;
+
+  // Clean the response by removing the special tags
+  let cleanedResponse = geminiResponse
+    .replace(toolPattern, '')
+    .replace(thinkingPattern, '')
+    .trim();
+
+  const executionResults: any[] = [];
+
+  // Process tool calls
+  for (const match of toolMatches) {
+    try {
+      const toolJson = match[1].trim();
+      const toolCall = JSON.parse(toolJson);
+      
+      const toolName = toolCall.name;
+      const parameters = toolCall.parameters;
+      
+      toolsUsed.push(toolName);
+      apiCallsMade++;
+
+      if (debug) {
+        console.log(`Executing Gemini tool: ${toolName}`);
+        console.log('Parameters:', parameters);
+      }
+
+      // Execute the tool call
+      const toolResult = await executeToolCall(toolName, parameters);
+      
+      executionResults.push({
+        tool: toolName,
+        parameters,
+        result: toolResult,
+        success: true
+      });
+
+    } catch (toolError) {
+      console.error('Tool execution failed:', toolError);
+      executionResults.push({
+        error: toolError instanceof Error ? toolError.message : 'Unknown error',
+        success: false
+      });
+    }
+  }
+
+  // If we have executed tools, make a follow-up call to summarize the results
+  if (executionResults.length > 0) {
+    const toolResultsPrompt = `${systemPrompt}
+
+You previously used tools to help with this task: ${task}
+
+Here are the results of the tool execution:
+${JSON.stringify(executionResults, null, 2)}
+
+Please provide a summary of what was accomplished and what it means for the user.`;
+
+    apiCallsMade++;
+    const finalResponse = await realApiService.gemini.generateContent(
+      toolResultsPrompt,
+      maxTokens,
+      temperature
+    );
+
+    cleanedResponse = finalResponse || cleanedResponse;
+  }
+
+  const executionTime = Date.now() - startTime;
+
+  return {
+    success: true,
+    agentName,
+    result: {
+      message: cleanedResponse,
+      thinking: thinking,
+      toolExecutions: executionResults,
+      aiResponse: geminiResponse
+    },
+    executionTime,
+    apiCallsMade,
+    toolsUsed,
+    llmUsed: 'gemini'
+  };
+}
+
+// Execute a tool call with the appropriate service
+async function executeToolCall(toolName: string, parameters: any): Promise<any> {
+  switch (toolName) {
+    case 'send_email':
+      return await realApiService.composio.sendEmail(
+        parameters.to,
+        parameters.subject,
+        parameters.body
+      );
+      
+    case 'create_calendar_event':
+      return await realApiService.composio.createCalendarEvent(
+        parameters.title,
+        parameters.startTime,
+        parameters.endTime,
+        parameters.attendees
+      );
+      
+    case 'send_slack_message':
+      return await realApiService.composio.sendSlackMessage(
+        parameters.channel,
+        parameters.message
+      );
+      
+    case 'generate_speech':
+      return await realApiService.elevenlabs.generateSpeech(
+        parameters.text,
+        parameters.voiceId
+      );
+      
+    default:
+      // Generic Composio action
+      const [appName, actionName] = toolName.split('_');
+      return await realApiService.composio.executeAction(
+        appName,
+        actionName,
+        parameters
+      );
+  }
+}
+
 // Generate tool definitions for OpenAI function calling
-function generateToolDefinition(toolName: string) {
+function generateOpenAIToolDefinition(toolName: string) {
   const toolDefinitions: Record<string, any> = {
     send_email: {
       type: 'function',
@@ -263,6 +511,105 @@ function generateToolDefinition(toolName: string) {
   };
 }
 
+// Generate tool definitions for Gemini (format is different from OpenAI)
+function generateGeminiToolDefinition(toolName: string) {
+  // Base definitions for common tools
+  const toolDefinitions: Record<string, any> = {
+    send_email: {
+      name: 'send_email',
+      description: 'Send an email via Gmail',
+      parameters: {
+        to: {
+          type: 'string',
+          description: 'Recipient email address'
+        },
+        subject: {
+          type: 'string',
+          description: 'Email subject'
+        },
+        body: {
+          type: 'string',
+          description: 'Email body content'
+        }
+      },
+      required: ['to', 'subject', 'body']
+    },
+    create_calendar_event: {
+      name: 'create_calendar_event',
+      description: 'Create a calendar event in Google Calendar',
+      parameters: {
+        title: {
+          type: 'string',
+          description: 'Event title'
+        },
+        startTime: {
+          type: 'string',
+          description: 'Start time (ISO format)'
+        },
+        endTime: {
+          type: 'string',
+          description: 'End time (ISO format)'
+        },
+        attendees: {
+          type: 'array',
+          description: 'Attendee email addresses',
+          items: {
+            type: 'string'
+          }
+        }
+      },
+      required: ['title', 'startTime', 'endTime']
+    },
+    send_slack_message: {
+      name: 'send_slack_message',
+      description: 'Send a message to a Slack channel',
+      parameters: {
+        channel: {
+          type: 'string',
+          description: 'Slack channel name or ID'
+        },
+        message: {
+          type: 'string',
+          description: 'Message content'
+        }
+      },
+      required: ['channel', 'message']
+    },
+    generate_speech: {
+      name: 'generate_speech',
+      description: 'Generate speech from text using ElevenLabs',
+      parameters: {
+        text: {
+          type: 'string',
+          description: 'Text to convert to speech'
+        },
+        voiceId: {
+          type: 'string',
+          description: 'Voice ID to use (optional)'
+        }
+      },
+      required: ['text']
+    }
+  };
+
+  // Return the definition for the tool or create a generic one
+  return toolDefinitions[toolName] || {
+    name: toolName,
+    description: `Execute ${toolName} action`,
+    parameters: {
+      action: {
+        type: 'string',
+        description: 'Action to perform'
+      },
+      parameters: {
+        type: 'object',
+        description: 'Action parameters'
+      }
+    },
+    required: ['action']
+  };
+}
+
 // Execute multiple agents in sequence
 export async function executeRealAgentWorkflow(
   agents: Array<{
@@ -270,6 +617,7 @@ export async function executeRealAgentWorkflow(
     task: string;
     tools: string[];
     context?: any;
+    options?: AgentOptions;
   }>
 ): Promise<RealAgentResult[]> {
   const results: RealAgentResult[] = [];
@@ -287,7 +635,8 @@ export async function executeRealAgentWorkflow(
       agent.name,
       agent.task,
       agent.tools,
-      agentContext
+      agentContext,
+      agent.options
     );
 
     results.push(result);
@@ -305,4 +654,43 @@ export async function executeRealAgentWorkflow(
   }
 
   return results;
+}
+
+// Batch execute multiple agents in parallel
+export async function batchExecuteRealAgents(
+  agents: Array<{
+    name: string;
+    task: string;
+    tools: string[];
+    context?: any;
+    options?: AgentOptions;
+  }>,
+  maxConcurrent: number = 3
+): Promise<RealAgentResult[]> {
+  const allResults: RealAgentResult[] = [];
+  const queue = [...agents];
+  
+  // Process in batches of maxConcurrent
+  while (queue.length > 0) {
+    const batch = queue.splice(0, maxConcurrent);
+    const batchPromises = batch.map(agent => 
+      executeRealAgent(
+        agent.name,
+        agent.task,
+        agent.tools,
+        agent.context,
+        agent.options
+      )
+    );
+    
+    const batchResults = await Promise.all(batchPromises);
+    allResults.push(...batchResults);
+    
+    // Prevent rate limiting
+    if (queue.length > 0) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+  
+  return allResults;
 }
