@@ -11,6 +11,7 @@ import Integrations from './components/Integrations';
 import ComposioIntegrationModal from './components/ComposioIntegrationModal';
 import Pricing from './components/Pricing';
 import Footer from './components/Footer';
+import TaskExecutionEntry from './components/TaskExecutionEntry';
 import Tooltip from './components/Tooltip';
 import { getDefaultMode, validateApiSetup, logApiStatus } from './config/apiConfig';
 import { Settings, HelpCircle, Book, Eye, Globe } from 'lucide-react';
@@ -216,6 +217,9 @@ function App() {
           onOpenApiSetup={() => {}}
         />
       </section>
+
+      {/* Enhanced Task Execution with GPT-5 */}
+      <TaskExecutionEntry realMode={globalRealMode} />
 
       {/* Agent Team Overview */}
       <AgentShowcase />
