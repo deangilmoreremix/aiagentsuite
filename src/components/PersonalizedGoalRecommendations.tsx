@@ -176,14 +176,14 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white dark:bg-transparent">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Target className="h-6 w-6 text-blue-400" />
+          <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           <div>
-            <h3 className="text-xl font-bold text-white">Personalized Recommendations</h3>
-            <p className="text-gray-300 text-sm">GPT-5 analyzed your business and recommends these goals</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Personalized Recommendations</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">GPT-5 analyzed your business and recommends these goals</p>
           </div>
         </div>
         
@@ -196,7 +196,7 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
                 className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                   filter === filterType
                     ? 'bg-blue-600 text-white'
-                    : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                    : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600'
                 }`}
               >
                 {filterType.replace('-', ' ')}
@@ -206,7 +206,7 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
           
           <button
             onClick={() => loadRecommendations(true)}
-            className="p-2 rounded-lg bg-purple-500/20 border border-purple-400/30 text-purple-300 hover:bg-purple-500/30 transition-colors"
+            className="p-2 rounded-lg bg-purple-500/20 border border-purple-400/30 text-purple-600 dark:text-purple-300 hover:bg-purple-500/30 transition-colors"
             title="Refresh recommendations"
           >
             <RefreshCw className="h-4 w-4" />

@@ -414,8 +414,8 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <TrendingUp className="h-5 w-5 text-red-400" />
-                <h4 className="text-white font-medium">Priority Level</h4>
+                <TrendingUp className="h-5 w-5 text-red-500 dark:text-red-400" />
+                <h4 className="text-gray-900 dark:text-white font-medium">Priority Level</h4>
                 <Tooltip 
                   content="High priority goals offer maximum business impact and ROI"
                   position="top"
@@ -429,7 +429,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
                     className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 hover:scale-105 ${
                       priorityFilter === priority
                         ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg'
-                        : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                        : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600'
                     }`}
                   >
                     {priority === 'all' ? 'All Priorities' : priority}
@@ -445,8 +445,8 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
 
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <Star className="h-5 w-5 text-purple-400" />
-                <h4 className="text-white font-medium">Complexity Level</h4>
+                <Star className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <h4 className="text-gray-900 dark:text-white font-medium">Complexity Level</h4>
                 <Tooltip 
                   content="Simple goals can be set up in minutes, while advanced goals offer more sophisticated automation"
                   position="top"
@@ -460,7 +460,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
                     className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 hover:scale-105 ${
                       complexityFilter === complexity
                         ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                        : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                        : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600'
                     }`}
                   >
                     {complexity === 'all' ? 'All Levels' : complexity}
