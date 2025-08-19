@@ -1,4 +1,5 @@
 import { realApiService } from './realApiService';
+import { apiConfig, validateApiSetup } from '../config/apiConfig';
 import { contextualMemoryService } from './contextualMemoryService';
 import { supabaseService } from './supabaseClient';
 import { allGoals, goalCategories } from '../data/goalsData';
@@ -45,6 +46,13 @@ export class PersonalizedGoalService {
     userId: string,
     refreshCache: boolean = false
   ): Promise<PersonalizedRecommendation[]> {
+    // Check API availability first
+    const validation = validateApiSetup();
+    if (!validation.canUseRealMode) {
+      console.warn('⚠️ OpenAI not configured, using fallback recommendations');
+      return this.getFallbackRecommendations();
+    }
+
     // Check cache first
     if (!refreshCache && this.recommendationCache.has(userId)) {
       return this.recommendationCache.get(userId)!;
@@ -152,6 +160,13 @@ export class PersonalizedGoalService {
 
   // Build comprehensive user profile for personalization
   private async buildUserProfile(userId: string): Promise<UserBusinessProfile> {
+    // Check API availability
+    const validation = validateApiSetup();
+    if (!validation.canUseRealMode) {
+      console.warn('⚠️ OpenAI not configured, using default profile');
+      return this.getDefaultProfile();
+    }
+
     // Check cache first
     if (this.userProfiles.has(userId)) {
       return this.userProfiles.get(userId)!;
@@ -225,8 +240,8 @@ export class PersonalizedGoalService {
       }
 
       const [contacts, deals] = await Promise.all([
-        supabaseService.getContacts(userId),
-        supabaseService.getDeals(userId)
+        supabaseService.getContacts(),
+        supabaseService.getDeals()
       ]);
 
       return {

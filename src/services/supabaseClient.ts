@@ -111,12 +111,11 @@ export const supabaseService = {
     return data;
   },
 
-  async getContacts(customerId: string) {
+  async getContacts() {
     const client = checkSupabaseAvailable();
     const { data, error } = await client
       .from('contacts')
       .select('*')
-      .eq('customer_id', customerId)
       .order('created_at', { ascending: false });
     
     if (error) throw error;
@@ -149,12 +148,11 @@ export const supabaseService = {
     return data;
   },
 
-  async getDeals(customerId: string) {
+  async getDeals() {
     const client = checkSupabaseAvailable();
     const { data, error } = await client
       .from('deals')
       .select('*')
-      .eq('customer_id', customerId)
       .order('created_at', { ascending: false });
     
     if (error) throw error;
@@ -283,6 +281,78 @@ export const supabaseService = {
   // Check if Supabase is available
   isAvailable() {
     return !!supabase;
+  },
+
+  // Storage operations
+  async uploadFile(
+    bucketName: string,
+    filePath: string,
+    file: File,
+    options?: { cacheControl?: string; upsert?: boolean }
+  ) {
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client.storage
+      .from(bucketName)
+      .upload(filePath, file, {
+        cacheControl: options?.cacheControl || '3600',
+        upsert: options?.upsert || false
+      });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async downloadFile(bucketName: string, filePath: string) {
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client.storage
+      .from(bucketName)
+      .download(filePath);
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteFile(bucketName: string, filePath: string) {
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client.storage
+      .from(bucketName)
+      .remove([filePath]);
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getPublicUrl(bucketName: string, filePath: string) {
+    const client = checkSupabaseAvailable();
+    const { data } = client.storage
+      .from(bucketName)
+      .getPublicUrl(filePath);
+    
+    return data.publicUrl;
+  },
+
+  async createSignedUrl(
+    bucketName: string, 
+    filePath: string, 
+    expiresIn: number = 3600
+  ) {
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client.storage
+      .from(bucketName)
+      .createSignedUrl(filePath, expiresIn);
+    
+    if (error) throw error;
+    return data.signedUrl;
+  },
+
+  async listFiles(bucketName: string, folder?: string) {
+    const client = checkSupabaseAvailable();
+    const { data, error } = await client.storage
+      .from(bucketName)
+      .list(folder);
+    
+    if (error) throw error;
+    return data;
   }
 };
 

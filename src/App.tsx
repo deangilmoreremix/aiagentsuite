@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Hero from './components/Hero';
 import AgentShowcase from './components/AgentShowcase';
 import CRMModules from './components/CRMModules';
@@ -15,6 +16,7 @@ import TaskExecutionEntry from './components/TaskExecutionEntry';
 import EnhancedAIConsole from './components/EnhancedAIConsole';
 import PersonalizedGoalRecommendations from './components/PersonalizedGoalRecommendations';
 import ProactiveAssistantPanel from './components/ProactiveAssistantPanel';
+import ThemeToggle from './components/ThemeToggle';
 import Tooltip from './components/Tooltip';
 import { getDefaultMode, validateApiSetup, logApiStatus } from './config/apiConfig';
 import { Settings, HelpCircle, Book, Eye, Globe } from 'lucide-react';
@@ -75,215 +77,219 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      {/* How to Use Guide Modal */}
-      <HowToUse
-        isOpen={showHowToUse}
-        onClose={() => setShowHowToUse(false)}
-        onOpenApiSetup={() => {}}
-      />
+    <ThemeProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 transition-colors duration-300">
+        {/* How to Use Guide Modal */}
+        <HowToUse
+          isOpen={showHowToUse}
+          onClose={() => setShowHowToUse(false)}
+          onOpenApiSetup={() => {}}
+        />
 
-      {/* Composio Integration Modal */}
-      <ComposioIntegrationModal
-        isOpen={showComposioModal}
-        onClose={() => setShowComposioModal(false)}
-      />
+        {/* Composio Integration Modal */}
+        <ComposioIntegrationModal
+          isOpen={showComposioModal}
+          onClose={() => setShowComposioModal(false)}
+        />
 
-      {/* Enhanced Global Status Header */}
-      <div className="fixed top-4 right-4 z-40 flex items-center gap-3">
-        {/* Help & Documentation Buttons */}
-        <div className="flex items-center gap-2">
-          <Tooltip 
-            content="View all 250+ Composio integrations"
-            position="bottom"
-          >
-            <button
-              onClick={handleOpenComposioModal}
-              className="p-3 rounded-xl bg-purple-500/20 border border-purple-400/30 text-purple-300 hover:text-purple-200 hover:bg-purple-500/30 transition-all duration-300 group"
-            >
-              <Globe className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-            </button>
-          </Tooltip>
-          
-          <Tooltip 
-            content="Complete guide on how to use SmartCRM AI Agent Suite"
-            position="bottom"
-          >
-            <button
-              onClick={handleOpenHowToUse}
-              className="p-3 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-300 hover:text-blue-200 hover:bg-blue-500/30 transition-all duration-300 group"
-            >
-              <Book className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-            </button>
-          </Tooltip>
-
-          <Tooltip 
-            content="Take a guided tour of the interface"
-            position="bottom"
-          >
-            <button
-              onClick={() => {
-                // This will trigger the walkthrough in the goal explorer
-                const event = new CustomEvent('trigger-walkthrough');
-                document.dispatchEvent(event);
-              }}
-              className="p-3 rounded-xl bg-green-500/20 border border-green-400/30 text-green-300 hover:text-green-200 hover:bg-green-500/30 transition-all duration-300 group"
-            >
-              <HelpCircle className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-            </button>
-          </Tooltip>
-        </div>
-
-        {/* Enhanced Mode Indicator */}
-        <div className={`px-6 py-3 rounded-xl border text-sm font-medium transition-all duration-300 ${
-          globalRealMode 
-            ? 'bg-red-500/20 border-red-400/30 text-red-300 shadow-lg shadow-red-500/20' 
-            : 'bg-blue-500/20 border-blue-400/30 text-blue-300 shadow-lg shadow-blue-500/20'
-        }`}>
-          <div className="flex items-center gap-3">
-            <div className={`w-3 h-3 rounded-full animate-pulse ${
-              globalRealMode ? 'bg-red-400' : 'bg-blue-400'
-            }`}></div>
-            <span className="font-semibold">
-              {globalRealMode ? '🔴 LIVE MODE' : '🔵 DEMO MODE'}
-            </span>
+        {/* Enhanced Global Status Header */}
+        <div className="fixed top-4 right-4 z-40 flex items-center gap-3">
+          {/* Help & Documentation Buttons */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle size="medium" />
             
-            <div className="flex items-center gap-2">
-              <Tooltip 
-                content="Switch between Demo and Live modes"
-                position="bottom"
+            <Tooltip 
+              content="View all 250+ Composio integrations"
+              position="bottom"
+            >
+              <button
+                onClick={handleOpenComposioModal}
+                className="p-3 rounded-xl bg-purple-500/20 dark:bg-purple-400/20 border border-purple-400/30 dark:border-purple-300/30 text-purple-300 dark:text-purple-200 hover:text-purple-200 dark:hover:text-purple-100 hover:bg-purple-500/30 dark:hover:bg-purple-400/30 transition-all duration-300 group"
               >
-                <button
-                  onClick={() => handleModeToggle(!globalRealMode)}
-                  className="p-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300 group"
+                <Globe className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+              </button>
+            </Tooltip>
+            
+            <Tooltip 
+              content="Complete guide on how to use SmartCRM AI Agent Suite"
+              position="bottom"
+            >
+              <button
+                onClick={handleOpenHowToUse}
+                className="p-3 rounded-xl bg-blue-500/20 dark:bg-blue-400/20 border border-blue-400/30 dark:border-blue-300/30 text-blue-300 dark:text-blue-200 hover:text-blue-200 dark:hover:text-blue-100 hover:bg-blue-500/30 dark:hover:bg-blue-400/30 transition-all duration-300 group"
+              >
+                <Book className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+              </button>
+            </Tooltip>
+
+            <Tooltip 
+              content="Take a guided tour of the interface"
+              position="bottom"
+            >
+              <button
+                onClick={() => {
+                  // This will trigger the walkthrough in the goal explorer
+                  const event = new CustomEvent('trigger-walkthrough');
+                  document.dispatchEvent(event);
+                }}
+                className="p-3 rounded-xl bg-green-500/20 dark:bg-green-400/20 border border-green-400/30 dark:border-green-300/30 text-green-300 dark:text-green-200 hover:text-green-200 dark:hover:text-green-100 hover:bg-green-500/30 dark:hover:bg-green-400/30 transition-all duration-300 group"
+              >
+                <HelpCircle className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+              </button>
+            </Tooltip>
+          </div>
+
+          {/* Enhanced Mode Indicator */}
+          <div className={`px-6 py-3 rounded-xl border text-sm font-medium transition-all duration-300 ${
+            globalRealMode 
+              ? 'bg-red-500/20 dark:bg-red-400/20 border-red-400/30 dark:border-red-300/30 text-red-300 dark:text-red-200 shadow-lg shadow-red-500/20' 
+              : 'bg-blue-500/20 dark:bg-blue-400/20 border-blue-400/30 dark:border-blue-300/30 text-blue-300 dark:text-blue-200 shadow-lg shadow-blue-500/20'
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-3 h-3 rounded-full animate-pulse ${
+                globalRealMode ? 'bg-red-400 dark:bg-red-300' : 'bg-blue-400 dark:bg-blue-300'
+              }`}></div>
+              <span className="font-semibold">
+                {globalRealMode ? '🔴 LIVE MODE' : '🔵 DEMO MODE'}
+              </span>
+              
+              <div className="flex items-center gap-2">
+                <Tooltip 
+                  content="Switch between Demo and Live modes"
+                  position="bottom"
                 >
-                  <Eye className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                </button>
-              </Tooltip>
+                  <button
+                    onClick={() => handleModeToggle(!globalRealMode)}
+                    className="p-1 rounded-lg bg-white/10 dark:bg-black/10 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 group"
+                  >
+                    <Eye className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                  </button>
+                </Tooltip>
+              </div>
+            </div>
+            
+            {/* Mode Description */}
+            <div className="text-xs opacity-75 mt-1">
+              {globalRealMode 
+                ? 'Real AI execution active' 
+                : 'Safe simulation mode'
+              }
             </div>
           </div>
-          
-          {/* Mode Description */}
-          <div className="text-xs opacity-75 mt-1">
-            {globalRealMode 
-              ? 'Real AI execution active' 
-              : 'Safe simulation mode'
-            }
-          </div>
         </div>
-      </div>
 
-      {/* Quick Access Notification for New Users */}
-      {!localStorage.getItem('first-visit-complete') && (
-        <div className="fixed bottom-4 left-4 z-40 max-w-sm">
-          <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-xl p-4 backdrop-blur-xl">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/20">
-                <HelpCircle className="h-5 w-5 text-blue-400" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-white font-medium text-sm mb-1">New to SmartCRM?</h4>
-                <p className="text-gray-300 text-xs mb-3">
-                  Take a quick tour or read the guide to get started with AI automation!
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      handleOpenHowToUse();
-                      localStorage.setItem('first-visit-complete', 'true');
-                    }}
-                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
-                  >
-                    Read Guide
-                  </button>
-                  <button
-                    onClick={() => localStorage.setItem('first-visit-complete', 'true')}
-                    className="px-3 py-1 text-gray-400 hover:text-white text-xs transition-colors"
-                  >
-                    Dismiss
-                  </button>
+        {/* Quick Access Notification for New Users */}
+        {!localStorage.getItem('first-visit-complete') && (
+          <div className="fixed bottom-4 left-4 z-40 max-w-sm">
+            <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 dark:from-blue-400/20 dark:to-purple-400/20 border border-blue-400/30 dark:border-blue-300/30 rounded-xl p-4 backdrop-blur-xl">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/20 dark:bg-blue-400/20">
+                  <HelpCircle className="h-5 w-5 text-blue-400 dark:text-blue-300" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-white dark:text-gray-200 font-medium text-sm mb-1">New to SmartCRM?</h4>
+                  <p className="text-gray-300 dark:text-gray-400 text-xs mb-3">
+                    Take a quick tour or read the guide to get started with AI automation!
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        handleOpenHowToUse();
+                        localStorage.setItem('first-visit-complete', 'true');
+                      }}
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
+                    >
+                      Read Guide
+                    </button>
+                    <button
+                      onClick={() => localStorage.setItem('first-visit-complete', 'true')}
+                      className="px-3 py-1 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 text-xs transition-colors"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Compact Hero Section */}
-      <Hero />
-      
-      {/* Interactive Goal Explorer - Primary Feature */}
-      <section id="goal-explorer-section" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {/* Enhanced AI Console Integration */}
-        <div className="mb-16">
-          <EnhancedAIConsole 
+        {/* Compact Hero Section */}
+        <Hero />
+        
+        {/* Interactive Goal Explorer - Primary Feature */}
+        <section id="goal-explorer-section" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          {/* Enhanced AI Console Integration */}
+          <div className="mb-16">
+            <EnhancedAIConsole 
+              realMode={globalRealMode}
+              onModeToggle={() => handleModeToggle(!globalRealMode)}
+              showProactiveSuggestions={true}
+            />
+          </div>
+
+          {/* Personalized Goal Recommendations */}
+          <div className="mb-16">
+            <PersonalizedGoalRecommendations 
+              userId="default-user"
+              onGoalSelect={(goal) => {
+                // Integration with existing goal execution system
+                console.log('Selected personalized goal:', goal.title);
+              }}
+              maxRecommendations={6}
+              showReasoningDetails={true}
+            />
+          </div>
+
+          <InteractiveGoalExplorer 
             realMode={globalRealMode}
-            onModeToggle={() => handleModeToggle(!globalRealMode)}
-            showProactiveSuggestions={true}
+            onModeToggle={handleModeToggle}
+            onOpenApiSetup={() => {}}
           />
-        </div>
+        </section>
 
-        {/* Personalized Goal Recommendations */}
-        <div className="mb-16">
-          <PersonalizedGoalRecommendations 
+        {/* Proactive Assistant Panel */}
+        <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <ProactiveAssistantPanel 
             userId="default-user"
-            onGoalSelect={(goal) => {
-              // Integration with existing goal execution system
-              console.log('Selected personalized goal:', goal.title);
+            realMode={globalRealMode}
+            onSuggestionExecute={(suggestion) => {
+              console.log('Executed proactive suggestion:', suggestion.title);
             }}
-            maxRecommendations={6}
-            showReasoningDetails={true}
+            onInsightView={(insight) => {
+              console.log('Viewed insight:', insight);
+            }}
           />
-        </div>
+        </section>
 
-        <InteractiveGoalExplorer 
-          realMode={globalRealMode}
-          onModeToggle={handleModeToggle}
-          onOpenApiSetup={() => {}}
-        />
-      </section>
+        {/* Enhanced Task Execution with GPT-5 */}
+        <TaskExecutionEntry realMode={globalRealMode} />
 
-      {/* Proactive Assistant Panel */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <ProactiveAssistantPanel 
-          userId="default-user"
-          realMode={globalRealMode}
-          onSuggestionExecute={(suggestion) => {
-            console.log('Executed proactive suggestion:', suggestion.title);
-          }}
-          onInsightView={(insight) => {
-            console.log('Viewed insight:', insight);
-          }}
-        />
-      </section>
+        {/* Agent Team Overview */}
+        <AgentShowcase />
 
-      {/* Enhanced Task Execution with GPT-5 */}
-      <TaskExecutionEntry realMode={globalRealMode} />
+        {/* Multi-Agent Live Demo */}
+        <MultiAgentDemo />
 
-      {/* Agent Team Overview */}
-      <AgentShowcase />
+        {/* CRM Integration Details */}
+        <CRMModules />
 
-      {/* Multi-Agent Live Demo */}
-      <MultiAgentDemo />
+        {/* Key Features */}
+        <Features />
 
-      {/* CRM Integration Details */}
-      <CRMModules />
+        {/* How It Works */}
+        <HowItWorks />
 
-      {/* Key Features */}
-      <Features />
+        {/* Tool Integrations */}
+        <Integrations onOpenComposioModal={handleOpenComposioModal} />
 
-      {/* How It Works */}
-      <HowItWorks />
+        {/* Pricing */}
+        <Pricing />
 
-      {/* Tool Integrations */}
-      <Integrations onOpenComposioModal={handleOpenComposioModal} />
-
-      {/* Pricing */}
-      <Pricing />
-
-      {/* Footer */}
-      <Footer />
-    </div>
+        {/* Footer */}
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 }
 
