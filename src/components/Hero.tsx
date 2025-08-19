@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Bot, 
   Zap, 
@@ -30,7 +31,6 @@ import {
   MicOff,
   BarChart3,
   Workflow,
-  Link,
   ExternalLink,
   Database,
   Presentation,
@@ -524,11 +524,18 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                to="/features-analytics"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                <BarChart3 className="inline-block w-6 h-6 mr-3" />
+                Advanced Features & Analytics
+              </Link>
               <button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
                 <PlayCircle className="inline-block w-6 h-6 mr-3" />
                 Try Interactive Demo
               </button>
-              <button className="flex-1 border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300">
+              <button className="border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300">
                 <Eye className="inline-block w-5 h-5 mr-2" />
                 Watch Live Demo
               </button>
