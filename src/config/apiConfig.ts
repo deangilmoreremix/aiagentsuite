@@ -99,5 +99,9 @@ export const logApiStatus = () => {
     console.warn('💡 Configuration Warnings:', validation.warnings);
   }
   
-  console.log('🚀 Ready for Real AI Execution!');
+  if (validation.canUseRealMode) {
+    console.log('🚀 Ready for Real AI Execution!');
+  } else {
+    console.log('🔵 Demo Mode Active - Configure APIs for real execution');
+  }
 };

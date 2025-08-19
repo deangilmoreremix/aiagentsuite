@@ -54,19 +54,27 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
   const [isLoading, setIsLoading] = useState(true);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
   const [filter, setFilter] = useState<'all' | 'high-impact' | 'quick-wins' | 'strategic'>('all');
+  const [hasError, setHasError] = useState(false);
 
   // Load personalized recommendations
   useEffect(() => {
+    console.log('🎯 Loading personalized recommendations...');
     loadRecommendations();
   }, [userId]);
 
   const loadRecommendations = async (refresh: boolean = false) => {
     setIsLoading(true);
+    setHasError(false);
     try {
+      console.log('🎯 Generating personalized recommendations...');
       const recs = await personalizedGoalService.generatePersonalizedRecommendations(userId, refresh);
+      console.log(`✅ Loaded ${recs.length} recommendations`);
       setRecommendations(recs.slice(0, maxRecommendations));
     } catch (error) {
       console.error('Failed to load recommendations:', error);
+      setHasError(true);
+      // Set empty recommendations on error to prevent blank screen
+      setRecommendations([]);
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +130,46 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
               <div className="w-1/2 h-3 bg-slate-600/50 rounded"></div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+  
+  // Error state
+  if (hasError && recommendations.length === 0) {
+    return (
+      <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <AlertTriangle className="h-6 w-6 text-yellow-400" />
+          <h3 className="text-xl font-bold text-white">Recommendations Temporarily Unavailable</h3>
+        </div>
+        <p className="text-yellow-200 mb-4">
+          We're having trouble generating personalized recommendations right now. This could be due to:
+        </p>
+        <ul className="text-yellow-200 text-sm space-y-1 mb-4 ml-4">
+          <li>• API configuration issues</li>
+          <li>• Database connection problems</li>
+          <li>• Temporary service unavailability</li>
+        </ul>
+        <div className="flex gap-3">
+          <button
+            onClick={() => loadRecommendations(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Try Again
+          </button>
+          <button
+            onClick={() => {
+              // Show default high-priority goals as fallback
+              const fallbackRecs = personalizedGoalService.getFallbackRecommendations();
+              setRecommendations(fallbackRecs);
+              setHasError(false);
+            }}
+            className="px-4 py-2 border border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 rounded-lg font-medium transition-colors"
+          >
+            Show Default Goals
+          </button>
         </div>
       </div>
     );

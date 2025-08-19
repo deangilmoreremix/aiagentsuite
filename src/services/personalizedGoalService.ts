@@ -46,6 +46,8 @@ export class PersonalizedGoalService {
     userId: string,
     refreshCache: boolean = false
   ): Promise<PersonalizedRecommendation[]> {
+    console.log('🎯 Starting personalized recommendations generation...');
+    
     // Check API availability first
     const validation = validateApiSetup();
     if (!validation.canUseRealMode) {
@@ -55,15 +57,40 @@ export class PersonalizedGoalService {
 
     // Check cache first
     if (!refreshCache && this.recommendationCache.has(userId)) {
+      console.log('📋 Using cached recommendations');
       return this.recommendationCache.get(userId)!;
     }
 
     try {
       console.log('🎯 Generating personalized goal recommendations with GPT-5...');
 
-      const userProfile = await this.buildUserProfile(userId);
-      const contextSummary = await contextualMemoryService.getContextualSummary();
-      const crmAnalysis = await this.analyzeCRMForGoalFit(userId);
+      let userProfile;
+      let contextSummary = 'No conversation context available yet.';
+      let crmAnalysis;
+      
+      try {
+        console.log('👤 Building user profile...');
+        userProfile = await this.buildUserProfile(userId);
+      } catch (profileError) {
+        console.warn('⚠️ Failed to build user profile, using default:', profileError);
+        userProfile = this.getDefaultProfile();
+      }
+      
+      try {
+        console.log('💬 Getting conversation context...');
+        contextSummary = await contextualMemoryService.getContextualSummary();
+      } catch (contextError) {
+        console.warn('⚠️ Failed to get context summary:', contextError);
+        contextSummary = 'No conversation context available yet.';
+      }
+      
+      try {
+        console.log('📊 Analyzing CRM for goal fit...');
+        crmAnalysis = await this.analyzeCRMForGoalFit(userId);
+      } catch (crmError) {
+        console.warn('⚠️ Failed to analyze CRM, using mock data:', crmError);
+        crmAnalysis = this.getMockCRMAnalysis();
+      }
 
       const recommendationPrompt = `
         You are an expert business consultant specializing in sales automation and CRM optimization.
@@ -236,28 +263,50 @@ export class PersonalizedGoalService {
   private async analyzeCRMForGoalFit(userId: string): Promise<any> {
     try {
       if (!supabaseService.isAvailable()) {
+        console.log('📊 Supabase not available, using mock CRM analysis');
         return this.getMockCRMAnalysis();
       }
 
-      const [contacts, deals] = await Promise.all([
-        supabaseService.getContacts(),
-        supabaseService.getDeals()
-      ]);
+      let contacts: any[] = [];
+      let deals: any[] = [];
+      
+      try {
+        console.log('📊 Fetching contacts data...');
+        contacts = await supabaseService.getContacts();
+        console.log(`✅ Retrieved ${contacts.length} contacts`);
+      } catch (contactError) {
+        console.warn('⚠️ Failed to fetch contacts:', contactError);
+        contacts = [];
+      }
+      
+      try {
+        console.log('📊 Fetching deals data...');
+        deals = await supabaseService.getDeals();
+        console.log(`✅ Retrieved ${deals.length} deals`);
+      } catch (dealError) {
+        console.warn('⚠️ Failed to fetch deals:', dealError);
+        deals = [];
+      }
+      
+      if (contacts.length === 0 && deals.length === 0) {
+        console.log('📊 No CRM data found, using mock analysis');
+        return this.getMockCRMAnalysis();
+      }
 
       return {
         contactsCount: contacts.length,
         dataQuality: this.assessDataQuality(contacts),
         dealsPipeline: {
           total: deals.length,
-          averageValue: deals.reduce((sum, d) => sum + (d.value || 0), 0) / deals.length,
+          averageValue: deals.length > 0 ? deals.reduce((sum, d) => sum + (d.value || 0), 0) / deals.length : 0,
           staleDeals: deals.filter(d => {
-            const updated = new Date(d.updated_at || d.created_at);
+            const updated = new Date(d.updated_at || d.created_at || Date.now());
             return (Date.now() - updated.getTime()) > 14 * 24 * 60 * 60 * 1000;
           }).length
         },
         activityLevel: {
           lastWeekContacts: contacts.filter(c => {
-            const lastContact = new Date(c.last_contacted || c.created_at);
+            const lastContact = new Date(c.last_contacted || c.created_at || Date.now());
             return (Date.now() - lastContact.getTime()) < 7 * 24 * 60 * 60 * 1000;
           }).length
         },
@@ -265,6 +314,7 @@ export class PersonalizedGoalService {
       };
     } catch (error) {
       console.error('Failed to analyze CRM for goal fit:', error);
+      console.log('📊 Falling back to mock CRM analysis due to error');
       return this.getMockCRMAnalysis();
     }
   }
@@ -558,7 +608,7 @@ export class PersonalizedGoalService {
     };
   }
 
-  private getFallbackRecommendations(): PersonalizedRecommendation[] {
+  getFallbackRecommendations(): PersonalizedRecommendation[] {
     return allGoals.filter(g => g.priority === 'High').slice(0, 5).map(goal => ({
       goal,
       relevanceScore: 75,

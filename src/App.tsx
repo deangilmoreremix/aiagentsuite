@@ -32,12 +32,17 @@ function App() {
 
   // Initialize with the appropriate mode based on API configuration
   useEffect(() => {
+    console.log('🚀 Initializing SmartCRM AI Agent Suite...');
+    
     const defaultMode = getDefaultMode();
+    console.log('🔧 Default mode determined:', defaultMode ? 'Live Mode' : 'Demo Mode');
     
     setGlobalRealMode(defaultMode);
     
     // Log API status on app start
     logApiStatus();
+    
+    console.log('✅ App initialization complete');
   }, []);
 
   // Auto-scroll to Goal Explorer after page loads

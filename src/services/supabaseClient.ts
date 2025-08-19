@@ -111,15 +111,46 @@ export const supabaseService = {
     return data;
   },
 
-  async getContacts() {
+  async getContacts(customerId?: string) {
     const client = checkSupabaseAvailable();
-    const { data, error } = await client
+    
+    // Note: contacts table doesn't have customer_id column
+    // So we select all contacts for authenticated users
+    let query = client
       .from('contacts')
-      .select('*')
+      .select(`
+        id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        company,
+        position,
+        status,
+        source,
+        lead_score,
+        engagement_score,
+        last_contacted,
+        last_activity,
+        social_profiles,
+        custom_fields,
+        tags,
+        notes,
+        created_at,
+        updated_at,
+        activity_log,
+        next_send_date,
+        is_team_member,
+        role,
+        gamification_stats,
+        ai_score
+      `)
       .order('created_at', { ascending: false });
     
+    const { data, error } = await query;
+    
     if (error) throw error;
-    return data;
+    return data || [];
   },
 
   async updateContact(id: string, updates: Partial<Contact>) {
@@ -148,15 +179,46 @@ export const supabaseService = {
     return data;
   },
 
-  async getDeals() {
+  async getDeals(customerId?: string) {
     const client = checkSupabaseAvailable();
-    const { data, error } = await client
+    
+    let query = client
       .from('deals')
-      .select('*')
+      .select(`
+        id,
+        customer_id,
+        title,
+        description,
+        value,
+        currency,
+        stage_id,
+        probability,
+        expected_close_date,
+        actual_close_date,
+        contact_id,
+        assigned_to,
+        created_by,
+        status,
+        deal_type,
+        lead_source,
+        competitors,
+        tags,
+        custom_fields,
+        attachments,
+        created_at,
+        updated_at
+      `)
       .order('created_at', { ascending: false });
     
+    // Only filter by customer_id if provided and if user wants to filter
+    if (customerId) {
+      query = query.eq('customer_id', customerId);
+    }
+    
+    const { data, error } = await query;
+    
     if (error) throw error;
-    return data;
+    return data || [];
   },
 
   async updateDeal(id: string, updates: Partial<Deal>) {
@@ -262,15 +324,22 @@ export const supabaseService = {
   async testConnection() {
     try {
       if (!supabase) {
+        console.log('⚠️ Supabase client not initialized');
         return false;
       }
       
+      // Test with a simple query that should always work
       const { data, error } = await supabase
-        .from('customers')
-        .select('count')
+        .from('contacts')
+        .select('id')
         .limit(1);
       
-      if (error) throw error;
+      if (error) {
+        console.warn('⚠️ Supabase connection test failed:', error);
+        return false;
+      }
+      
+      console.log('✅ Supabase connection test passed');
       return true;
     } catch (error) {
       console.error('Supabase connection test failed:', error);
