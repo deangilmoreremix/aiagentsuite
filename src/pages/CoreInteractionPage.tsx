@@ -18,7 +18,8 @@ import {
   Settings,
   Eye,
   Globe,
-  Book
+  Book,
+  Bot
 } from 'lucide-react';
 import Tooltip from '../components/Tooltip';
 
@@ -99,6 +100,26 @@ const CoreInteractionPage = () => {
       
       {/* Enhanced AI Console */}
       <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Navigation Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Bot className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+            </div>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">SmartCRM AI Agent Suite</span>
+          </div>
+          
+          <Link
+            to="/features-analytics"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            <BarChart3 className="h-5 w-5" />
+            Advanced Features & Analytics
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-6">
             <Brain className="h-10 w-10 text-blue-600 dark:text-blue-400" />
