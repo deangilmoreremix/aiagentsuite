@@ -559,16 +559,13 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
             </div>
           ))}
           
-        <div className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-slate-800/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl border border-gray-300/50 dark:border-slate-700/50 p-6">
           {isProcessing && (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+              </div>
               <div className="bg-white/80 dark:bg-slate-700/50 px-4 py-3 rounded-xl border border-gray-300/30 dark:border-slate-600/30">
-              <div className="bg-slate-700/50 px-4 py-3 rounded-xl border border-slate-600/30">
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Enhanced AI processing with contextual understanding...</span>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Enhanced AI Console</h3>
-                <p className="text-gray-700 dark:text-gray-300 text-sm">GPT-5 powered with contextual memory & emotional intelligence</p>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Enhanced AI processing with contextual understanding...</span>
               </div>
             </div>
           )}
@@ -578,7 +575,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
 
         {/* Command Suggestions */}
         {commandSuggestions.length > 0 && (
-            <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+          <div className="mb-4 space-y-2">
             <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
               <Sparkles className="h-3 w-3" />
               Suggested completions:
@@ -586,8 +583,8 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
             {commandSuggestions.map((suggestion, index) => (
               <button
                 key={index}
+                onClick={() => handleSuggestionClick(suggestion)}
                 className="w-full text-left p-2 text-sm bg-gray-200/50 dark:bg-slate-600/30 hover:bg-gray-300/50 dark:hover:bg-slate-600/50 border border-gray-300/30 dark:border-slate-500/30 hover:border-blue-500/30 dark:hover:border-blue-500/30 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                className="p-2 rounded-lg bg-gray-200/50 dark:bg-slate-700/50 hover:bg-gray-300/50 dark:hover:bg-slate-600/50 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 {suggestion}
               </button>
@@ -607,14 +604,14 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
               placeholder={realMode 
                 ? "Ask anything - I have full context and memory..." 
                 : "Try enhanced AI features in Demo Mode..."
+              }
               className="w-full pl-4 pr-4 py-3 bg-white/70 dark:bg-slate-700/50 border border-gray-300/50 dark:border-slate-600/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20"
-              className="w-full pl-4 pr-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20"
               disabled={isProcessing}
             />
             
-              <div className="absolute right-12 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 dark:text-gray-500">
+            {realMode && (
               <div className="absolute right-12 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                {realMode ? 'Enhanced NLU active' : 'Demo mode'}
+                Enhanced NLU active
               </div>
             )}
           </div>
@@ -623,8 +620,8 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
             onClick={handleVoiceToggle}
             className={`p-3 rounded-xl transition-all duration-300 ${
               isListening
+                ? 'bg-red-500 text-white animate-pulse'
                 : 'bg-gray-300 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-slate-600 hover:text-gray-900 dark:hover:text-white'
-                : 'bg-slate-700 text-gray-300 hover:bg-slate-600 hover:text-white'
             }`}
             disabled={isProcessing}
           >
@@ -646,10 +643,10 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
             <div className="flex items-center gap-1 bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
               <CheckCircle className="h-3 w-3" />
               Contextual Memory
-          <div className="mb-4 p-3 bg-blue-500/10 dark:bg-blue-500/10 border border-blue-400/30 dark:border-blue-400/30 rounded-lg">
+            </div>
             <div className="flex items-center gap-1 bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full">
               <Brain className="h-3 w-3" />
-              <span className="text-blue-700 dark:text-blue-300">
+              Emotional Intelligence
             </div>
             <div className="flex items-center gap-1 bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">
               <Lightbulb className="h-3 w-3" />
@@ -665,5 +662,5 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
     </div>
   );
 };
-            <div className="flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300 mb-3">
+
 export default EnhancedAIConsole;
