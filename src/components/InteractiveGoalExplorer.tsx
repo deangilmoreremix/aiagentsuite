@@ -477,7 +477,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
 
       {/* Enhanced Results Summary with Mode Toggle */}
       <div className="grid lg:grid-cols-3  gap-6">
-        <div className="lg:col-span-2 bg-gradient-to-r from-white/80 to-gray-50/80 dark:from-slate-800/50 dark:to-slate-900/50 rounded-xl p-6 border border-gray-300/50 dark:border-slate-700/50">
+        <div className="lg:col-span-2 bg-white/90 dark:bg-gradient-to-r dark:from-slate-800/50 dark:to-slate-900/50 rounded-xl p-6 border border-gray-300/50 dark:border-slate-700/50">
           <div className="flex items-center justify-between">
             <div className="text-gray-600 dark:text-gray-300">
               Showing <span className="text-gray-900 dark:text-white font-bold text-lg">{filteredGoals.length}</span> of{' '}

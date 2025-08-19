@@ -457,7 +457,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         )}
 
         {/* Chat Messages */}
-        <div className="h-64 overflow-y-auto space-y-3 mb-4 bg-gray-100/50 dark:bg-slate-900/30 rounded-xl p-4 border border-gray-300/30 dark:border-slate-700/30">
+        <div className="h-64 overflow-y-auto space-y-3 mb-4 bg-gray-50 dark:bg-slate-900/30 rounded-xl p-4 border border-gray-300/50 dark:border-slate-700/30">
           {messages.length === 0 && (
             <div className="text-center py-8">
               <Bot className="h-12 w-12 text-blue-400 mx-auto mb-4" />
@@ -504,8 +504,8 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
                     message.type === 'user'
                       ? 'bg-blue-600 text-white'
                       : message.type === 'system'
-                      ? 'bg-yellow-500/20 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-yellow-500/30 dark:border-yellow-500/30'
-                      : 'bg-white/80 dark:bg-slate-700/50 text-gray-900 dark:text-gray-200 border border-gray-300/30 dark:border-slate-600/30'
+                      ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-800 dark:text-yellow-300 border border-yellow-400 dark:border-yellow-500/30'
+                      : 'bg-white dark:bg-slate-700/50 text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-slate-600/30 shadow-sm'
                   }`}
                 >
                   {message.content}
@@ -524,7 +524,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
                 </div>
 
                 {message.thinking && (
-                  <div className="mt-2 p-2 bg-gray-200/50 dark:bg-slate-600/30 rounded border-l-2 border-blue-500 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="mt-2 p-2 bg-gray-100 dark:bg-slate-600/30 rounded border-l-2 border-blue-500 text-xs text-gray-600 dark:text-gray-400">
                     <Brain className="inline h-3 w-3 mr-1" />
                     {message.thinking}
                   </div>
@@ -533,7 +533,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
                 {message.entities && message.entities.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {message.entities.map((entity, index) => (
-                      <span key={index} className="text-xs bg-green-500/20 dark:bg-green-500/20 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
+                      <span key={index} className="text-xs bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
                         {entity.type}: {entity.value}
                       </span>
                     ))}
@@ -543,7 +543,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
                 {message.toolsUsed && message.toolsUsed.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {message.toolsUsed.map((tool, index) => (
-                      <span key={index} className="text-xs bg-orange-500/20 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full">
+                      <span key={index} className="text-xs bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full">
                         🔧 {tool}
                       </span>
                     ))}
@@ -564,8 +564,8 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
               </div>
-              <div className="bg-white/80 dark:bg-slate-700/50 px-4 py-3 rounded-xl border border-gray-300/30 dark:border-slate-600/30">
-                <span className="text-sm text-gray-700 dark:text-gray-300">Enhanced AI processing with contextual understanding...</span>
+              <div className="bg-white dark:bg-slate-700/50 px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-600/30 shadow-sm">
+                <span className="text-sm text-gray-800 dark:text-gray-300">Enhanced AI processing with contextual understanding...</span>
               </div>
             </div>
           )}
@@ -584,7 +584,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
               <button
                 key={index}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="w-full text-left p-2 text-sm bg-gray-200/50 dark:bg-slate-600/30 hover:bg-gray-300/50 dark:hover:bg-slate-600/50 border border-gray-300/30 dark:border-slate-500/30 hover:border-blue-500/30 dark:hover:border-blue-500/30 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className="w-full text-left p-2 text-sm bg-gray-100 dark:bg-slate-600/30 hover:bg-gray-200 dark:hover:bg-slate-600/50 border border-gray-300 dark:border-slate-500/30 hover:border-blue-500/50 dark:hover:border-blue-500/30 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               >
                 {suggestion}
               </button>
@@ -605,7 +605,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
                 ? "Ask anything - I have full context and memory..." 
                 : "Try enhanced AI features in Demo Mode..."
               }
-              className="w-full pl-4 pr-4 py-3 bg-white/70 dark:bg-slate-700/50 border border-gray-300/50 dark:border-slate-600/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20"
+              className="w-full pl-4 pr-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-300 dark:border-slate-600/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 shadow-sm"
               disabled={isProcessing}
             />
             
@@ -621,7 +621,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
             className={`p-3 rounded-xl transition-all duration-300 ${
               isListening
                 ? 'bg-red-500 text-white animate-pulse'
-                : 'bg-gray-300 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-slate-600 hover:text-gray-900 dark:hover:text-white'
+                : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600 hover:text-gray-900 dark:hover:text-white'
             }`}
             disabled={isProcessing}
           >
@@ -640,19 +640,19 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         {/* Enhanced Features Indicator */}
         {realMode && (
           <div className="mt-4 flex flex-wrap gap-3 text-xs">
-            <div className="flex items-center gap-1 bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
+            <div className="flex items-center gap-1 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 px-2 py-1 rounded-full">
               <CheckCircle className="h-3 w-3" />
               Contextual Memory
             </div>
-            <div className="flex items-center gap-1 bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full">
+            <div className="flex items-center gap-1 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 px-2 py-1 rounded-full">
               <Brain className="h-3 w-3" />
               Emotional Intelligence
             </div>
-            <div className="flex items-center gap-1 bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">
+            <div className="flex items-center gap-1 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 px-2 py-1 rounded-full">
               <Lightbulb className="h-3 w-3" />
               Proactive Suggestions
             </div>
-            <div className="flex items-center gap-1 bg-orange-500/20 text-orange-400 px-2 py-1 rounded-full">
+            <div className="flex items-center gap-1 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 px-2 py-1 rounded-full">
               <Volume2 className="h-3 w-3" />
               Emotional Voice
             </div>
