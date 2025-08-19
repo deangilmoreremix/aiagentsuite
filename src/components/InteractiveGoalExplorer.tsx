@@ -414,8 +414,8 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <TrendingUp className="h-5 w-5 text-red-500 dark:text-red-400" />
-                <h4 className="text-gray-900 dark:text-white font-medium">Priority Level</h4>
+                <TrendingUp className="h-5 w-5 text-red-400" />
+                <h4 className="text-white font-medium">Priority Level</h4>
                 <Tooltip 
                   content="High priority goals offer maximum business impact and ROI"
                   position="top"
@@ -429,7 +429,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
                     className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 hover:scale-105 ${
                       priorityFilter === priority
                         ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg'
-                        : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600'
+                        : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
                     }`}
                   >
                     {priority === 'all' ? 'All Priorities' : priority}
@@ -445,8 +445,8 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
 
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <Star className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                <h4 className="text-gray-900 dark:text-white font-medium">Complexity Level</h4>
+                <Star className="h-5 w-5 text-purple-400" />
+                <h4 className="text-white font-medium">Complexity Level</h4>
                 <Tooltip 
                   content="Simple goals can be set up in minutes, while advanced goals offer more sophisticated automation"
                   position="top"
@@ -460,7 +460,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
                     className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 hover:scale-105 ${
                       complexityFilter === complexity
                         ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                        : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600'
+                        : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
                     }`}
                   >
                     {complexity === 'all' ? 'All Levels' : complexity}
@@ -477,13 +477,13 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
 
       {/* Enhanced Results Summary with Mode Toggle */}
       <div className="grid lg:grid-cols-3  gap-6">
-        <div className="lg:col-span-2 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-xl p-6 border border-slate-700/50">
+        <div className="lg:col-span-2 bg-gradient-to-r from-white/80 to-gray-50/80 dark:from-slate-800/50 dark:to-slate-900/50 rounded-xl p-6 border border-gray-300/50 dark:border-slate-700/50">
           <div className="flex items-center justify-between">
-            <div className="text-gray-300">
-              Showing <span className="text-white font-bold text-lg">{filteredGoals.length}</span> of{' '}
-              <span className="text-white font-bold text-lg">{allGoals.length}</span> goals
+            <div className="text-gray-600 dark:text-gray-300">
+              Showing <span className="text-gray-900 dark:text-white font-bold text-lg">{filteredGoals.length}</span> of{' '}
+              <span className="text-gray-900 dark:text-white font-bold text-lg">{allGoals.length}</span> goals
               {searchQuery && (
-                <span> matching "<span className="text-blue-400 font-medium">{searchQuery}</span>"</span>
+                <span> matching "<span className="text-blue-600 dark:text-blue-400 font-medium">{searchQuery}</span>"</span>
               )}
             </div>
             
@@ -497,8 +497,8 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
               >
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
                   realMode 
-                    ? 'bg-red-500/20 border-red-400/30 text-red-300' 
-                    : 'bg-blue-500/20 border-blue-400/30 text-blue-300'
+                    ? 'bg-red-500/20 border-red-400/30 text-red-600 dark:text-red-300' 
+                    : 'bg-blue-500/20 border-blue-400/30 text-blue-600 dark:text-blue-300'
                 }`}>
                   <div className="w-3 h-3 rounded-full animate-pulse" style={{
                     backgroundColor: realMode ? '#f87171' : '#60a5fa'

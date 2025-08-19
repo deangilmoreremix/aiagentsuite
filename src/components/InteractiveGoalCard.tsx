@@ -139,11 +139,11 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
           </div>
 
           <h3 className={`text-lg font-bold transition-colors duration-300 ${
-            isHovered ? 'text-white' : 'text-gray-200'
+            isHovered ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-200'
           }`}>
             {goal.title}
           </h3>
-          <p className="text-sm text-gray-300 mt-2 line-clamp-2">{goal.description}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">{goal.description}</p>
         </div>
 
         {/* Business Impact */}
@@ -156,7 +156,7 @@ const InteractiveGoalCard: React.FC<InteractiveGoalCardProps> = ({
               position="top"
             />
           </div>
-          <div className="text-sm text-gray-300">{goal.businessImpact}</div>
+          <div className="text-sm text-gray-700 dark:text-gray-300">{goal.businessImpact}</div>
         </div>
 
         {/* Live Metrics (when hovered or executing) */}
