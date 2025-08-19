@@ -8,6 +8,28 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Include the bridge -->
+    <script src="./remote-navigation-bridge.js"></script>
+    
+    <!-- Add navigation (same for all apps) -->
+    <script>
+    function addCRMNavigation() {
+      const navHTML = `
+        <div style="padding: 10px; background: #f8f9fa; border-bottom: 1px solid #ddd; display: flex; gap: 10px;">
+          <button onclick="window.remoteBridge.navigateToDashboard()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">Dashboard</button>
+          <button onclick="window.remoteBridge.navigateToContacts()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">Contacts</button>
+          <button onclick="window.remoteBridge.navigateToDeals()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">Deals</button>
+          <button onclick="window.remoteBridge.navigateToTasks()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">Tasks</button>
+          <button onclick="window.remoteBridge.navigateToCalendar()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">Calendar</button>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('afterbegin', navHTML);
+    }
+    
+    document.addEventListener('DOMContentLoaded', addCRMNavigation);
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

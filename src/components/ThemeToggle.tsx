@@ -40,14 +40,18 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         >
           {/* Background animation */}
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 dark:from-blue-400/20 dark:to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+            theme === 'dark' 
+              ? 'from-yellow-400/20 to-orange-400/20' 
+              : 'from-blue-400/20 to-purple-400/20'
+          }`} />
           
           {/* Icon with transition */}
           <div className="relative z-10 transition-transform duration-300 group-hover:scale-110">
             {theme === 'dark' ? (
-              <Sun className={`${iconSizes[size]} text-yellow-400 dark:text-yellow-300`} />
+              <Sun className={`${iconSizes[size]} text-yellow-400`} />
             ) : (
-              <Moon className={`${iconSizes[size]} text-slate-600 dark:text-blue-300`} />
+              <Moon className={`${iconSizes[size]} text-slate-600`} />
             )}
           </div>
         </button>

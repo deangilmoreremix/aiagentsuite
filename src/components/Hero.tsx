@@ -453,15 +453,15 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 dark:from-slate-900 dark:via-blue-900 dark:to-slate-900">
       {/* Animated Background with Particles */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900">
+      <div className="absolute inset-0">
         {/* Particle System */}
         <div className="absolute inset-0">
           {[...Array(50)].map((_, i) => (
             <div
               key={i}
-              className="absolute rounded-full bg-blue-400/10 animate-pulse"
+              className="absolute rounded-full bg-blue-400/10 dark:bg-blue-400/10 animate-pulse"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -476,23 +476,23 @@ const Hero = () => {
 
         {/* Data Flow Lines */}
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse"></div>
-          <div className="absolute top-3/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-0 bottom-0 left-1/4 w-px bg-gradient-to-b from-transparent via-blue-500 to-transparent animate-pulse" style={{animationDelay: '2s'}}></div>
-          <div className="absolute top-0 bottom-0 right-1/4 w-px bg-gradient-to-b from-transparent via-purple-500 to-transparent animate-pulse" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400 dark:via-blue-500 to-transparent animate-pulse"></div>
+          <div className="absolute top-3/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-400 dark:via-purple-500 to-transparent animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-0 bottom-0 left-1/4 w-px bg-gradient-to-b from-transparent via-blue-400 dark:via-blue-500 to-transparent animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-0 bottom-0 right-1/4 w-px bg-gradient-to-b from-transparent via-purple-400 dark:via-purple-500 to-transparent animate-pulse" style={{animationDelay: '3s'}}></div>
         </div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-section="dashboard">
         {/* Compact Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
-              <Bot className="h-8 w-8 text-blue-400" />
+              <Bot className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             </div>
-            <span className="text-xl font-bold text-white">SmartCRM</span>
-            <span className="text-blue-400">AI Agent Suite</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">SmartCRM</span>
+            <span className="text-blue-600 dark:text-blue-400">AI Agent Suite</span>
           </div>
         </div>
 
@@ -500,14 +500,14 @@ const Hero = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           {/* Left: Value Proposition */}
           <div className="space-y-6">
-            <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight">
+            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
               Transform Your CRM Into an{' '}
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent animate-pulse">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 dark:from-blue-400 dark:via-purple-400 dark:to-blue-400 bg-clip-text text-transparent animate-pulse">
                 AI Sales Machine
               </span>
             </h1>
             
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
               Deploy 15+ specialized AI agents that work 24/7 to automate your entire sales process. 
               From lead generation to closing deals — all powered by voice, vision, and intelligence.
             </p>
@@ -516,8 +516,8 @@ const Hero = () => {
             <div className="grid grid-cols-4 gap-4 py-6">
               {liveStats.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-xs text-gray-400">{stat.label}</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -528,7 +528,7 @@ const Hero = () => {
                 <PlayCircle className="inline-block w-6 h-6 mr-3" />
                 Try Interactive Demo
               </button>
-              <button className="flex-1 border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300">
+              <button className="flex-1 border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300">
                 <Eye className="inline-block w-5 h-5 mr-2" />
                 Watch Live Demo
               </button>
@@ -540,16 +540,16 @@ const Hero = () => {
             {/* Global Mode Toggle */}
             <div className={`p-4 rounded-xl border transition-all duration-300 ${
               realMode 
-                ? 'bg-red-500/10 border-red-400/30' 
-                : 'bg-blue-500/10 border-blue-400/30'
+                ? 'bg-red-500/10 dark:bg-red-400/20 border-red-400/30 dark:border-red-300/30' 
+                : 'bg-blue-500/10 dark:bg-blue-400/20 border-blue-400/30 dark:border-blue-300/30'
             }`}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full animate-pulse ${
-                    realMode ? 'bg-red-400' : 'bg-blue-400'
+                    realMode ? 'bg-red-500 dark:bg-red-400' : 'bg-blue-500 dark:bg-blue-400'
                   }`}></div>
                   <span className={`font-semibold ${
-                    realMode ? 'text-red-300' : 'text-blue-300'
+                    realMode ? 'text-red-600 dark:text-red-300' : 'text-blue-600 dark:text-blue-300'
                   }`}>
                     {realMode ? '🔴 LIVE MODE' : '🔵 DEMO MODE'}
                   </span>
@@ -573,7 +573,7 @@ const Hero = () => {
                 </button>
               </div>
               <p className={`text-sm ${
-                realMode ? 'text-red-200' : 'text-blue-200'
+                realMode ? 'text-red-700 dark:text-red-200' : 'text-blue-700 dark:text-blue-200'
               }`}>
                 {realMode 
                   ? 'Real AI agents executing with your API keys'
@@ -583,21 +583,21 @@ const Hero = () => {
             </div>
 
             {/* Compact Interactive Console */}
-            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 h-96 flex flex-col relative">
+            <div className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-slate-800/90 dark:to-slate-900/90 backdrop-blur-xl rounded-2xl border border-gray-300/50 dark:border-slate-700/50 p-6 h-96 flex flex-col relative shadow-xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                 </div>
-                <span className="text-white font-semibold">AI Agent Console</span>
+                <span className="text-gray-900 dark:text-white font-semibold">AI Agent Console</span>
                 <Tooltip 
                   content="Interact with AI agents using natural language. Try typing or using voice commands."
                   position="top"
                 />
                 <div className="ml-auto flex items-center gap-2">
                   <Activity className="h-4 w-4 text-green-400 animate-pulse" />
-                  <span className="text-sm text-green-400">Live</span>
+                  <span className="text-sm text-green-600 dark:text-green-400">Live</span>
                 </div>
               </div>
 
@@ -605,11 +605,11 @@ const Hero = () => {
               <div className="flex-1 overflow-y-auto space-y-3 mb-4">
                 {messages.length === 0 && (
                   <div className="text-center py-8">
-                    <Bot className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-                    <h3 className="text-white font-semibold mb-2">Try the AI Console</h3>
+                    <Bot className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-gray-900 dark:text-white font-semibold mb-2">Try the AI Console</h3>
                     <button
                       onClick={handleTryExample}
-                      className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
                     >
                       Try: "{examplePrompts[currentPromptIndex]}"
                     </button>
@@ -629,7 +629,7 @@ const Hero = () => {
                     
                     <div className={`max-w-xs ${message.type === 'user' ? 'order-2' : ''}`}>
                       {message.agentName && (
-                        <div className="text-xs font-medium text-blue-400 mb-1">{message.agentName}</div>
+                        <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">{message.agentName}</div>
                       )}
                       
                       <div
@@ -638,9 +638,9 @@ const Hero = () => {
                             ? 'bg-blue-600 text-white'
                             : message.type === 'system'
                             ? realMode 
-                              ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                              : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                            : 'bg-slate-700/50 text-gray-200 border border-slate-600/30'
+                              ? 'bg-red-500/20 dark:bg-red-500/20 text-red-700 dark:text-red-300 border border-red-500/30'
+                              : 'bg-yellow-500/20 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-yellow-500/30'
+                            : 'bg-gray-200/50 dark:bg-slate-700/50 text-gray-800 dark:text-gray-200 border border-gray-300/30 dark:border-slate-600/30'
                         }`}
                       >
                         {message.content}
@@ -660,9 +660,9 @@ const Hero = () => {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                       <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
                     </div>
-                    <div className="bg-slate-700/50 px-4 py-3 rounded-xl border border-slate-600/30">
+                    <div className="bg-gray-200/50 dark:bg-slate-700/50 px-4 py-3 rounded-xl border border-gray-300/30 dark:border-slate-600/30">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-300">AI agents processing...</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">AI agents processing...</span>
                       </div>
                     </div>
                   </div>
@@ -680,7 +680,7 @@ const Hero = () => {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Command your AI agents..."
-                    className="w-full pl-4 pr-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50"
+                    className="w-full pl-4 pr-4 py-3 bg-white/70 dark:bg-slate-700/50 border border-gray-300/50 dark:border-slate-600/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500/50"
                     disabled={isProcessing}
                   />
                 </div>
@@ -690,7 +690,7 @@ const Hero = () => {
                   className={`p-3 rounded-xl transition-all duration-300 ${
                     isListening
                       ? 'bg-red-500 text-white animate-pulse'
-                      : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                      : 'bg-gray-300 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-slate-600'
                   }`}
                   disabled={isProcessing}
                 >
@@ -707,13 +707,13 @@ const Hero = () => {
 
                 {/* Interactive Tooltip for New Users */}
                 {showTooltip && (
-                  <div className="absolute -top-24 right-0 bg-blue-500/20 border border-blue-400/30 rounded-lg p-3 w-64 animate-fadeIn">
+                  <div className="absolute -top-24 right-0 bg-blue-500/20 dark:bg-blue-500/20 border border-blue-400/30 dark:border-blue-400/30 rounded-lg p-3 w-64 animate-fadeIn shadow-lg">
                     <div className="flex items-start gap-2">
-                      <HelpCircle className="h-5 w-5 text-blue-400 flex-shrink-0 mt-1" />
+                      <HelpCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
                       <div>
-                        <p className="text-blue-300 text-sm">Try typing a command or click the microphone to use voice!</p>
+                        <p className="text-blue-700 dark:text-blue-300 text-sm">Try typing a command or click the microphone to use voice!</p>
                         <button 
-                          className="text-xs text-blue-400 hover:text-blue-300 mt-2"
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mt-2"
                           onClick={() => {
                             setShowTooltip(false);
                             handleTryExample();
@@ -723,7 +723,7 @@ const Hero = () => {
                         </button>
                       </div>
                     </div>
-                    <div className="absolute bottom-[-8px] right-12 w-4 h-4 bg-blue-500/20 border border-blue-400/30 transform rotate-45"></div>
+                    <div className="absolute bottom-[-8px] right-12 w-4 h-4 bg-blue-500/20 dark:bg-blue-500/20 border border-blue-400/30 dark:border-blue-400/30 transform rotate-45"></div>
                   </div>
                 )}
               </div>
@@ -732,7 +732,7 @@ const Hero = () => {
         </div>
 
         {/* Compact Feature Preview */}
-        <div className="bg-gradient-to-r from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-8">
+        <div className="bg-gradient-to-r from-white/80 to-gray-50/80 dark:from-slate-800/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl border border-gray-300/50 dark:border-slate-700/50 p-8 shadow-xl">
           <div className="grid md:grid-cols-4 gap-6 text-center">
             {heroFeatures.map((feature, index) => {
               const IconComponent = feature.icon;
@@ -743,21 +743,21 @@ const Hero = () => {
                   key={index}
                   className={`p-6 rounded-xl border transition-all duration-500 ${
                     isActive 
-                      ? 'bg-blue-500/10 border-blue-400/30 transform scale-105'
-                      : 'bg-slate-700/30 border-slate-600/30'
+                      ? 'bg-blue-500/10 dark:bg-blue-500/10 border-blue-400/30 dark:border-blue-400/30 transform scale-105'
+                      : 'bg-gray-100/30 dark:bg-slate-700/30 border-gray-300/30 dark:border-slate-600/30'
                   }`}
                 >
                   <div className={`p-3 rounded-lg bg-gradient-to-r ${getColorClasses(feature.color)} mb-4 mx-auto w-fit`}>
                     <IconComponent className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-sm text-gray-300">{feature.description}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{feature.description}</p>
                   <Tooltip 
                     content={feature.demo}
                     position="bottom"
                     className="mt-2 inline-block"
                   >
-                    <Info className="h-4 w-4 text-gray-400 hover:text-blue-400 transition-colors" />
+                    <Info className="h-4 w-4 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" />
                   </Tooltip>
                 </div>
               );
