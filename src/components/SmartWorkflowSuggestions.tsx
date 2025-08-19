@@ -380,8 +380,8 @@ const SmartWorkflowSuggestions: React.FC<SmartWorkflowSuggestionsProps> = ({
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Loading State */}
       {isLoading && (
