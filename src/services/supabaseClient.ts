@@ -153,10 +153,7 @@ export const supabaseService = {
     const client = checkSupabaseAvailable();
     const { data, error } = await client
       .from('deals')
-      .select(`
-        *,
-        contacts (first_name, last_name, email)
-      `)
+      .select('*')
       .eq('customer_id', customerId)
       .order('created_at', { ascending: false });
     
