@@ -16,6 +16,10 @@ import TaskExecutionEntry from './components/TaskExecutionEntry';
 import EnhancedAIConsole from './components/EnhancedAIConsole';
 import PersonalizedGoalRecommendations from './components/PersonalizedGoalRecommendations';
 import ProactiveAssistantPanel from './components/ProactiveAssistantPanel';
+import ConversationInsightsPanel from './components/ConversationInsightsPanel';
+import SmartWorkflowSuggestions from './components/SmartWorkflowSuggestions';
+import DataQualityDashboard from './components/DataQualityDashboard';
+import AgentLearningPanel from './components/AgentLearningPanel';
 import ThemeToggle from './components/ThemeToggle';
 import Tooltip from './components/Tooltip';
 import { getDefaultMode, validateApiSetup, logApiStatus } from './config/apiConfig';
@@ -260,6 +264,53 @@ function App() {
               console.log('Viewed insight:', insight);
             }}
           />
+        </section>
+
+        {/* Phase 1 Intelligence Enhancements */}
+        <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left Column */}
+            <div className="space-y-8">
+              {/* Conversation Insights */}
+              <ConversationInsightsPanel 
+                userId="default-user"
+                realMode={globalRealMode}
+                onInsightAction={(insight) => {
+                  console.log('Applied conversation insight:', insight.title);
+                }}
+              />
+              
+              {/* Data Quality Dashboard */}
+              <DataQualityDashboard 
+                userId="default-user"
+                realMode={globalRealMode}
+                onAutoFix={(issues) => {
+                  console.log('Auto-fixed data issues:', issues.length);
+                }}
+              />
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-8">
+              {/* Smart Workflow Suggestions */}
+              <SmartWorkflowSuggestions 
+                userId="default-user"
+                realMode={globalRealMode}
+                onWorkflowCreate={(workflow) => {
+                  console.log('Created workflow:', workflow.name);
+                }}
+              />
+              
+              {/* Agent Learning Panel */}
+              <AgentLearningPanel 
+                userId="default-user"
+                realMode={globalRealMode}
+                onInsightApply={(insight) => {
+                  console.log('Applied learning insight:', insight.title);
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         {/* Enhanced Task Execution with GPT-5 */}
