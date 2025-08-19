@@ -453,7 +453,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 dark:from-slate-900 dark:via-blue-900 dark:to-slate-900">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-blue-50 to-gray-50 dark:from-slate-900 dark:via-blue-900 dark:to-slate-900">
       {/* Animated Background with Particles */}
       <div className="absolute inset-0">
         {/* Particle System */}
@@ -538,15 +538,15 @@ const Hero = () => {
           {/* Right: Interactive Demo Console */}
           <div className="space-y-6">
             {/* Global Mode Toggle */}
-            <div className={`p-4 rounded-xl border transition-all duration-300 ${
+            <div className={`p-4 rounded-xl border transition-all duration-300 bg-white dark:bg-slate-800/50 ${
               realMode 
-                ? 'bg-red-500/10 dark:bg-red-400/20 border-red-400/30 dark:border-red-300/30' 
-                : 'bg-blue-500/10 dark:bg-blue-400/20 border-blue-400/30 dark:border-blue-300/30'
+                ? 'border-red-400/50 dark:border-red-400/30' 
+                : 'border-blue-400/50 dark:border-blue-400/30'
             }`}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full animate-pulse ${
-                    realMode ? 'bg-red-500 dark:bg-red-400' : 'bg-blue-500 dark:bg-blue-400'
+                    realMode ? 'bg-red-500' : 'bg-blue-500'
                   }`}></div>
                   <span className={`font-semibold ${
                     realMode ? 'text-red-600 dark:text-red-300' : 'text-blue-600 dark:text-blue-300'
@@ -573,7 +573,7 @@ const Hero = () => {
                 </button>
               </div>
               <p className={`text-sm ${
-                realMode ? 'text-red-700 dark:text-red-200' : 'text-blue-700 dark:text-blue-200'
+                realMode ? 'text-red-600 dark:text-red-200' : 'text-blue-600 dark:text-blue-200'
               }`}>
                 {realMode 
                   ? 'Real AI agents executing with your API keys'
@@ -583,7 +583,7 @@ const Hero = () => {
             </div>
 
             {/* Compact Interactive Console */}
-            <div className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-slate-800/90 dark:to-slate-900/90 backdrop-blur-xl rounded-2xl border border-gray-300/50 dark:border-slate-700/50 p-6 h-96 flex flex-col relative shadow-xl">
+            <div className="bg-white/95 dark:bg-gradient-to-br dark:from-slate-800/90 dark:to-slate-900/90 backdrop-blur-xl rounded-2xl border border-gray-300/50 dark:border-slate-700/50 p-6 h-96 flex flex-col relative shadow-xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
@@ -605,11 +605,11 @@ const Hero = () => {
               <div className="flex-1 overflow-y-auto space-y-3 mb-4">
                 {messages.length === 0 && (
                   <div className="text-center py-8">
-                    <Bot className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+                    <Bot className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                     <h3 className="text-gray-900 dark:text-white font-semibold mb-2">Try the AI Console</h3>
                     <button
                       onClick={handleTryExample}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
                     >
                       Try: "{examplePrompts[currentPromptIndex]}"
                     </button>
@@ -638,9 +638,9 @@ const Hero = () => {
                             ? 'bg-blue-600 text-white'
                             : message.type === 'system'
                             ? realMode 
-                              ? 'bg-red-500/20 dark:bg-red-500/20 text-red-700 dark:text-red-300 border border-red-500/30'
-                              : 'bg-yellow-500/20 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-yellow-500/30'
-                            : 'bg-gray-200/50 dark:bg-slate-700/50 text-gray-800 dark:text-gray-200 border border-gray-300/30 dark:border-slate-600/30'
+                              ? 'bg-red-50 dark:bg-red-500/20 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-500/30'
+                              : 'bg-yellow-50 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-500/30'
+                            : 'bg-gray-100 dark:bg-slate-700/50 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-slate-600/30'
                         }`}
                       >
                         {message.content}
@@ -690,7 +690,7 @@ const Hero = () => {
                   className={`p-3 rounded-xl transition-all duration-300 ${
                     isListening
                       ? 'bg-red-500 text-white animate-pulse'
-                      : 'bg-gray-300 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-slate-600'
+                      : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600 hover:text-gray-900 dark:hover:text-white'
                   }`}
                   disabled={isProcessing}
                 >
@@ -732,7 +732,7 @@ const Hero = () => {
         </div>
 
         {/* Compact Feature Preview */}
-        <div className="bg-gradient-to-r from-white/80 to-gray-50/80 dark:from-slate-800/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl border border-gray-300/50 dark:border-slate-700/50 p-8 shadow-xl">
+        <div className="bg-white/90 dark:bg-gradient-to-r dark:from-slate-800/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl border border-gray-300/50 dark:border-slate-700/50 p-8 shadow-xl">
           <div className="grid md:grid-cols-4 gap-6 text-center">
             {heroFeatures.map((feature, index) => {
               const IconComponent = feature.icon;

@@ -1,18 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Hero from './components/Hero';
-import AgentShowcase from './components/AgentShowcase';
-import CRMModules from './components/CRMModules';
-import Features from './components/Features';
-import MultiAgentDemo from './components/MultiAgentDemo';
 import InteractiveGoalExplorer from './components/InteractiveGoalExplorer';
 import HowToUse from './components/HowToUse';
-import HowItWorks from './components/HowItWorks';
-import Integrations from './components/Integrations';
 import ComposioIntegrationModal from './components/ComposioIntegrationModal';
-import Pricing from './components/Pricing';
-import Footer from './components/Footer';
-import TaskExecutionEntry from './components/TaskExecutionEntry';
 import EnhancedAIConsole from './components/EnhancedAIConsole';
 import PersonalizedGoalRecommendations from './components/PersonalizedGoalRecommendations';
 import ProactiveAssistantPanel from './components/ProactiveAssistantPanel';
@@ -21,9 +12,21 @@ import SmartWorkflowSuggestions from './components/SmartWorkflowSuggestions';
 import DataQualityDashboard from './components/DataQualityDashboard';
 import AgentLearningPanel from './components/AgentLearningPanel';
 import ThemeToggle from './components/ThemeToggle';
+import LoadingSpinner from './components/LoadingSpinner';
 import Tooltip from './components/Tooltip';
 import { getDefaultMode, validateApiSetup, logApiStatus } from './config/apiConfig';
 import { Settings, HelpCircle, Book, Eye, Globe } from 'lucide-react';
+
+// Lazy load heavy components that are not immediately visible
+const AgentShowcase = React.lazy(() => import('./components/AgentShowcase'));
+const CRMModules = React.lazy(() => import('./components/CRMModules'));
+const Features = React.lazy(() => import('./components/Features'));
+const MultiAgentDemo = React.lazy(() => import('./components/MultiAgentDemo'));
+const HowItWorks = React.lazy(() => import('./components/HowItWorks'));
+const Integrations = React.lazy(() => import('./components/Integrations'));
+const Pricing = React.lazy(() => import('./components/Pricing'));
+const Footer = React.lazy(() => import('./components/Footer'));
+const TaskExecutionEntry = React.lazy(() => import('./components/TaskExecutionEntry'));
 
 function App() {
   const [globalRealMode, setGlobalRealMode] = useState(false);
@@ -319,31 +322,49 @@ function App() {
         </section>
 
         {/* Enhanced Task Execution with GPT-5 */}
-        <TaskExecutionEntry realMode={globalRealMode} />
+        <React.Suspense fallback={<LoadingSpinner message="Loading Task Execution..." size="large" />}>
+          <TaskExecutionEntry realMode={globalRealMode} />
+        </React.Suspense>
 
         {/* Agent Team Overview */}
-        <AgentShowcase />
+        <React.Suspense fallback={<LoadingSpinner message="Loading Agent Showcase..." />}>
+          <AgentShowcase />
+        </React.Suspense>
 
         {/* Multi-Agent Live Demo */}
-        <MultiAgentDemo />
+        <React.Suspense fallback={<LoadingSpinner message="Loading Multi-Agent Demo..." />}>
+          <MultiAgentDemo />
+        </React.Suspense>
 
         {/* CRM Integration Details */}
-        <CRMModules />
+        <React.Suspense fallback={<LoadingSpinner message="Loading CRM Modules..." />}>
+          <CRMModules />
+        </React.Suspense>
 
         {/* Key Features */}
-        <Features />
+        <React.Suspense fallback={<LoadingSpinner message="Loading Features..." />}>
+          <Features />
+        </React.Suspense>
 
         {/* How It Works */}
-        <HowItWorks />
+        <React.Suspense fallback={<LoadingSpinner message="Loading How It Works..." />}>
+          <HowItWorks />
+        </React.Suspense>
 
         {/* Tool Integrations */}
-        <Integrations onOpenComposioModal={handleOpenComposioModal} />
+        <React.Suspense fallback={<LoadingSpinner message="Loading Integrations..." />}>
+          <Integrations onOpenComposioModal={handleOpenComposioModal} />
+        </React.Suspense>
 
         {/* Pricing */}
-        <Pricing />
+        <React.Suspense fallback={<LoadingSpinner message="Loading Pricing..." />}>
+          <Pricing />
+        </React.Suspense>
 
         {/* Footer */}
-        <Footer />
+        <React.Suspense fallback={<LoadingSpinner message="Loading Footer..." />}>
+          <Footer />
+        </React.Suspense>
       </div>
     </ThemeProvider>
   );
