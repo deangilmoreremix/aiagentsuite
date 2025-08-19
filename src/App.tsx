@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import CoreInteractionPage from './pages/CoreInteractionPage';
+import { ArrowLeft } from 'lucide-react';
 
 // Lazy load the advanced features page for optimal performance
 const FeaturesAnalyticsPage = React.lazy(() => import('./pages/FeaturesAnalyticsPage'));
