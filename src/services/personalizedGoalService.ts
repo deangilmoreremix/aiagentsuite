@@ -113,14 +113,8 @@ export class PersonalizedGoalService {
         ]
       `;
 
-    let parsedRecommendations;
-    try {
       const recommendations = await realApiService.openai.generateText(recommendationPrompt, 2000, 0.3);
-      parsedRecommendations = JSON.parse(recommendations);
-    } catch (error) {
-      console.warn('OpenAI API not available, using fallback recommendations');
-      return this.getFallbackRecommendations();
-    }
+      const parsedRecommendations = JSON.parse(recommendations);
 
       // Map to full recommendation objects
       const fullRecommendations: PersonalizedRecommendation[] = parsedRecommendations
@@ -199,17 +193,20 @@ export class PersonalizedGoalService {
         }
       `;
 
-      let parsedProfile: UserBusinessProfile;
+      let parsedRecommendations;
       try {
-        const profile = await realApiService.openai.generateText(profilePrompt, 500, 0.4);
-        parsedProfile = {
-          ...JSON.parse(profile),
-          goalHistory: [] // Will be populated from actual goal execution history
-        };
+        const recommendations = await realApiService.openai.generateText(recommendationPrompt, 2000, 0.3);
+        parsedRecommendations = JSON.parse(recommendations);
       } catch (error) {
-        console.warn('OpenAI API not available, using default profile');
-        parsedProfile = this.getDefaultProfile();
+        console.warn('OpenAI API not available, using fallback recommendations');
+        return this.getFallbackRecommendations();
       }
+
+      const profile = await realApiService.openai.generateText(profilePrompt, 500, 0.3);
+      const parsedProfile: UserBusinessProfile = {
+        ...JSON.parse(profile),
+        goalHistory: [] // Will be populated from actual goal execution history
+      };
 
       this.userProfiles.set(userId, parsedProfile);
       return parsedProfile;
