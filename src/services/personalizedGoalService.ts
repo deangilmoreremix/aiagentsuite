@@ -193,8 +193,14 @@ export class PersonalizedGoalService {
         }
       `;
 
-      const profile = await realApiService.openai.generateText(profilePrompt, 500, 0.4);
-      const parsedProfile: UserBusinessProfile = {
+    let parsedRecommendations;
+    try {
+      const recommendations = await realApiService.openai.generateText(recommendationPrompt, 2000, 0.3);
+      parsedRecommendations = JSON.parse(recommendations);
+    } catch (error) {
+      console.warn('OpenAI API not available, using fallback recommendations');
+      return this.getFallbackRecommendations();
+    }
         ...JSON.parse(profile),
         goalHistory: [] // Will be populated from actual goal execution history
       };
