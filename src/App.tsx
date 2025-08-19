@@ -12,6 +12,9 @@ import ComposioIntegrationModal from './components/ComposioIntegrationModal';
 import Pricing from './components/Pricing';
 import Footer from './components/Footer';
 import TaskExecutionEntry from './components/TaskExecutionEntry';
+import EnhancedAIConsole from './components/EnhancedAIConsole';
+import PersonalizedGoalRecommendations from './components/PersonalizedGoalRecommendations';
+import ProactiveAssistantPanel from './components/ProactiveAssistantPanel';
 import Tooltip from './components/Tooltip';
 import { getDefaultMode, validateApiSetup, logApiStatus } from './config/apiConfig';
 import { Settings, HelpCircle, Book, Eye, Globe } from 'lucide-react';
@@ -211,10 +214,46 @@ function App() {
       
       {/* Interactive Goal Explorer - Primary Feature */}
       <section id="goal-explorer-section" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Enhanced AI Console Integration */}
+        <div className="mb-16">
+          <EnhancedAIConsole 
+            realMode={globalRealMode}
+            onModeToggle={() => handleModeToggle(!globalRealMode)}
+            showProactiveSuggestions={true}
+          />
+        </div>
+
+        {/* Personalized Goal Recommendations */}
+        <div className="mb-16">
+          <PersonalizedGoalRecommendations 
+            userId="default-user"
+            onGoalSelect={(goal) => {
+              // Integration with existing goal execution system
+              console.log('Selected personalized goal:', goal.title);
+            }}
+            maxRecommendations={6}
+            showReasoningDetails={true}
+          />
+        </div>
+
         <InteractiveGoalExplorer 
           realMode={globalRealMode}
           onModeToggle={handleModeToggle}
           onOpenApiSetup={() => {}}
+        />
+      </section>
+
+      {/* Proactive Assistant Panel */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <ProactiveAssistantPanel 
+          userId="default-user"
+          realMode={globalRealMode}
+          onSuggestionExecute={(suggestion) => {
+            console.log('Executed proactive suggestion:', suggestion.title);
+          }}
+          onInsightView={(insight) => {
+            console.log('Viewed insight:', insight);
+          }}
         />
       </section>
 
