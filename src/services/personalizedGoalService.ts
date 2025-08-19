@@ -1,5 +1,6 @@
 import { realApiService } from './realApiService';
 import { contextualMemoryService } from './contextualMemoryService';
+import { supabaseService } from './supabaseClient';
 import { allGoals, goalCategories } from '../data/goalsData';
 import { Goal } from '../types/goals';
 
