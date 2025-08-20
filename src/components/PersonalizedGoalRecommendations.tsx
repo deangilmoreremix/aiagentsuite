@@ -56,6 +56,15 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
   const [filter, setFilter] = useState<'all' | 'high-impact' | 'quick-wins' | 'strategic'>('all');
   const [hasError, setHasError] = useState(false);
 
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Load personalized recommendations
   useEffect(() => {
     console.log('🎯 Loading personalized recommendations...');
@@ -69,14 +78,20 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
       console.log('🎯 Generating personalized recommendations...');
       const recs = await personalizedGoalService.generatePersonalizedRecommendations(userId, refresh);
       console.log(`✅ Loaded ${recs.length} recommendations`);
-      setRecommendations(recs.slice(0, maxRecommendations));
+      if (isMountedRef.current) {
+        setRecommendations(recs.slice(0, maxRecommendations));
+      }
     } catch (error) {
       console.error('Failed to load recommendations:', error);
-      setHasError(true);
-      // Set empty recommendations on error to prevent blank screen
-      setRecommendations([]);
+      if (isMountedRef.current) {
+        setHasError(true);
+        // Set empty recommendations on error to prevent blank screen
+        setRecommendations([]);
+      }
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 

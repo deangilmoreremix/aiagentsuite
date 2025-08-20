@@ -179,6 +179,14 @@ const Hero = () => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Initialize connected tools from composio options
   useEffect(() => {
@@ -195,7 +203,9 @@ const Hero = () => {
   // Rotate features every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % heroFeatures.length);
+      if (isMountedRef.current) {
+        setActiveFeature((prev) => (prev + 1) % heroFeatures.length);
+      }
     }, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -203,7 +213,9 @@ const Hero = () => {
   // Rotate example prompts
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentPromptIndex((prev) => (prev + 1) % examplePrompts.length);
+      if (isMountedRef.current) {
+        setCurrentPromptIndex((prev) => (prev + 1) % examplePrompts.length);
+      }
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -211,6 +223,8 @@ const Hero = () => {
   // Simulate live agent activity
   useEffect(() => {
     const interval = setInterval(() => {
+      if (!isMountedRef.current) return;
+      
       const randomActivity = liveAgentActivities[Math.floor(Math.random() * liveAgentActivities.length)];
       const newActivity: AgentActivity = {
         id: Date.now().toString(),
@@ -228,13 +242,15 @@ const Hero = () => {
         const updated = [newActivity, ...prev.slice(0, 4)];
         // Complete the activity after 2 seconds
         setTimeout(() => {
-          setAgentActivities(current => 
-            current.map(activity => 
-              activity.id === newActivity.id 
-                ? { ...activity, status: 'completed' }
-                : activity
-            )
-          );
+          if (isMountedRef.current) {
+            setAgentActivities(current => 
+              current.map(activity => 
+                activity.id === newActivity.id 
+                  ? { ...activity, status: 'completed' }
+                  : activity
+              )
+            );
+          }
         }, 2000);
         return updated;
       });
@@ -246,16 +262,18 @@ const Hero = () => {
   // Update live stats periodically
   useEffect(() => {
     const interval = setInterval(() => {
-      setLiveStats(prev => prev.map(stat => ({
-        ...stat,
-        value: stat.label === "Active Users" 
-          ? (parseInt(stat.value.replace(',', '')) + Math.floor(Math.random() * 3)).toLocaleString()
-          : stat.label === "Emails Sent Today"
-          ? (parseInt(stat.value.replace(',', '')) + Math.floor(Math.random() * 50)).toLocaleString()
-          : stat.label === "Meetings Scheduled"
-          ? (parseInt(stat.value) + Math.floor(Math.random() * 2)).toString()
-          : stat.value
-      })));
+      if (isMountedRef.current) {
+        setLiveStats(prev => prev.map(stat => ({
+          ...stat,
+          value: stat.label === "Active Users" 
+            ? (parseInt(stat.value.replace(',', '')) + Math.floor(Math.random() * 3)).toLocaleString()
+            : stat.label === "Emails Sent Today"
+            ? (parseInt(stat.value.replace(',', '')) + Math.floor(Math.random() * 50)).toLocaleString()
+            : stat.label === "Meetings Scheduled"
+            ? (parseInt(stat.value) + Math.floor(Math.random() * 2)).toString()
+            : stat.value
+        })));
+      }
     }, 8000);
     return () => clearInterval(interval);
   }, []);
@@ -264,11 +282,15 @@ const Hero = () => {
   useEffect(() => {
     if (!localStorage.getItem('console-tooltip-seen')) {
       setTimeout(() => {
-        setShowTooltip(true);
-        setTimeout(() => {
-          setShowTooltip(false);
-          localStorage.setItem('console-tooltip-seen', 'true');
-        }, 8000);
+        if (isMountedRef.current) {
+          setShowTooltip(true);
+          setTimeout(() => {
+            if (isMountedRef.current) {
+              setShowTooltip(false);
+              localStorage.setItem('console-tooltip-seen', 'true');
+            }
+          }, 8000);
+        }
       }, 3000);
     }
   }, []);

@@ -77,31 +77,35 @@ export const getDefaultMode = (): boolean => {
 
 // Log configuration status
 export const logApiStatus = () => {
-  const validation = validateApiSetup();
-  
-  console.log('🔧 API Configuration Status:');
-  console.log('OpenAI:', apiConfig.openai.isConfigured ? '✅ Configured' : '❌ Missing');
-  console.log('Gemini:', apiConfig.gemini.isConfigured ? '✅ Configured' : '❌ Missing');
-  console.log('ElevenLabs:', apiConfig.elevenlabs.isConfigured ? '✅ Configured' : '⚠️ Missing (optional)');
-  console.log('Composio:', apiConfig.composio.isConfigured ? '✅ Configured' : '⚠️ Missing (fallback available)');
-  console.log('Supabase:', apiConfig.supabase.isConfigured ? '✅ Configured' : '⚠️ Missing (temporary data)');
-  console.log('Default Mode:', validation.canUseRealMode ? '🔴 Real Mode' : '🔵 Demo Mode');
-  console.log('Available LLMs:', [
-    validation.hasOpenAI ? 'OpenAI' : null,
-    validation.hasGemini ? 'Gemini' : null
-  ].filter(Boolean).join(', ') || 'None');
-  
-  if (validation.issues.length > 0) {
-    console.warn('⚠️ Configuration Issues:', validation.issues);
-  }
-  
-  if (validation.warnings.length > 0) {
-    console.warn('💡 Configuration Warnings:', validation.warnings);
-  }
-  
-  if (validation.canUseRealMode) {
-    console.log('🚀 Ready for Real AI Execution!');
-  } else {
-    console.log('🔵 Demo Mode Active - Configure APIs for real execution');
+  try {
+    const validation = validateApiSetup();
+    
+    console.log('🔧 API Configuration Status:');
+    console.log('OpenAI:', apiConfig.openai.isConfigured ? '✅ Configured' : '❌ Missing');
+    console.log('Gemini:', apiConfig.gemini.isConfigured ? '✅ Configured' : '❌ Missing');
+    console.log('ElevenLabs:', apiConfig.elevenlabs.isConfigured ? '✅ Configured' : '⚠️ Missing (optional)');
+    console.log('Composio:', apiConfig.composio.isConfigured ? '✅ Configured' : '⚠️ Missing (fallback available)');
+    console.log('Supabase:', apiConfig.supabase.isConfigured ? '✅ Configured' : '⚠️ Missing (temporary data)');
+    console.log('Default Mode:', validation.canUseRealMode ? '🔴 Real Mode' : '🔵 Demo Mode');
+    console.log('Available LLMs:', [
+      validation.hasOpenAI ? 'OpenAI' : null,
+      validation.hasGemini ? 'Gemini' : null
+    ].filter(Boolean).join(', ') || 'None');
+    
+    if (validation.issues.length > 0) {
+      console.warn('⚠️ Configuration Issues:', validation.issues);
+    }
+    
+    if (validation.warnings.length > 0) {
+      console.warn('💡 Configuration Warnings:', validation.warnings);
+    }
+    
+    if (validation.canUseRealMode) {
+      console.log('🚀 Ready for Real AI Execution!');
+    } else {
+      console.log('🔵 Demo Mode Active - Configure APIs for real execution');
+    }
+  } catch (error) {
+    console.error('❌ Failed to log API status:', error);
   }
 };

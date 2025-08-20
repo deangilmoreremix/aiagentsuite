@@ -91,7 +91,8 @@ export interface Customer {
 // Helper function to check if Supabase is available
 const checkSupabaseAvailable = () => {
   if (!supabase) {
-    throw new Error('Supabase is not configured. Please set up VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.');
+    console.warn('⚠️ Supabase is not configured. Some features may not work properly.');
+    return null;
   }
   return supabase;
 };
@@ -101,6 +102,8 @@ export const supabaseService = {
   // Contact operations
   async createContact(contact: Partial<Contact>) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+    
     const { data, error } = await client
       .from('contacts')
       .insert(contact)
@@ -113,6 +116,7 @@ export const supabaseService = {
 
   async getContacts(customerId?: string) {
     const client = checkSupabaseAvailable();
+    if (!client) return [];
     
     // Note: contacts table doesn't have customer_id column
     // So we select all contacts for authenticated users

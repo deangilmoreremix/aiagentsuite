@@ -77,6 +77,15 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
   const [goalResults, setGoalResults] = useState<any>(null);
   const [showHelp, setShowHelp] = useState(false);
 
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Generate execution steps based on goal and required agents
   useEffect(() => {
     const generateExecutionSteps = (): ExecutionStep[] => {
@@ -230,13 +239,15 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
 
           setLiveActivity(prev => [
             `✅ ${step.agentName}: Task completed successfully (simulated)`,
-            `📈 CRM Updated: ${step.crmImpact}`,
-            ...prev.slice(0, 8)
-          ]);
+        if (isMountedRef.current) {
+          const result = await runComposioAgent(
+            step.agentName,
+            step.prompt,
+            step.tools
+          );
+          
+          results.push(result);
         }
-
-        // Update progress
-        setOverallProgress(((i + 1) / executionSteps.length) * 100);
       }
 
       // Execution completed - generate results

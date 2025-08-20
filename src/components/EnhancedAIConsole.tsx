@@ -82,6 +82,14 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Initialize contextual memory and proactive assistant
   useEffect(() => {
@@ -116,7 +124,9 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
     const loadSuggestions = async () => {
       try {
         const suggestions = await proactiveAssistantService.generateProactiveSuggestions('default-user');
-        setProactiveSuggestions(suggestions.slice(0, 3)); // Show top 3
+        if (isMountedRef.current) {
+          setProactiveSuggestions(suggestions.slice(0, 3)); // Show top 3
+        }
       } catch (error) {
         console.error('Failed to load proactive suggestions:', error);
       }
@@ -138,7 +148,9 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
       const updateSummary = async () => {
         try {
           const summary = await contextualMemoryService.getContextualSummary();
-          setConversationSummary(summary);
+          if (isMountedRef.current) {
+            setConversationSummary(summary);
+          }
         } catch (error) {
           console.error('Failed to update conversation summary:', error);
         }
@@ -153,7 +165,9 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
       const getSuggestions = async () => {
         try {
           const suggestions = await enhancedNLUService.getCommandSuggestions(inputValue);
-          setCommandSuggestions(suggestions.slice(0, 3));
+          if (isMountedRef.current) {
+            setCommandSuggestions(suggestions.slice(0, 3));
+          }
         } catch (error) {
           console.error('Failed to get command suggestions:', error);
         }

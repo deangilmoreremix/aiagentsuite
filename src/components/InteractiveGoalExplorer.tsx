@@ -61,6 +61,15 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
     crmUpdates: 0
   });
 
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Check if user has seen walkthrough and auto-start when section comes into view
   useEffect(() => {
     const seen = localStorage.getItem('goal-explorer-walkthrough-seen');
@@ -74,7 +83,9 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
             if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
               // Delay to ensure smooth scrolling is complete
               setTimeout(() => {
-                setShowWalkthrough(true);
+                if (isMountedRef.current) {
+                  setShowWalkthrough(true);
+                }
               }, 1000);
               observer.disconnect(); // Only trigger once
             }
@@ -138,18 +149,25 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
 
     // Simulate execution progress
     const progressInterval = setInterval(() => {
+      if (!isMountedRef.current) {
+        clearInterval(progressInterval);
+        return;
+      }
+      
       setExecutionProgress(prev => {
         const currentProgress = prev[goal.id] || 0;
         const newProgress = Math.min(100, currentProgress + Math.random() * 12 + 3);
         
         if (newProgress >= 100) {
           clearInterval(progressInterval);
-          setExecutingGoals(current => {
-            const newSet = new Set(current);
-            newSet.delete(goal.id);
-            return newSet;
-          });
-          setCompletedGoals(current => new Set([...current, goal.id]));
+          if (isMountedRef.current) {
+            setExecutingGoals(current => {
+              const newSet = new Set(current);
+              newSet.delete(goal.id);
+              return newSet;
+            });
+            setCompletedGoals(current => new Set([...current, goal.id]));
+          }
           return { ...prev, [goal.id]: 100 };
         }
         

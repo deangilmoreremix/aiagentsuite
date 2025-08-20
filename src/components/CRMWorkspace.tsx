@@ -80,6 +80,15 @@ const CRMWorkspace: React.FC<CRMWorkspaceProps> = ({
   const [liveAgentActions, setLiveAgentActions] = useState<AgentAction[]>([]);
   const [recentActivities, setRecentActivities] = useState<AgentAction[]>([]);
 
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Initialize sample CRM data
   useEffect(() => {
     setContacts([
@@ -164,24 +173,26 @@ const CRMWorkspace: React.FC<CRMWorkspaceProps> = ({
       
       // Execute the action after a delay
       setTimeout(() => {
-        const completedAction = { ...action, status: 'completed' as const };
-        
-        // Apply action to CRM data
-        applyActionToCRM(completedAction);
-        
-        // Move to recent activities
-        setRecentActivities(prev => [completedAction, ...prev.slice(0, 9)]);
-        
-        // Remove from live actions
-        setLiveAgentActions(prev => prev.filter(a => a.id !== action.id));
-        
-        onActionComplete?.(completedAction);
-        
-        actionIndex++;
-        
-        // Schedule next action
-        if (actionIndex < agentActionsForGoal.length) {
-          setTimeout(executeNextAction, Math.random() * 2000 + 1000);
+        if (isMountedRef.current) {
+          const completedAction = { ...action, status: 'completed' as const };
+          
+          // Apply action to CRM data
+          applyActionToCRM(completedAction);
+          
+          // Move to recent activities
+          setRecentActivities(prev => [completedAction, ...prev.slice(0, 9)]);
+          
+          // Remove from live actions
+          setLiveAgentActions(prev => prev.filter(a => a.id !== action.id));
+          
+          onActionComplete?.(completedAction);
+          
+          actionIndex++;
+          
+          // Schedule next action
+          if (actionIndex < agentActionsForGoal.length) {
+            setTimeout(executeNextAction, Math.random() * 2000 + 1000);
+          }
         }
       }, Math.random() * 3000 + 2000);
     };

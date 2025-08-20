@@ -89,7 +89,11 @@ export async function executeAgentWithTools(agentName: string, task: string, too
   if (!validation.canUseRealMode) {
     const errorMsg = 'Real mode not available. Please configure your OpenAI API key.';
     console.error('❌', errorMsg);
-    embedAgentResponseUI(null, errorMsg);
+    try {
+      embedAgentResponseUI(null, errorMsg);
+    } catch (error) {
+      console.error('Failed to embed response UI:', error);
+    }
     return errorMsg;
   }
 
@@ -107,7 +111,11 @@ export async function executeAgentWithTools(agentName: string, task: string, too
     );
 
     console.log('✅ Real AI execution completed');
-    embedAgentResponseUI(tools, result);
+    try {
+      embedAgentResponseUI(tools, result);
+    } catch (error) {
+      console.error('Failed to embed response UI:', error);
+    }
     
     // If voice is available, generate speech
     if (validation.hasVoice) {
@@ -131,7 +139,11 @@ export async function executeAgentWithTools(agentName: string, task: string, too
   } catch (error) {
     console.error('❌ Real agent execution failed:', error);
     const errorMsg = `Real AI execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-    embedAgentResponseUI(null, errorMsg);
+    try {
+      embedAgentResponseUI(null, errorMsg);
+    } catch (uiError) {
+      console.error('Failed to embed error UI:', uiError);
+    }
     return errorMsg;
   }
 }
@@ -167,66 +179,73 @@ export async function runAgentForModule(agentName: string, task: string, app: st
 }
 
 function embedAgentResponseUI(toolsUsed: any, output: any) {
-  const container = document.querySelector("#agent-response-container");
-  if (!container) return;
-  container.innerHTML = "";
+  try {
+    const container = document.querySelector("#agent-response-container");
+    if (!container) {
+      console.warn('Agent response container not found');
+      return;
+    }
+    container.innerHTML = "";
 
-  const card = document.createElement("div");
-  card.className = "border border-gray-300 rounded-lg p-4 bg-white shadow-sm";
+    const card = document.createElement("div");
+    card.className = "border border-gray-300 rounded-lg p-4 bg-white shadow-sm";
 
-  const title = document.createElement("h3");
-  title.innerText = validation.canUseRealMode ? "🔴 Real AI Agent Result" : "🔵 Demo Agent Response";
-  title.className = "text-lg font-semibold mb-2";
+    const title = document.createElement("h3");
+    title.innerText = validation.canUseRealMode ? "🔴 Real AI Agent Result" : "🔵 Demo Agent Response";
+    title.className = "text-lg font-semibold mb-2";
 
-  const content = document.createElement("pre");
-  content.className = "text-sm whitespace-pre-wrap break-words";
-  content.innerText = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
+    const content = document.createElement("pre");
+    content.className = "text-sm whitespace-pre-wrap break-words";
+    content.innerText = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
 
-  const buttonRow = document.createElement("div");
-  buttonRow.className = "mt-4 flex gap-2";
+    const buttonRow = document.createElement("div");
+    buttonRow.className = "mt-4 flex gap-2";
 
-  const copyBtn = document.createElement("button");
-  copyBtn.className = "bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 text-xs";
-  copyBtn.innerText = "Copy";
-  copyBtn.onclick = () => navigator.clipboard.writeText(content.innerText);
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 text-xs";
+    copyBtn.innerText = "Copy";
+    copyBtn.onclick = () => navigator.clipboard.writeText(content.innerText);
 
-  const exportBtn = document.createElement("button");
-  exportBtn.className = "bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 text-xs";
-  exportBtn.innerText = "Export";
-  exportBtn.onclick = () => {
-    const blob = new Blob([content.innerText], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = "real-agent-response.txt";
-    link.click();
-  };
-
-  if (validation.hasToolIntegration) {
-    const emailBtn = document.createElement("button");
-    emailBtn.className = "bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs";
-    emailBtn.innerText = "Send via Email";
-    emailBtn.onclick = async () => {
-      try {
-        await realApiService.composio.sendEmail({
-          to: "user@example.com",
-          subject: "Real AI Agent Response", 
-          body: content.innerText
-        });
-        alert("✅ Email sent via real API!");
-      } catch (error) {
-        alert("⚠️ Email send failed: " + error);
-      }
+    const exportBtn = document.createElement("button");
+    exportBtn.className = "bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 text-xs";
+    exportBtn.innerText = "Export";
+    exportBtn.onclick = () => {
+      const blob = new Blob([content.innerText], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = "real-agent-response.txt";
+      link.click();
     };
-    buttonRow.appendChild(emailBtn);
+
+    if (validation.hasToolIntegration) {
+      const emailBtn = document.createElement("button");
+      emailBtn.className = "bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs";
+      emailBtn.innerText = "Send via Email";
+      emailBtn.onclick = async () => {
+        try {
+          await realApiService.composio.sendEmail({
+            to: "user@example.com",
+            subject: "Real AI Agent Response", 
+            body: content.innerText
+          });
+          alert("✅ Email sent via real API!");
+        } catch (error) {
+          alert("⚠️ Email send failed: " + error);
+        }
+      };
+      buttonRow.appendChild(emailBtn);
+    }
+
+    buttonRow.appendChild(copyBtn);
+    buttonRow.appendChild(exportBtn);
+
+    card.appendChild(title);
+    card.appendChild(content);
+    card.appendChild(buttonRow);
+    container.appendChild(card);
+  } catch (error) {
+    console.error('Failed to embed agent response UI:', error);
   }
-
-  buttonRow.appendChild(copyBtn);
-  buttonRow.appendChild(exportBtn);
-
-  card.appendChild(title);
-  card.appendChild(content);
-  card.appendChild(buttonRow);
-  container.appendChild(card);
 }
 
 // Initialize on page load

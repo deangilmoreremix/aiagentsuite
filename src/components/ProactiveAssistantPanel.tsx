@@ -60,6 +60,15 @@ const ProactiveAssistantPanel: React.FC<ProactiveAssistantPanelProps> = ({
   const [filter, setFilter] = useState<'all' | 'high' | 'actionable'>('all');
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Load suggestions and insights
   useEffect(() => {
     if (realMode) {
@@ -74,7 +83,9 @@ const ProactiveAssistantPanel: React.FC<ProactiveAssistantPanelProps> = ({
 
     const interval = setInterval(() => {
       loadSuggestions();
-      setLastRefresh(new Date());
+      if (isMountedRef.current) {
+        setLastRefresh(new Date());
+      }
     }, 60000); // Refresh every minute
 
     return () => clearInterval(interval);
@@ -83,14 +94,20 @@ const ProactiveAssistantPanel: React.FC<ProactiveAssistantPanelProps> = ({
   const loadSuggestions = async () => {
     if (!realMode) return;
     
-    setIsLoading(true);
+    if (isMountedRef.current) {
+      setIsLoading(true);
+    }
     try {
       const newSuggestions = await proactiveAssistantService.generateProactiveSuggestions(userId);
-      setSuggestions(newSuggestions);
+      if (isMountedRef.current) {
+        setSuggestions(newSuggestions);
+      }
     } catch (error) {
       console.error('Failed to load proactive suggestions:', error);
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 

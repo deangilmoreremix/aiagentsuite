@@ -12,6 +12,35 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'medium',
   showIcon = true 
 }) => {
+  // Add error boundary protection
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    const errorHandler = (error: ErrorEvent) => {
+      console.error('LoadingSpinner error:', error);
+      setHasError(true);
+    };
+
+    window.addEventListener('error', errorHandler);
+    return () => window.removeEventListener('error', errorHandler);
+  }, []);
+
+  if (hasError) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-center">
+          <div className="text-red-400 mb-2">Loading error occurred</div>
+          <button 
+            onClick={() => setHasError(false)}
+            className="text-blue-400 hover:text-blue-300 text-sm underline"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const sizeClasses = {
     small: 'h-4 w-4',
     medium: 'h-8 w-8', 
