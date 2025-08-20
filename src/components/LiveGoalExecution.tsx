@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Goal } from '../types/goals';
 import { runComposioAgent } from '../agents/composioAgentRunner';
 import { executeAgentWithTools } from '../agents/useOpenAIAgentSuite';
@@ -239,11 +239,23 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
 
           setLiveActivity(prev => [
             `✅ ${step.agentName}: Task completed successfully (simulated)`,
+            `📊 CRM Impact: ${step.crmImpact}`,
+            ...prev.slice(0, 8)
+          ]);
+        }
+
+        // Update progress
+        setOverallProgress(((i + 1) / executionSteps.length) * 100);
+      }
+
+      // Execute real agents if needed
+      const results = [];
+      for (const step of executionSteps) {
         if (isMountedRef.current) {
           const result = await runComposioAgent(
             step.agentName,
-            step.prompt,
-            step.tools
+            step.action,
+            step.toolsUsed || []
           );
           
           results.push(result);
