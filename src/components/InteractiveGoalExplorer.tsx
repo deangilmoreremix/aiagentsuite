@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Goal } from '../types/goals';
 import { goalCategories, allGoals } from '../data/goalsData';
 import InteractiveGoalCard from './InteractiveGoalCard';

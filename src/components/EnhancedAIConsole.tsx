@@ -28,6 +28,7 @@ import { contextualMemoryService } from '../services/contextualMemoryService';
 import { proactiveAssistantService } from '../services/proactiveAssistantService';
 import { enhancedNLUService } from '../services/enhancedNLUService';
 import { emotionalVoiceService } from '../services/emotionalVoiceService';
+import { realApiService } from '../services/realApiService';
 import Tooltip from './Tooltip';
 
 interface Message {

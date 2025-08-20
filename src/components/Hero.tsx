@@ -460,6 +460,17 @@ const Hero = () => {
       setConnectedTools(prev => prev.map(tool => 
         tool.id === toolValue ? { ...tool, status: 'disconnected' } : tool
       ));
+    } catch (error) {
+      console.error('Failed to generate enhanced demo:', error);
+      return {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: `I understand you want to work with "${input}". I'm currently in demo mode, so I'll provide simulated responses.`,
+        agentName: 'Enhanced Demo Agent',
+        timestamp: new Date(),
+        thinking: 'Demo mode: Providing simulated response due to generation error',
+        emotionalTone: 'professional'
+      };
     }
   };
 

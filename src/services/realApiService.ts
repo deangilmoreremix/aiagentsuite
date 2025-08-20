@@ -355,11 +355,13 @@ export const realApiService = {
 
     // Test ElevenLabs (handle gracefully)
     try {
-      if (realElevenLabsService && typeof realElevenLabsService.generateSpeech === 'function') {
-        const audioUrl = await realElevenLabsService.generateSpeech('Test', 'EXAVITQu4vr4xnSDxMaL');
-        results.elevenlabs = audioUrl !== null;
+      const audioUrl = await realElevenLabsService.generateSpeech('Test');
+      results.elevenlabs = audioUrl !== null;
+      if (audioUrl) {
+        console.log('✅ ElevenLabs connection test passed');
+      } else {
+        console.log('⚠️ ElevenLabs API key not configured (voice features disabled)');
       }
-      console.log(audioUrl ? '✅ ElevenLabs connection test passed' : '⚠️ ElevenLabs connection test failed (continuing without voice)');
     } catch (error) {
       console.log('⚠️ ElevenLabs connection test failed (continuing without voice):', error);
     }

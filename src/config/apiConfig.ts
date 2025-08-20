@@ -69,10 +69,15 @@ export const validateApiSetup = () => {
 
 // Get default mode based on API configuration
 export const getDefaultMode = (): boolean => {
-  const validation = validateApiSetup();
-  
-  // Default to real mode if any LLM is configured and not in development
-  return validation.canUseRealMode && !apiConfig.isDevelopmentMode;
+  try {
+    const validation = validateApiSetup();
+    
+    // Default to real mode if any LLM is configured and not in development
+    return validation.canUseRealMode && !apiConfig.isDevelopmentMode;
+  } catch (error) {
+    console.error('Failed to get default mode:', error);
+    return false; // Default to demo mode on error
+  }
 };
 
 // Log configuration status
