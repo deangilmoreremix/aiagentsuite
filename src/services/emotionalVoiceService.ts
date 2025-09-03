@@ -306,60 +306,6 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
     
     return guides[style] || guides.detailed;
   }
-        
-        User Emotion: ${emotionalContext.userEmotion}
-        - If excited: Match their energy, use enthusiastic language
-        - If frustrated: Be supportive, acknowledge their concern, focus on solutions
-        - If confused: Be patient, break down complex concepts, offer clarification
-        - If satisfied: Celebrate their success, build on positive momentum
-        - If urgent: Be direct, focus on immediate actions, show urgency understanding
-        
-        Conversation Tone: ${emotionalContext.conversationTone}
-        - Professional: Use formal language, focus on business value
-        - Casual: Use friendly language, be conversational
-        - Supportive: Be encouraging, empathetic, solution-focused
-        - Celebratory: Express excitement, highlight achievements
-        - Instructional: Be clear, step-by-step, educational
-        
-        Response Style: ${emotionalContext.responseStyle}
-        - Concise: Keep it brief and actionable
-        - Detailed: Provide comprehensive information
-        - Encouraging: Focus on positive outcomes and motivation
-        - Technical: Include specific details and methods
-        - Strategic: Focus on big-picture impact and planning
-        
-        Guidelines:
-        - Maintain the core information from the original response
-        - Adjust tone and style to match emotional context
-        - Add appropriate emotional markers (enthusiasm, empathy, etc.)
-        - Include relevant context references when helpful
-        - Keep it natural and human-like
-        
-        Return only the enhanced response text.`;
-
-      const responseInput = `Your response: "${content}"
-        
-        Emotional Context: ${JSON.stringify(emotionalContext, null, 2)}
-        Conversation Context: ${conversationSummary}
-        Additional Context: ${context ? JSON.stringify(context, null, 2) : 'None'}` + `
-
-      const response = await realApiService.openai.generateAIResponse(
-        instructions,
-        responseInput,
-        {
-          maxTokens: 400,
-          temperature: 0.6,
-          previousResponseId: summaryResult.lastResponseId
-        }
-      );
-      
-      const enhancedResponse = response.output_text || content;
-      return enhancedResponse;
-    } catch (error) {
-      console.error('Failed to generate emotional response:', error);
-      return content; // Fallback to original
-    }
-  }
 
   // Generate voice synthesis parameters based on emotion
   generateVoiceParameters(emotionalContext?: EmotionalContext): any {
@@ -442,7 +388,6 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
       if (audioUrl) {
         console.log('🎙️ Generated emotionally intelligent voice response');
         
-        User Emotion: ${emotionalContext.userEmotion}
         await contextualMemoryService.addMessage(
           'system',
           `Generated emotional voice response with ${this.currentEmotionalContext.conversationTone} tone`,
@@ -509,4 +454,3 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
 }
 
 export const emotionalVoiceService = EmotionalVoiceService.getInstance();
-}
