@@ -1,567 +1,327 @@
-import OpenAI from 'openai';
-import { apiConfig } from '../config/apiConfig';
+import { realApiService } from './realApiService';
 import { supabaseService } from './supabaseClient';
 
-// Initialize OpenAI client
-let openaiClient: OpenAI | null = null;
-
-if (apiConfig.openai.isConfigured) {
-  openaiClient = new OpenAI({
-    apiKey: apiConfig.openai.apiKey,
-    dangerouslyAllowBrowser: true
-  });
+interface AgentPerformanceData {
+  agentName: string;
+  totalExecutions: number;
+  successRate: number;
+  averageExecutionTime: number;
+  userSatisfactionScore: number;
+  improvementTrends: {
+    timeframe: string;
+    metricChange: number;
+  }[];
+  commonFailureReasons: string[];
+  optimizationSuggestions: string[];
 }
 
-// Initialize Gemini client
-let geminiClient: any = null;
-
-if (import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.VITE_GEMINI_API_KEY !== 'your_gemini_api_key_here') {
-  // Gemini would be initialized here if we had the client library
-  console.log('Gemini API key detected - ready for integration');
+interface LearningInsight {
+  id: string;
+  agentName: string;
+  insightType: 'performance_improvement' | 'user_preference' | 'process_optimization' | 'error_pattern';
+  title: string;
+  description: string;
+  actionable: boolean;
+  implementationSuggestion?: string;
+  expectedImprovement: string;
+  confidence: number;
+  createdAt: Date;
 }
 
-// Real OpenAI API calls
-export const realOpenAiService = {
-  // Dynamic model and parameter selection based on task
-  selectOptimalParameters(taskType: 'creative' | 'analytical' | 'factual' | 'conversational' = 'conversational', complexity: 'simple' | 'intermediate' | 'advanced' = 'intermediate') {
-    const configs = {
-      creative: { temperature: 0.8, maxTokens: 800, model: 'gpt-5' },
-      analytical: { temperature: 0.3, maxTokens: 1200, model: 'gpt-5' },
-      factual: { temperature: 0.1, maxTokens: 600, model: 'gpt-5' },
-      conversational: { temperature: 0.7, maxTokens: 1000, model: 'gpt-5' }
-    };
-    
-    const complexityMultipliers = {
-      simple: { tokenMultiplier: 0.7, tempAdjustment: -0.1 },
-      intermediate: { tokenMultiplier: 1.0, tempAdjustment: 0.0 },
-      advanced: { tokenMultiplier: 1.5, tempAdjustment: 0.1 }
-    };
-    
-    const baseConfig = configs[taskType];
-    const modifier = complexityMultipliers[complexity];
-    
-    return {
-      model: baseConfig.model,
-      temperature: Math.max(0.0, Math.min(1.0, baseConfig.temperature + modifier.tempAdjustment)),
-      maxTokens: Math.round(baseConfig.maxTokens * modifier.tokenMultiplier)
-    };
-  },
+interface UserInteractionPattern {
+  userId: string;
+  preferredAgents: string[];
+  commonWorkflows: string[];
+  successfulInteractions: {
+    pattern: string;
+    successRate: number;
+    frequency: number;
+  }[];
+  challengingAreas: string[];
+  learningOpportunities: string[];
+}
 
-  async generateAIResponse(instructions: string, input: string, options?: {
-    temperature?: number;
-    maxTokens?: number;
-    previousResponseId?: string;
-    store?: boolean;
-    taskType?: 'creative' | 'analytical' | 'factual' | 'conversational';
-    complexity?: 'simple' | 'intermediate' | 'advanced';
-    enableChainOfThought?: boolean;
-  }) {
-    if (!openaiClient) {
-      throw new Error('OpenAI API key not configured');
+export class AgentLearningService {
+  private static instance: AgentLearningService;
+  private performanceData: Map<string, AgentPerformanceData> = new Map();
+  private learningInsights: Map<string, LearningInsight[]> = new Map();
+  private userPatterns: Map<string, UserInteractionPattern> = new Map();
+
+  static getInstance(): AgentLearningService {
+    if (!AgentLearningService.instance) {
+      AgentLearningService.instance = new AgentLearningService();
     }
+    return AgentLearningService.instance;
+  }
 
-    const { 
-      previousResponseId, 
-      store = false,
-      taskType = 'conversational',
-      complexity = 'intermediate',
-      enableChainOfThought = false
-    } = options || {};
-    
-    // Use optimized parameters based on task type
-    const optimalParams = this.selectOptimalParameters(taskType, complexity);
-    const temperature = options?.temperature ?? optimalParams.temperature;
-    const maxTokens = options?.maxTokens ?? optimalParams.maxTokens;
-    
-    // Enhanced instructions with GPT-5 specific optimizations
-    let enhancedInstructions = instructions;
-    
-    if (enableChainOfThought) {
-      enhancedInstructions += `
-
-Please think through this step-by-step:
-1. First, analyze the problem and identify key requirements
-2. Consider multiple approaches and their trade-offs
-3. Select the best approach with clear reasoning
-4. Provide your final response with confidence level
-
-Use this format:
-<thinking>
-Your step-by-step reasoning process...
-</thinking>
-
-<response>
-Your final response...
-</response>
-
-<confidence>
-Your confidence level (0-100) and reasoning for this confidence
-</confidence>`;
-    }
-
+  // Analyze agent performance and generate learning insights
+  async analyzeAgentPerformance(userId: string): Promise<LearningInsight[]> {
     try {
-      console.log(`🤖 Making GPT-5 Responses API call (${taskType}, ${complexity})...`);
+      console.log('📊 Analyzing agent performance with GPT-5 advanced learning capabilities...');
+
+      const performanceData = await this.gatherPerformanceData(userId);
+      const userPatterns = await this.analyzeUserInteractionPatterns(userId);
+      const businessOutcomes = await this.getBusinessOutcomesData(userId);
+      const competitiveContext = await this.getIndustryBenchmarks(userId);
+
+      const instructions = `You are an expert AI performance analyst and machine learning specialist with deep expertise in:
+- Multi-agent system optimization and coordination
+- Business process improvement and automation effectiveness
+- User behavior analysis and personalization strategies
+- Performance analytics and predictive modeling
+- Continuous learning and adaptive system design
+
+ADVANCED LEARNING MISSION:
+Conduct sophisticated analysis of agent performance, user behavior, and business outcomes to generate actionable insights that will significantly improve system effectiveness and user satisfaction.
+
+LEARNING FRAMEWORK:
+1. PERFORMANCE PATTERN ANALYSIS
+   - Identify success patterns and failure modes
+    outputFormat?: 'json' | 'text' | 'structured';
+    qualityMode?: 'speed' | 'balanced' | 'accuracy';
+        
+        Agent Performance Data:
+        ${JSON.stringify(performanceData, null, 2)}
+        
+        User Interaction Patterns:
+        ${JSON.stringify(userPatterns, null, 2)}
+        
+        Generate insights that help:
+        1. Improve agent performance based on success/failure patterns
+        2. Adapt to user preferences and communication styles
+        3. Optimize workflows based on usage patterns
+        4. Identify training opportunities for better results
+        
+        Return JSON array:
+        [
+          {
+            "agentName": "AI SDR Agent",
+            "insightType": "performance_improvement",
+            "title": "Improve email personalization success",
+            "description": "Email Agent shows 15% lower success rate with tech prospects",
+            "actionable": true,
+            "implementationSuggestion": "Add technical terminology to email templates",
+            "expectedImprovement": "Increase tech prospect response rate by 20%",
+            "confidence": 85
+          }
+        ]
+        
+        Focus on actionable insights that can be implemented to improve agent effectiveness.
+      `;
+
+      const insights = await realApiService.openai.generateText(learningPrompt, 1000, 0.3);
+      const parsedInsights: LearningInsight[] = JSON.parse(insights).map((insight: any) => ({
+        ...insight,
+        id: `insight-${Date.now()}-${Math.random()}`,
+        createdAt: new Date()
+      }));
+
+      this.learningInsights.set(userId, parsedInsights);
+      console.log(`✅ Generated ${parsedInsights.length} learning insights`);
+      return parsedInsights;
+
+    } catch (error) {
+      console.error('❌ Failed to analyze agent performance:', error);
+      return [];
+    }
+  }
+
+  // Gather agent performance data
+  private async gatherPerformanceData(userId: string): Promise<Record<string, AgentPerformanceData>> {
+    try {
+      // In a real implementation, this would query actual execution logs
+      // For now, we'll simulate based on available data
       
-      const requestBody: any = {
-        model: optimalParams.model,
-        instructions: enhancedInstructions,
-        input,
-        temperature,
-        max_tokens: maxTokens,
-        store
+      const agentNames = [
+        'AI SDR Agent', 'AI AE Agent', 'Email Agent', 'Voice Agent',
+        'Calendar Agent', 'Follow-up Agent', 'Lead Scoring Agent'
+      ];
+
+      const performanceData: Record<string, AgentPerformanceData> = {};
+
+      agentNames.forEach(agentName => {
+        performanceData[agentName] = {
+          agentName,
+          totalExecutions: Math.floor(Math.random() * 100) + 20,
+          successRate: Math.floor(Math.random() * 20) + 75, // 75-95%
+          averageExecutionTime: Math.floor(Math.random() * 3000) + 1000, // 1-4 seconds
+          userSatisfactionScore: Math.floor(Math.random() * 15) + 80, // 80-95%
+          improvementTrends: [
+            {
+              timeframe: 'last_week',
+              metricChange: Math.floor(Math.random() * 10) - 5 // -5 to +5
+            }
+          ],
+          commonFailureReasons: this.getCommonFailureReasons(agentName),
+          optimizationSuggestions: []
+        };
+      });
+
+      return performanceData;
+
+    } catch (error) {
+      console.error('Failed to gather performance data:', error);
+      return {};
+    }
+  }
+
+  // Analyze user interaction patterns
+  private async analyzeUserInteractionPatterns(userId: string): Promise<UserInteractionPattern> {
+    try {
+      // This would analyze actual user interaction data
+      const pattern: UserInteractionPattern = {
+        userId,
+        preferredAgents: ['AI SDR Agent', 'Email Agent'],
+        commonWorkflows: ['lead_generation', 'follow_up_sequences'],
+        successfulInteractions: [
+          {
+            pattern: 'email_then_call',
+            successRate: 85,
+            frequency: 12
+          }
+        ],
+        challengingAreas: ['complex_negotiations', 'objection_handling'],
+        learningOpportunities: ['voice_interaction_improvement', 'advanced_automation']
       };
 
-      if (previousResponseId) {
-        requestBody.previous_response_id = previousResponseId;
-      }
+      this.userPatterns.set(userId, pattern);
+      return pattern;
 
-      // Note: Using fetch directly as the OpenAI SDK might not support /v1/responses yet
-      const response = await fetch('https://api.openai.com/v1/responses', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiClient.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!response.ok) {
-        throw new Error(`OpenAI Responses API failed: ${response.status} ${response.statusText}`);
-      }
-
-      const responseData = await response.json();
-
-      console.log('✅ GPT-5 Responses API call successful');
-      return responseData;
     } catch (error) {
-      console.error('❌ GPT-5 Responses API Error:', error);
-      throw new Error(`OpenAI Responses API failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  },
-
-  async generateText(
-    prompt: string, 
-    maxTokens: number = 500, 
-    temperature = 0.7, 
-    instructions?: string,
-    taskType: 'creative' | 'analytical' | 'factual' | 'conversational' = 'conversational',
-    complexity: 'simple' | 'intermediate' | 'advanced' = 'intermediate',
-    enableChainOfThought: boolean = false
-  ) {
-    if (!openaiClient) {
-      throw new Error('OpenAI API key not configured');
-    }
-
-    try {
-      console.log(`📝 Generating text with GPT-5 (${taskType}, ${complexity})...`);
-      
-      const response = await this.generateAIResponse(
-        instructions || 'You are an expert AI assistant with deep business knowledge and analytical capabilities.',
-        prompt,
-        {
-          maxTokens,
-          temperature,
-          taskType,
-          complexity,
-          enableChainOfThought
-        }
-      );
-
-      const text = response.output_text || '';
-      console.log('✅ GPT-5 text generation successful');
-      return text;
-    } catch (error) {
-      console.error('❌ GPT-5 Text Generation Error:', error);
-      throw new Error(`Text generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  },
-
-  // Legacy method for backward compatibility during transition
-  async createChatCompletion(messages: any[], tools?: any[], temperature = 0.7, maxTokens = 1000) {
-    console.warn('⚠️ createChatCompletion is deprecated, use generateAIResponse instead');
-    
-    // Extract system message as instructions and last user message as input
-    const systemMessage = messages.find(msg => msg.role === 'system');
-    const userMessage = messages.findLast(msg => msg.role === 'user');
-    
-    const instructions = systemMessage?.content || 'You are a helpful AI assistant.';
-    const input = userMessage?.content || '';
-    
-    // If there are tools, we need to handle this differently
-    // For now, append tool information to instructions
-    let enhancedInstructions = instructions;
-    if (tools && tools.length > 0) {
-      enhancedInstructions += `\n\nAvailable tools: ${JSON.stringify(tools, null, 2)}`;
-      enhancedInstructions += '\nWhen you need to use a tool, describe the action you would take in your response.';
-    }
-    
-    try {
-      const response = await this.generateAIResponse(enhancedInstructions, input, {
-        temperature
-      });
-
-      // Format response to match Chat Completions structure for backward compatibility
+      console.error('Failed to analyze user patterns:', error);
       return {
-        choices: [{
-          message: {
-            content: response.output_text,
-            role: 'assistant'
-          }
-        }],
-        id: response.id,
-        created: Math.floor(Date.now() / 1000),
-        model: response.model || 'gpt-5'
-      };
-    } catch (error) {
-      console.error('❌ Legacy Chat Completion Error:', error);
-      throw error;
-    }
-  }
-};
-
-// Real ElevenLabs API calls with graceful error handling
-export const realElevenLabsService = {
-  async generateSpeech(text: string, voiceId: string = 'EXAVITQu4vr4xnSDxMaL') {
-    const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
-    
-    if (!apiKey || apiKey === 'your_elevenlabs_api_key_here') {
-      console.warn('⚠️ ElevenLabs API key not configured - voice features unavailable');
-      return null;
-    }
-
-    try {
-      console.log('🎙️ Generating speech with ElevenLabs...');
-      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': apiKey
-        },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_monolingual_v1",
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75
-          }
-        })
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.warn('⚠️ ElevenLabs API key is invalid or expired - voice features disabled');
-          console.warn('💡 Please check your ElevenLabs API key in the .env file');
-        } else {
-          console.warn(`⚠️ ElevenLabs API failed: ${response.status} ${response.statusText}`);
-        }
-        return null; // Return null instead of throwing error
-      }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      console.log('✅ Voice generation successful');
-      return audioUrl;
-    } catch (error) {
-      console.warn('⚠️ ElevenLabs API Error (continuing without voice):', error);
-      console.warn('💡 Voice generation failed but agent will continue without audio features');
-      return null; // Return null instead of throwing error
-    }
-  }
-};
-
-// Real Gemini API calls
-export const realGeminiService = {
-  async generateContent(prompt: string, maxTokens: number = 500, temperature = 0.7) {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    
-    if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-      throw new Error('Gemini API key not configured');
-    }
-
-    try {
-      console.log('🧠 Making Gemini API call...');
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature,
-            maxOutputTokens: maxTokens,
-            topP: 0.95,
-            topK: 40
-          }
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Gemini API failed: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      
-      if (result.promptFeedback && result.promptFeedback.blockReason) {
-        throw new Error(`Gemini blocked the request: ${result.promptFeedback.blockReason}`);
-      }
-      
-      const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      console.log('✅ Gemini API call successful');
-      return text;
-    } catch (error) {
-      console.error('❌ Gemini API Error:', error);
-      throw new Error(`Gemini API failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  },
-  
-  // Streaming version for UI feedback
-  streamContent: async function*(prompt: string, maxTokens: number = 500, temperature = 0.7) {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    
-    if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-      throw new Error('Gemini API key not configured');
-    }
-    
-    try {
-      // Note: This is using a pretend streaming approach as the Gemini API doesn't have native streaming yet
-      // In a real implementation, you would use a proper streaming API
-      const text = await this.generateContent(prompt, maxTokens, temperature);
-      
-      // Fake streaming by yielding chunks of the text
-      const chunkSize = 10;
-      for (let i = 0; i < text.length; i += chunkSize) {
-        yield text.substring(i, Math.min(i + chunkSize, text.length));
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-    } catch (error) {
-      console.error('❌ Gemini Streaming Error:', error);
-      throw new Error(`Gemini streaming failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
-};
-
-// Enhanced Composio service with Supabase integration
-export const realComposioService = {
-  async executeAction(appName: string, actionName: string, parameters: any) {
-    const apiKey = import.meta.env.VITE_COMPOSIO_API_KEY;
-    
-    if (!apiKey || apiKey === 'your_composio_api_key_here') {
-      console.log('⚠️ Composio API key not configured - using mock execution');
-      return {
-        success: true,
-        message: `Mock execution: ${actionName} on ${appName}`,
-        parameters
+        userId,
+        preferredAgents: [],
+        commonWorkflows: [],
+        successfulInteractions: [],
+        challengingAreas: [],
+        learningOpportunities: []
       };
     }
+  }
 
+  // Get common failure reasons for specific agents
+  private getCommonFailureReasons(agentName: string): string[] {
+    const reasonMap: Record<string, string[]> = {
+      'AI SDR Agent': ['Invalid contact data', 'Rate limiting', 'Email deliverability'],
+      'Email Agent': ['Template formatting', 'Personalization failures', 'Spam filters'],
+      'Voice Agent': ['Audio processing errors', 'Network latency', 'Voice recognition'],
+      'Calendar Agent': ['Timezone conflicts', 'Availability sync', 'Permission issues']
+    };
+
+    return reasonMap[agentName] || ['Configuration issues', 'Network timeouts'];
+  }
+
+  // Apply learning insights to improve agent behavior
+  async applyLearningInsights(userId: string, insights: LearningInsight[]): Promise<boolean> {
     try {
-      console.log(`🔧 Executing ${actionName} on ${appName} via Composio...`);
-      
-      // For Composio API key that was directly provided
-      if (apiKey === 'ijlbnshtz1r4yz0mnxeuyd') {
-        console.log('✅ Using provided Composio API key');
-      }
-      
-      const response = await fetch('https://backend.composio.dev/api/v1/actions/execute', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          appName,
-          actionName,
-          parameters
-        })
-      });
+      console.log('🧠 Applying learning insights to improve agent performance...');
 
-      if (!response.ok) {
-        throw new Error(`Composio API failed: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      console.log('✅ Composio action executed successfully');
-      
-      // Log to Supabase if available
-      if (apiConfig.supabase.isConfigured) {
-        try {
+      for (const insight of insights.filter(i => i.actionable)) {
+        // Log the learning application
+        if (supabaseService.isAvailable()) {
           await supabaseService.logActivity({
-            customer_id: 'default', // You'll want to get this from context
-            type: 'tool_integration',
-            title: `${appName} ${actionName}`,
-            description: `Executed ${actionName} on ${appName} via Composio`,
-            metadata: { parameters, result }
+            customer_id: userId,
+            type: 'agent_learning',
+            title: `Applied learning: ${insight.title}`,
+            description: insight.implementationSuggestion || insight.description,
+            metadata: {
+              agentName: insight.agentName,
+              insightType: insight.insightType,
+              expectedImprovement: insight.expectedImprovement,
+              confidence: insight.confidence
+            }
           });
-        } catch (logError) {
-          console.warn('Failed to log activity to Supabase:', logError);
+        }
+
+        // Update agent performance tracking
+        const currentPerformance = this.performanceData.get(insight.agentName);
+        if (currentPerformance) {
+          currentPerformance.optimizationSuggestions.push(insight.implementationSuggestion || insight.description);
+          this.performanceData.set(insight.agentName, currentPerformance);
         }
       }
-      
-      return result;
+
+      console.log('✅ Learning insights applied successfully');
+      return true;
+
     } catch (error) {
-      console.error('❌ Composio API Error:', error);
-      // Fallback to mock execution if Composio fails
-      return {
-        success: true,
-        message: `Fallback execution: ${actionName} on ${appName}`,
-        parameters,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
+      console.error('❌ Failed to apply learning insights:', error);
+      return false;
     }
-  },
-
-  async sendEmail(emailData: { to: string; subject: string; body: string }) {
-    const result = await this.executeAction('gmail', 'send_email', emailData);
-    
-    // Log to CRM if Supabase is available
-    if (apiConfig.supabase.isConfigured) {
-      try {
-        await supabaseService.logActivity({
-          customer_id: 'default',
-          type: 'email',
-          title: `Email sent: ${emailData.subject}`,
-          description: `Sent email to ${emailData.to}`,
-          metadata: { emailData, result }
-        });
-      } catch (error) {
-        console.warn('Failed to log email to CRM:', error);
-      }
-    }
-    
-    return result;
-  },
-
-  async createCalendarEvent(eventData: {
-    title: string;
-    startTime: string;
-    endTime: string;
-    attendees?: string[];
-  }) {
-    const result = await this.executeAction('google_calendar', 'create_event', {
-      title: eventData.title,
-      start_time: eventData.startTime,
-      end_time: eventData.endTime,
-      attendees: eventData.attendees
-    });
-    
-    // Log to CRM
-    if (apiConfig.supabase.isConfigured) {
-      try {
-        await supabaseService.logActivity({
-          customer_id: 'default',
-          type: 'meeting',
-          title: `Meeting scheduled: ${eventData.title}`,
-          description: `Scheduled for ${eventData.startTime}`,
-          metadata: { eventData, result }
-        });
-      } catch (error) {
-        console.warn('Failed to log meeting to CRM:', error);
-      }
-    }
-    
-    return result;
-  },
-
-  async sendSlackMessage(channel: string, message: string) {
-    return this.executeAction('slack', 'send_message', { channel, message });
   }
-};
 
-// Unified real API service
-export const realApiService = {
-  openai: realOpenAiService,
-  elevenlabs: realElevenLabsService,
-  gemini: realGeminiService,
-  composio: realComposioService,
-  supabase: supabaseService,
-  
-  // Test all API connections
-  async testConnections() {
-    const results = {
-      openai: false,
-      elevenlabs: false,
-      gemini: false,
-      composio: false,
-      supabase: false
+  // Get performance data for a specific agent
+  getAgentPerformance(agentName: string): AgentPerformanceData | null {
+    return this.performanceData.get(agentName) || null;
+  }
+
+  // Get all learning insights for a user
+  getLearningInsights(userId: string): LearningInsight[] {
+    return this.learningInsights.get(userId) || [];
+  }
+
+  // Get user interaction patterns
+  getUserInteractionPatterns(userId: string): UserInteractionPattern | null {
+    return this.userPatterns.get(userId) || null;
+  }
+
+  // Record agent execution result for learning
+  recordAgentExecution(
+    agentName: string,
+    success: boolean,
+    executionTime: number,
+    context?: any
+  ): void {
+    const currentData = this.performanceData.get(agentName) || {
+      agentName,
+      totalExecutions: 0,
+      successRate: 0,
+      averageExecutionTime: 0,
+      userSatisfactionScore: 0,
+      improvementTrends: [],
+      commonFailureReasons: [],
+      optimizationSuggestions: []
     };
 
-    // Test OpenAI
-    try {
-      if (openaiClient) {
-        await realOpenAiService.generateText('Test connection', 10);
-        results.openai = true;
-        console.log('✅ OpenAI connection test passed');
-      }
-    } catch (error) {
-      console.log('❌ OpenAI connection test failed:', error);
-    }
+    // Update performance metrics
+    currentData.totalExecutions++;
+    const oldSuccessRate = currentData.successRate;
+    currentData.successRate = ((oldSuccessRate * (currentData.totalExecutions - 1)) + (success ? 100 : 0)) / currentData.totalExecutions;
+    currentData.averageExecutionTime = ((currentData.averageExecutionTime * (currentData.totalExecutions - 1)) + executionTime) / currentData.totalExecutions;
 
-    // Test new Responses API specifically
-    try {
-      if (openaiClient) {
-        await realOpenAiService.generateAIResponse(
-          'You are a helpful assistant.',
-          'Test connection',
-          { maxTokens: 10 }
-        );
-        console.log('✅ OpenAI Responses API test passed');
-      }
-    } catch (error) {
-      console.log('❌ OpenAI Responses API test failed:', error);
-    }
-
-    // Test ElevenLabs (handle gracefully)
-    try {
-      const audioUrl = await realElevenLabsService.generateSpeech('Test');
-      results.elevenlabs = audioUrl !== null;
-      if (audioUrl) {
-        console.log('✅ ElevenLabs connection test passed');
-      } else {
-        console.log('⚠️ ElevenLabs API key not configured (voice features disabled)');
-      }
-    } catch (error) {
-      console.log('⚠️ ElevenLabs connection test failed (continuing without voice):', error);
-    }
-
-    // Test Gemini
-    try {
-      if (realGeminiService && typeof realGeminiService.generateContent === 'function') {
-        await realGeminiService.generateContent('Hello');
-      }
-      results.gemini = true;
-      console.log('✅ Gemini connection test passed');
-    } catch (error) {
-      console.log('❌ Gemini connection test failed:', error);
-    }
-
-    // Test Composio (always passes with fallback)
-    try {
-      if (realComposioService && typeof realComposioService.executeAction === 'function') {
-        await realComposioService.executeAction('test', 'ping', {});
-      }
-      results.composio = true;
-      console.log('✅ Composio connection test passed');
-    } catch (error) {
-      console.log('❌ Composio connection test failed:', error);
-    }
-
-    // Test Supabase
-    try {
-      if (supabaseService && typeof supabaseService.testConnection === 'function') {
-        const connected = await supabaseService.testConnection();
-        results.supabase = connected;
-      }
-      console.log(connected ? '✅ Supabase connection test passed' : '❌ Supabase connection test failed');
-    } catch (error) {
-      console.log('❌ Supabase connection test failed:', error);
-    }
-
-    return results;
+    this.performanceData.set(agentName, currentData);
   }
-};
+
+  // Generate agent improvement recommendations
+  async generateAgentImprovements(agentName: string): Promise<string[]> {
+    try {
+      const performanceData = this.performanceData.get(agentName);
+      if (!performanceData) return [];
+
+      const improvementPrompt = `
+        Analyze this agent's performance and suggest improvements:
+        
+        Agent: ${agentName}
+        Performance Data: ${JSON.stringify(performanceData, null, 2)}
+        
+        Generate 3-5 specific improvement suggestions that could:
+        1. Increase success rate
+        2. Reduce execution time
+        3. Improve user satisfaction
+        4. Address common failure reasons
+        
+        Return as simple text array of actionable suggestions.
+      `;
+
+      const improvements = await realApiService.openai.generateText(improvementPrompt, 400, 0.4);
+      return improvements.split('\n').filter(i => i.trim().length > 0);
+
+    } catch (error) {
+      console.error('Failed to generate agent improvements:', error);
+      return [];
+    }
+  }
+}
+
+export const agentLearningService = AgentLearningService.getInstance();
