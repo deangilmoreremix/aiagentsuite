@@ -73,7 +73,7 @@ export class EmotionalVoiceService {
           "businessContext": "learning",
           "responseStyle": "detailed"
         }
-      `;
+        `;
 
       const analysis = await realApiService.openai.generateText(emotionalAnalysisPrompt, 300, 0.3);
       const emotionalContext: EmotionalContext = JSON.parse(analysis);
@@ -335,14 +335,13 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
         - Include relevant context references when helpful
         - Keep it natural and human-like
         
-        Return only the enhanced response text.
-      `;
+        Return only the enhanced response text.`;
 
       const responseInput = `Your response: "${content}"
         
         Emotional Context: ${JSON.stringify(emotionalContext, null, 2)}
         Conversation Context: ${conversationSummary}
-        Additional Context: ${context ? JSON.stringify(context, null, 2) : 'None'}`;
+        Additional Context: ${context ? JSON.stringify(context, null, 2) : 'None'}` + `
 
       const response = await realApiService.openai.generateAIResponse(
         instructions,
@@ -443,7 +442,7 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
       if (audioUrl) {
         console.log('🎙️ Generated emotionally intelligent voice response');
         
-        // Log the emotional enhancement
+        User Emotion: ${emotionalContext.userEmotion}
         await contextualMemoryService.addMessage(
           'system',
           `Generated emotional voice response with ${this.currentEmotionalContext.conversationTone} tone`,
