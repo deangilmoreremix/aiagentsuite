@@ -124,123 +124,102 @@ async function executeWithOpenAI(
 ): Promise<RealAgentResult> {
   const { debug, temperature, maxTokens } = options;
   
-  // Prepare messages for OpenAI
-  const messages = [
-    {
-      role: 'system',
-      content: systemPrompt
-    },
-    {
-      role: 'user',
-      content: task
-    }
-  ];
-
-  // Prepare tool definitions for OpenAI function calling
-  const toolDefinitions = tools.map(tool => generateOpenAIToolDefinition(tool));
+  // Prepare instructions and input for new Responses API
+  let instructions = systemPrompt;
+  
+  // Add tool information to instructions since Responses API handles tools differently
+  if (tools.length > 0) {
+    const toolDefinitions = tools.map(tool => generateOpenAIToolDefinition(tool));
+    instructions += '\n\nAvailable tools: ' + JSON.stringify(toolDefinitions, null, 2);
+    instructions += '\nWhen you need to use a tool, describe the specific action you would take and include the tool name and parameters in your response.';
+  }
   
   if (debug) {
-    console.log('OpenAI Tool Definitions:', JSON.stringify(toolDefinitions, null, 2));
-    console.log('Messages:', JSON.stringify(messages, null, 2));
+    console.log('OpenAI Instructions:', instructions);
+    console.log('OpenAI Input:', task);
   }
 
-  // Make OpenAI API call
+  // Make OpenAI Responses API call
   apiCallsMade++;
-  const openaiResponse = await realApiService.openai.createChatCompletion(
-    messages,
-    toolDefinitions,
-    temperature,
-    maxTokens
+  const openaiResponse = await realApiService.openai.generateAIResponse(
+    instructions,
+    task,
+    {
+      temperature,
+      maxTokens,
+      store: true
+    }
   );
 
-  const responseMessage = openaiResponse.choices[0]?.message;
+  const responseText = openaiResponse.output_text;
   
-  if (!responseMessage) {
+  if (!responseText) {
     throw new Error('No response from OpenAI');
   }
 
-  let finalResult = responseMessage.content || '';
+  let finalResult = responseText;
   const executionResults: any[] = [];
 
-  // Execute tool calls if any
-  if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
-    for (const toolCall of responseMessage.tool_calls) {
-      try {
-        const toolName = toolCall.function.name;
-        const parameters = JSON.parse(toolCall.function.arguments);
-        
-        toolsUsed.push(toolName);
-        apiCallsMade++;
-
-        if (debug) {
-          console.log(`Executing tool: ${toolName}`);
-          console.log('Parameters:', parameters);
-        }
-
-        // Execute the tool call
-        const toolResult = await executeToolCall(toolName, parameters);
-        executionResults.push({
-          tool: toolName,
-          parameters,
-          result: toolResult,
-          success: true
-        });
-
-      } catch (toolError) {
-        console.error(`Tool execution failed for ${toolCall.function.name}:`, toolError);
-        executionResults.push({
-          tool: toolCall.function.name,
-          error: toolError instanceof Error ? toolError.message : 'Unknown error',
-          success: false
-        });
-      }
-    }
-
-    // Generate final response with tool results
-    if (executionResults.length > 0) {
-      const toolResultsMessage = {
-        role: 'user',
-        content: `Tool execution results: ${JSON.stringify(executionResults, null, 2)}. 
-                 Please provide a summary of what was accomplished.`
-      };
-
+  // Parse tool usage from response text (since Responses API doesn't have structured tool calls)
+  const toolUsagePattern = /TOOL_CALL:\s*(\w+)\s*\{([^}]*)\}/g;
+  let toolMatch;
+  
+  while ((toolMatch = toolUsagePattern.exec(responseText)) !== null) {
+    try {
+      const toolName = toolMatch[1];
+      const parametersText = toolMatch[2];
+      
+      // Parse parameters from the extracted text
+      const parameters = parseToolParameters(parametersText);
+      
+      toolsUsed.push(toolName);
       apiCallsMade++;
-      const finalResponse = await realApiService.openai.createChatCompletion(
-        [...messages, responseMessage, toolResultsMessage],
-        [],
-        temperature,
-        maxTokens
-      );
 
-      finalResult = finalResponse.choices[0]?.message?.content || finalResult;
+      if (debug) {
+        console.log(`Executing tool: ${toolName}`);
+        console.log('Parameters:', parameters);
+      }
+
+      // Execute the tool call
+      const toolResult = await executeToolCall(toolName, parameters);
+      executionResults.push({
+        tool: toolName,
+        parameters,
+        result: toolResult,
+        success: true
+      });
+
+    } catch (toolError) {
+      console.error(`Tool execution failed for ${toolMatch[1]}:`, toolError);
+      executionResults.push({
+        tool: toolMatch[1],
+        error: toolError instanceof Error ? toolError.message : 'Unknown error',
+        success: false
+      });
     }
   }
 
-  const executionTime = Date.now() - startTime;
+  // Generate final response with tool results if any tools were used
+  if (executionResults.length > 0) {
+    const toolResultsInput = `Tool execution results: ${JSON.stringify(executionResults, null, 2)}. 
+                             Please provide a summary of what was accomplished.`;
 
-  // Helper method to parse tool parameters from text
-  parseToolParameters(parametersText: string): Record<string, any> {
-    try {
-      // Try to parse as JSON first
-      return JSON.parse(`{${parametersText}}`);
-    } catch (error) {
-      // If JSON parsing fails, try to extract key-value pairs
-      const params: Record<string, any> = {};
-      const pairs = parametersText.split(',');
-      
-      pairs.forEach(pair => {
-        const [key, value] = pair.split(':').map(s => s.trim());
-        if (key && value) {
-          // Remove quotes if present
-          const cleanKey = key.replace(/['"]/g, '');
-          const cleanValue = value.replace(/['"]/g, '');
-          params[cleanKey] = cleanValue;
-        }
-      });
-      
-      return params;
-    }
-  },
+    apiCallsMade++;
+    const finalResponse = await realApiService.openai.generateAIResponse(
+      'Provide a summary of tool execution results.',
+      toolResultsInput,
+      {
+        temperature,
+        maxTokens,
+        previousResponseId: openaiResponse.id,
+        store: true
+      }
+    );
+
+    finalResult = finalResponse.output_text || finalResult;
+  }
+
+  const executionTime = Date.now() - startTime;
 
   return {
     success: true,
@@ -256,6 +235,25 @@ async function executeWithOpenAI(
     toolsUsed,
     llmUsed: 'openai'
   };
+}
+
+// Parse tool parameters from text
+function parseToolParameters(parametersText: string): any {
+  try {
+    // Try to parse as JSON first
+    return JSON.parse(`{${parametersText}}`);
+  } catch {
+    // If JSON parsing fails, parse key-value pairs
+    const parameters: any = {};
+    const pairs = parametersText.split(',');
+    for (const pair of pairs) {
+      const [key, value] = pair.split(':').map(s => s.trim());
+      if (key && value) {
+        parameters[key.replace(/['"]/g, '')] = value.replace(/['"]/g, '');
+      }
+    }
+    return parameters;
+  }
 }
 
 // Execute agent with Gemini's tool usage format
