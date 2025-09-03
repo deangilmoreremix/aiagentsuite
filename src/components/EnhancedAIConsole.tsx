@@ -263,7 +263,11 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
           instructions,
           enhancedInput,
           {
-            maxTokens: 600,
+            taskType: 'complex_reasoning',
+            complexity: 'intermediate', 
+            enableChainOfThought: true,
+            maxTokens: 800, // Increased for GPT-5
+            qualityMode: 'balanced',
             previousResponseId: contextSummaryResult.lastResponseId,
             store: true
           }

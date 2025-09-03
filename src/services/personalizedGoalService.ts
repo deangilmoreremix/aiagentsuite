@@ -101,6 +101,14 @@ export class PersonalizedGoalService {
         
         CRM Analysis: ${JSON.stringify(crmAnalysis, null, 2)}
         
+        GPT-5 STRATEGIC ANALYSIS REQUIREMENTS:
+        Apply advanced reasoning to understand user's business situation comprehensively:
+        - Analyze business patterns and growth opportunities
+        - Consider competitive landscape and positioning
+        - Evaluate scalability and long-term value potential
+        - Identify strategic automation opportunities
+        - Assess risk mitigation and success amplification factors
+        
         Available Goals: ${JSON.stringify(allGoals.slice(0, 20).map(g => ({
           id: g.id,
           title: g.title,

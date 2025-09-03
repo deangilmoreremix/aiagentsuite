@@ -148,7 +148,8 @@ export class GPT5TaskOrchestrator {
           complexity: 'advanced',
           enableChainOfThought: true,
           temperature: 0.2,
-          maxTokens: 3000,
+          maxTokens: 3000, // Increased for GPT-5
+          qualityMode: 'accuracy',
           outputFormat: 'json',
           qualityMode: 'accuracy'
         }
@@ -551,4 +552,5 @@ Focus on creating a plan that not only completes the task but does so with excep
 
 // Export singleton instance
 export const gpt5TaskOrchestrator = GPT5TaskOrchestrator.getInstance();
+}
 }

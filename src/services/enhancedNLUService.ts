@@ -85,15 +85,17 @@ export class EnhancedNLUService {
       ];
 
       const parsePrompt = `
-        You are a GPT-5 powered advanced natural language understanding system with sophisticated business context awareness and intent recognition capabilities.
+        You are an expert GPT-5 powered natural language understanding system with advanced business intelligence and predictive capabilities.
 
-        ADVANCED PARSING MISSION:
-        Leverage GPT-5's enhanced understanding to parse complex business commands with:
+        GPT-5 ENHANCED PARSING MISSION:
+        Apply GPT-5's advanced reasoning and business intelligence to parse complex commands with sophisticated understanding:
         - Deep semantic understanding beyond surface keywords
         - Business context awareness and industry knowledge
         - Multi-intent recognition for complex workflows
         - Intelligent entity resolution and relationship mapping
         - Predictive analysis of user's likely next actions
+        - Strategic business implications assessment
+        - Cross-functional workflow optimization opportunities
         
         User Command: "${userInput}"
         

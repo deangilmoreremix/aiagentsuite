@@ -277,12 +277,21 @@ async function executeWithGemini(
   }
 
   // Gemini requires a different prompt structure for tool usage
-  const fullPrompt = `${systemPrompt}
+  const fullPrompt = `GPT-5 ENHANCED AGENT COORDINATION:
+  Apply advanced reasoning and strategic business intelligence.
+  
+  ${systemPrompt}
+
+GPT-5 REASONING FRAMEWORK:
+- Think through the business implications step-by-step
+- Consider optimization opportunities and strategic value
+- Apply advanced pattern recognition and business intelligence
+- Provide detailed rationale for your decisions
 
 When you need to use a tool, respond in the following format:
 
 <thinking>
-Your step-by-step reasoning about what tool to use and why
+Your advanced GPT-5 reasoning: step-by-step analysis, business implications, strategic considerations, and optimization opportunities
 </thinking>
 
 <tool>

@@ -71,6 +71,13 @@ export class AgentLearningService {
         User Interaction Patterns:
         ${JSON.stringify(userPatterns, null, 2)}
         
+        GPT-5 ADVANCED PERFORMANCE ANALYSIS:
+        Apply sophisticated reasoning to generate insights that go beyond surface-level metrics:
+        - Identify subtle performance patterns and correlation factors
+        - Analyze cross-agent synergies and optimization opportunities
+        - Evaluate business impact optimization strategies
+        - Consider predictive improvement pathways
+        
         Generate insights that help:
         1. Improve agent performance based on success/failure patterns
         2. Adapt to user preferences and communication styles

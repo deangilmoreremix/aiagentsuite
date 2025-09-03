@@ -169,6 +169,31 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
       console.error('Failed to generate emotional response:', error);
       return content; // Fallback to original
     }
+  },
+
+  // GPT-5 personality mode selection
+  private getGPT5PersonalityMode(emotionalContext: EmotionalContext): string {
+    const personalityModes = {
+      excited: 'Enthusiastic Collaborator - energetic, action-oriented, celebration-focused',
+      frustrated: 'Supportive Guide - calm, solution-focused, empathetic problem-solver',
+      confused: 'Patient Teacher - clear, educational, step-by-step instructor',
+      satisfied: 'Success Partner - warm, building on momentum, opportunity-focused',
+      urgent: 'Efficient Executor - direct, fast-acting, priority-focused',
+      neutral: 'Professional Advisor - balanced, comprehensive, strategically-minded'
+    };
+    
+    return personalityModes[emotionalContext.userEmotion] || personalityModes.neutral;
+  },
+
+  // GPT-5 response adaptation strategy
+  private getGPT5ResponseAdaptation(emotionalContext: EmotionalContext): string {
+    return `Tone: ${emotionalContext.conversationTone} | Context: ${emotionalContext.businessContext} | Style: ${emotionalContext.responseStyle}
+    
+    GPT-5 Enhanced Adaptation:
+    - Apply personality-driven response patterns
+    - Leverage advanced empathy and business context understanding
+    - Optimize language patterns for maximum engagement and clarity
+    - Integrate strategic business intelligence naturally into conversational flow`;
   }
 
   // Get emotional response strategy for GPT-5

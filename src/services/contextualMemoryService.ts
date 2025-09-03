@@ -298,8 +298,10 @@ Keep the summary comprehensive but under 500 words, focusing on actionable insig
                 if (!d.expected_close_date) return false;
                 const closeDate = new Date(d.expected_close_date);
                 const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            enableChainOfThought: true,
                 return closeDate <= weekFromNow && closeDate >= now;
-              }).length,
+            maxTokens: 1000, // Increased for GPT-5
+            qualityMode: 'accuracy',
               totalValue: deals.reduce((sum, d) => sum + (d.value || 0), 0)
             }
           }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { Bot, Brain, Activity } from 'lucide-react';
 
 interface LoadingSpinnerProps {

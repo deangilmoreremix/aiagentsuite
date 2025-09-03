@@ -60,11 +60,18 @@ export class SmartWorkflowService {
       const crmData = await this.getCRMDataSummary(userId);
 
       const workflowPrompt = `
-        Analyze user behavior and suggest workflow automations:
+        GPT-5 ENHANCED WORKFLOW INTELLIGENCE:
+        Apply advanced pattern recognition and business optimization to suggest sophisticated workflow automations:
         
         User Behavior Pattern: ${JSON.stringify(behaviorPattern, null, 2)}
         Conversation Context: ${conversationContext}
         CRM Data Summary: ${JSON.stringify(crmData, null, 2)}
+        
+        ADVANCED REASONING REQUIREMENTS:
+        - Identify subtle patterns and optimization opportunities
+        - Consider business process maturity and scalability
+        - Evaluate cross-functional impact and dependencies
+        - Predict workflow evolution and adaptation needs
         
         Available Goals for Workflow Building:
         ${allGoals.slice(0, 15).map(g => `${g.id}: ${g.title} - ${g.description}`).join('\n')}
