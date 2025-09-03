@@ -22,50 +22,123 @@ if (import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.VITE_GEMINI_API_KEY !
 
 // Real OpenAI API calls
 export const realOpenAiService = {
-  async createChatCompletion(messages: any[], tools?: any[], temperature = 0.7, maxTokens = 1000) {
+  async generateAIResponse(instructions: string, input: string, options?: {
+    temperature?: number;
+    maxTokens?: number;
+    previousResponseId?: string;
+    store?: boolean;
+  }) {
     if (!openaiClient) {
       throw new Error('OpenAI API key not configured');
     }
 
+    const { temperature = 0.7, maxTokens = 1000, previousResponseId, store = false } = options || {};
+
     try {
-      console.log('🤖 Making real OpenAI API call...');
-      const response = await openaiClient.chat.completions.create({
-        model: "gpt-4",
-        messages,
-        tools,
-        tool_choice: tools && tools.length > 0 ? "auto" : undefined,
+      console.log('🤖 Making real OpenAI Responses API call...');
+      
+      const requestBody: any = {
+        model: "gpt-5",
+        instructions,
+        input,
         temperature,
-        max_tokens: maxTokens
+        max_tokens: maxTokens,
+        store
+      };
+
+      if (previousResponseId) {
+        requestBody.previous_response_id = previousResponseId;
+      }
+
+      // Note: Using fetch directly as the OpenAI SDK might not support /v1/responses yet
+      const response = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiClient.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
       });
 
-      console.log('✅ OpenAI API call successful');
-      return response;
+      if (!response.ok) {
+        throw new Error(`OpenAI Responses API failed: ${response.status} ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+
+      console.log('✅ OpenAI Responses API call successful');
+      return responseData;
     } catch (error) {
-      console.error('❌ OpenAI API Error:', error);
-      throw new Error(`OpenAI API failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ OpenAI Responses API Error:', error);
+      throw new Error(`OpenAI Responses API failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
 
-  async generateText(prompt: string, maxTokens: number = 500, temperature = 0.7) {
+  async generateText(prompt: string, maxTokens: number = 500, temperature = 0.7, instructions?: string) {
     if (!openaiClient) {
       throw new Error('OpenAI API key not configured');
     }
 
     try {
       console.log('📝 Generating text with OpenAI...');
-      const response = await openaiClient.chat.completions.create({
-        model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: maxTokens,
-        temperature
-      });
+      
+      const response = await this.generateAIResponse(
+        instructions || 'You are a helpful AI assistant.',
+        prompt,
+        {
+          maxTokens,
+          temperature
+        }
+      );
 
-      const text = response.choices[0]?.message?.content || '';
+      const text = response.output_text || '';
       console.log('✅ Text generation successful');
       return text;
     } catch (error) {
       console.error('❌ OpenAI Text Generation Error:', error);
       throw new Error(`Text generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  // Legacy method for backward compatibility during transition
+  async createChatCompletion(messages: any[], tools?: any[], temperature = 0.7, maxTokens = 1000) {
+    console.warn('⚠️ createChatCompletion is deprecated, use generateAIResponse instead');
+    
+    // Extract system message as instructions and last user message as input
+    const systemMessage = messages.find(msg => msg.role === 'system');
+    const userMessage = messages.findLast(msg => msg.role === 'user');
+    
+    const instructions = systemMessage?.content || 'You are a helpful AI assistant.';
+    const input = userMessage?.content || '';
+    
+    // If there are tools, we need to handle this differently
+    // For now, append tool information to instructions
+    let enhancedInstructions = instructions;
+    if (tools && tools.length > 0) {
+      enhancedInstructions += `\n\nAvailable tools: ${JSON.stringify(tools, null, 2)}`;
+      enhancedInstructions += '\nWhen you need to use a tool, describe the action you would take in your response.';
+    }
+    
+    try {
+      const response = await this.generateAIResponse(enhancedInstructions, input, {
+        temperature
+      });
+
+      // Format response to match Chat Completions structure for backward compatibility
+      return {
+        choices: [{
+          message: {
+            content: response.output_text,
+            role: 'assistant'
+          }
+        }],
+        id: response.id,
+        created: Math.floor(Date.now() / 1000),
+        model: response.model || 'gpt-5'
+      };
+    } catch (error) {
+      console.error('❌ Legacy Chat Completion Error:', error);
+      throw error;
     }
   }
 };
