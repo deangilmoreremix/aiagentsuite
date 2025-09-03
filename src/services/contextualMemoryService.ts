@@ -150,16 +150,17 @@ export class ContextualMemoryService {
   }
 
   // Get contextual summary for AI agents
-  async getContextualSummary(): Promise<string> {
+  async getContextualSummary(): Promise<{ summary: string; lastResponseId?: string }> {
     if (!this.currentContext || this.currentContext.messages.length === 0) {
-      return 'No previous conversation context.';
+      return { summary: 'No previous conversation context.' };
     }
 
     try {
       const recentMessages = this.currentContext.messages.slice(-10);
       const crmContext = this.currentContext.crmContext;
       
-      const contextPrompt = `
+      // Build conversation input for new API
+      const conversationInput = `
         Summarize this conversation context for an AI agent:
         
         User Profile: ${JSON.stringify(this.currentContext.userProfile, null, 2)}
@@ -169,7 +170,9 @@ export class ContextualMemoryService {
         
         CRM Context:
         ${JSON.stringify(crmContext, null, 2)}
-        
+      `;
+      
+      const instructions = `
         Provide a concise summary that helps an AI agent understand:
         1. What the user is trying to accomplish
         2. Key CRM entities involved
@@ -179,11 +182,24 @@ export class ContextualMemoryService {
         Keep it under 300 words and focus on actionable insights.
       `;
 
-      const summary = await realApiService.openai.generateText(contextPrompt, 300, 0.3);
-      return summary;
+      const response = await realApiService.openai.generateAIResponse(
+        instructions,
+        conversationInput,
+        {
+          maxTokens: 300,
+          temperature: 0.3,
+          previousResponseId: crmContext.lastResponseId,
+          store: true
+        }
+      );
+      
+      return {
+        summary: response.output_text || 'No summary available.',
+        lastResponseId: response.id
+      };
     } catch (error) {
       console.error('Failed to generate contextual summary:', error);
-      return 'Error generating context summary.';
+      return { summary: 'Error generating context summary.' };
     }
   }
 

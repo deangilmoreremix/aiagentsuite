@@ -218,13 +218,38 @@ async function executeWithOpenAI(
 
   const executionTime = Date.now() - startTime;
 
+  // Helper method to parse tool parameters from text
+  parseToolParameters(parametersText: string): Record<string, any> {
+    try {
+      // Try to parse as JSON first
+      return JSON.parse(`{${parametersText}}`);
+    } catch (error) {
+      // If JSON parsing fails, try to extract key-value pairs
+      const params: Record<string, any> = {};
+      const pairs = parametersText.split(',');
+      
+      pairs.forEach(pair => {
+        const [key, value] = pair.split(':').map(s => s.trim());
+        if (key && value) {
+          // Remove quotes if present
+          const cleanKey = key.replace(/['"]/g, '');
+          const cleanValue = value.replace(/['"]/g, '');
+          params[cleanKey] = cleanValue;
+        }
+      });
+      
+      return params;
+    }
+  },
+
   return {
     success: true,
     agentName,
     result: {
       message: finalResult,
       toolExecutions: executionResults,
-      aiResponse: responseMessage
+      aiResponse: openaiResponse,
+      responseId: openaiResponse.id
     },
     executionTime,
     apiCallsMade,
