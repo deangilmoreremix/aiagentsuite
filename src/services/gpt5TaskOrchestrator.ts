@@ -531,5 +531,3 @@ Focus on creating a plan that not only completes the task but does so with excep
 
 // Export singleton instance
 export const gpt5TaskOrchestrator = GPT5TaskOrchestrator.getInstance();
-}
-}
