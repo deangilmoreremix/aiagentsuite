@@ -22,24 +22,89 @@ if (import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.VITE_GEMINI_API_KEY !
 
 // Real OpenAI API calls
 export const realOpenAiService = {
+  // Dynamic model and parameter selection based on task
+  selectOptimalParameters(taskType: 'creative' | 'analytical' | 'factual' | 'conversational' = 'conversational', complexity: 'simple' | 'intermediate' | 'advanced' = 'intermediate') {
+    const configs = {
+      creative: { temperature: 0.8, maxTokens: 800, model: 'gpt-5' },
+      analytical: { temperature: 0.3, maxTokens: 1200, model: 'gpt-5' },
+      factual: { temperature: 0.1, maxTokens: 600, model: 'gpt-5' },
+      conversational: { temperature: 0.7, maxTokens: 1000, model: 'gpt-5' }
+    };
+    
+    const complexityMultipliers = {
+      simple: { tokenMultiplier: 0.7, tempAdjustment: -0.1 },
+      intermediate: { tokenMultiplier: 1.0, tempAdjustment: 0.0 },
+      advanced: { tokenMultiplier: 1.5, tempAdjustment: 0.1 }
+    };
+    
+    const baseConfig = configs[taskType];
+    const modifier = complexityMultipliers[complexity];
+    
+    return {
+      model: baseConfig.model,
+      temperature: Math.max(0.0, Math.min(1.0, baseConfig.temperature + modifier.tempAdjustment)),
+      maxTokens: Math.round(baseConfig.maxTokens * modifier.tokenMultiplier)
+    };
+  },
+
   async generateAIResponse(instructions: string, input: string, options?: {
     temperature?: number;
     maxTokens?: number;
     previousResponseId?: string;
     store?: boolean;
+    taskType?: 'creative' | 'analytical' | 'factual' | 'conversational';
+    complexity?: 'simple' | 'intermediate' | 'advanced';
+    enableChainOfThought?: boolean;
   }) {
     if (!openaiClient) {
       throw new Error('OpenAI API key not configured');
     }
 
-    const { temperature = 0.7, maxTokens = 1000, previousResponseId, store = false } = options || {};
+    const { 
+      previousResponseId, 
+      store = false,
+      taskType = 'conversational',
+      complexity = 'intermediate',
+      enableChainOfThought = false
+    } = options || {};
+    
+    // Use optimized parameters based on task type
+    const optimalParams = this.selectOptimalParameters(taskType, complexity);
+    const temperature = options?.temperature ?? optimalParams.temperature;
+    const maxTokens = options?.maxTokens ?? optimalParams.maxTokens;
+    
+    // Enhanced instructions with GPT-5 specific optimizations
+    let enhancedInstructions = instructions;
+    
+    if (enableChainOfThought) {
+      enhancedInstructions += `
+
+Please think through this step-by-step:
+1. First, analyze the problem and identify key requirements
+2. Consider multiple approaches and their trade-offs
+3. Select the best approach with clear reasoning
+4. Provide your final response with confidence level
+
+Use this format:
+<thinking>
+Your step-by-step reasoning process...
+</thinking>
+
+<response>
+Your final response...
+</response>
+
+<confidence>
+Your confidence level (0-100) and reasoning for this confidence
+</confidence>`;
+    }
 
     try {
-      console.log('🤖 Making real OpenAI Responses API call...');
+      console.log(`🤖 Making GPT-5 Responses API call (${taskType}, ${complexity})...`);
       
       const requestBody: any = {
-        model: "gpt-5",
-        instructions,
+        model: optimalParams.model,
+        instructions: enhancedInstructions,
         input,
         temperature,
         max_tokens: maxTokens,
@@ -66,36 +131,47 @@ export const realOpenAiService = {
 
       const responseData = await response.json();
 
-      console.log('✅ OpenAI Responses API call successful');
+      console.log('✅ GPT-5 Responses API call successful');
       return responseData;
     } catch (error) {
-      console.error('❌ OpenAI Responses API Error:', error);
+      console.error('❌ GPT-5 Responses API Error:', error);
       throw new Error(`OpenAI Responses API failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
 
-  async generateText(prompt: string, maxTokens: number = 500, temperature = 0.7, instructions?: string) {
+  async generateText(
+    prompt: string, 
+    maxTokens: number = 500, 
+    temperature = 0.7, 
+    instructions?: string,
+    taskType: 'creative' | 'analytical' | 'factual' | 'conversational' = 'conversational',
+    complexity: 'simple' | 'intermediate' | 'advanced' = 'intermediate',
+    enableChainOfThought: boolean = false
+  ) {
     if (!openaiClient) {
       throw new Error('OpenAI API key not configured');
     }
 
     try {
-      console.log('📝 Generating text with OpenAI...');
+      console.log(`📝 Generating text with GPT-5 (${taskType}, ${complexity})...`);
       
       const response = await this.generateAIResponse(
-        instructions || 'You are a helpful AI assistant.',
+        instructions || 'You are an expert AI assistant with deep business knowledge and analytical capabilities.',
         prompt,
         {
           maxTokens,
-          temperature
+          temperature,
+          taskType,
+          complexity,
+          enableChainOfThought
         }
       );
 
       const text = response.output_text || '';
-      console.log('✅ Text generation successful');
+      console.log('✅ GPT-5 text generation successful');
       return text;
     } catch (error) {
-      console.error('❌ OpenAI Text Generation Error:', error);
+      console.error('❌ GPT-5 Text Generation Error:', error);
       throw new Error(`Text generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
