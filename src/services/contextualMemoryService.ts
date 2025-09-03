@@ -150,57 +150,213 @@ export class ContextualMemoryService {
   }
 
   // Get contextual summary for AI agents
-  async getContextualSummary(): Promise<{ summary: string; lastResponseId?: string }> {
+  async getContextualSummary(
+    maxContextLength: number = 8000,
+    includeDetailedCRM: boolean = true,
+    prioritizeRecentInteractions: boolean = true
+  ): Promise<{ summary: string; lastResponseId?: string }> {
     if (!this.currentContext || this.currentContext.messages.length === 0) {
       return { summary: 'No previous conversation context.' };
     }
 
     try {
-      const recentMessages = this.currentContext.messages.slice(-10);
+      // Enhanced context selection for GPT-5's larger context window
+      const contextWindow = Math.min(this.currentContext.messages.length, 25); // Increased from 10 to 25
+      const recentMessages = prioritizeRecentInteractions 
+        ? this.currentContext.messages.slice(-contextWindow)
+        : this.getBalancedMessageContext(contextWindow);
+        
       const crmContext = this.currentContext.crmContext;
       
-      // Build conversation input for new API
-      const conversationInput = `
-        Summarize this conversation context for an AI agent:
-        
-        User Profile: ${JSON.stringify(this.currentContext.userProfile, null, 2)}
-        
-        Recent Conversation:
-        ${recentMessages.map(msg => `${msg.type}: ${msg.content}`).join('\n')}
-        
-        CRM Context:
-        ${JSON.stringify(crmContext, null, 2)}
-      `;
+      // Enhanced CRM context for better agent coordination
+      const enhancedCRMContext = includeDetailedCRM 
+        ? await this.buildEnhancedCRMContext()
+        : crmContext;
       
-      const instructions = `
-        Provide a concise summary that helps an AI agent understand:
-        1. What the user is trying to accomplish
-        2. Key CRM entities involved
-        3. Current conversation state
-        4. Relevant business context
-        
-        Keep it under 300 words and focus on actionable insights.
-      `;
+      const conversationInput = `CONVERSATION HISTORY:
+${recentMessages.map(msg => `${msg.timestamp.toLocaleTimeString()} | ${msg.type.toUpperCase()}${msg.agentName ? ` (${msg.agentName})` : ''}: ${msg.content}`).join('\n')}
 
+USER PROFILE & PREFERENCES:
+${JSON.stringify(this.currentContext.userProfile, null, 2)}
+
+CRM CONTEXT & BUSINESS DATA:
+${JSON.stringify(enhancedCRMContext, null, 2)}
+
+CONVERSATION ANALYTICS:
+- Total Messages: ${this.currentContext.messages.length}
+- User Messages: ${this.currentContext.messages.filter(m => m.type === 'user').length}
+- AI Responses: ${this.currentContext.messages.filter(m => m.type === 'ai').length}
+- Session Duration: ${this.getSessionDuration()}
+- Key Topics Discussed: ${this.extractKeyTopics(recentMessages)}
+- Last User Intent: ${this.inferCurrentUserIntent(recentMessages)}`;
+      
+      const instructions = `You are an expert conversation analyst providing contextual intelligence to AI agents.
+
+ANALYSIS OBJECTIVES:
+1. Identify the user's current goals and intentions
+2. Understand their business context and challenges
+3. Recognize patterns in their communication style and preferences
+4. Extract actionable insights for agent coordination
+5. Highlight important CRM entities and relationships
+6. Assess conversation momentum and engagement level
+
+SUMMARIZATION REQUIREMENTS:
+Create a comprehensive yet concise summary that enables other AI agents to:
+- Understand exactly what the user is trying to accomplish
+- Recognize their communication style and emotional state  
+- Access relevant CRM data and business context
+- Make informed decisions about next best actions
+- Provide personalized and contextually appropriate responses
+
+RESPONSE FORMAT:
+Structure your summary with these key sections:
+1. CURRENT OBJECTIVE: What the user is focused on right now
+2. BUSINESS CONTEXT: Industry, company situation, and relevant background
+3. CONVERSATION TONE: Communication style, emotional state, and preferences
+4. CRM INSIGHTS: Relevant contacts, deals, and business data
+5. NEXT LIKELY ACTIONS: What the user will probably want to do next
+6. AGENT COORDINATION NOTES: Important context for multi-agent workflows
+
+Keep the summary comprehensive but under 500 words, focusing on actionable insights.`;
+      
       const response = await realApiService.openai.generateAIResponse(
         instructions,
         conversationInput,
         {
-          maxTokens: 300,
-          temperature: 0.3,
+          taskType: 'analytical',
+          complexity: 'intermediate',
+          temperature: 0.2,
+          maxTokens: 600,
           previousResponseId: crmContext.lastResponseId,
           store: true
         }
       );
       
       return {
-        summary: response.output_text || 'No summary available.',
+        summary: response.output_text || 'Enhanced context analysis unavailable.',
         lastResponseId: response.id
       };
     } catch (error) {
-      console.error('Failed to generate contextual summary:', error);
-      return { summary: 'Error generating context summary.' };
+      console.error('Failed to generate enhanced contextual summary:', error);
+      return { summary: 'Error generating enhanced context summary.' };
     }
+  }
+
+  // Enhanced context selection for better agent coordination
+  private getBalancedMessageContext(limit: number): ConversationMessage[] {
+    if (!this.currentContext) return [];
+    
+    const messages = this.currentContext.messages;
+    const recent = Math.ceil(limit * 0.6); // 60% recent messages
+    const important = Math.floor(limit * 0.4); // 40% important historical messages
+    
+    // Get recent messages
+    const recentMessages = messages.slice(-recent);
+    
+    // Get important historical messages (those with high action content)
+    const historicalMessages = messages
+      .slice(0, -recent)
+      .filter(msg => 
+        msg.actions && msg.actions.length > 0 || 
+        msg.content.toLowerCase().includes('create') ||
+        msg.content.toLowerCase().includes('schedule') ||
+        msg.content.toLowerCase().includes('send')
+      )
+      .slice(-important);
+    
+    return [...historicalMessages, ...recentMessages];
+  }
+
+  // Build enhanced CRM context for GPT-5
+  private async buildEnhancedCRMContext(): Promise<any> {
+    if (!this.currentContext) return {};
+    
+    try {
+      // Get fresh CRM data if available
+      if (supabaseService.isAvailable()) {
+        const [contacts, deals] = await Promise.all([
+          supabaseService.getContacts().catch(() => []),
+          supabaseService.getDeals().catch(() => [])
+        ]);
+        
+        const now = new Date();
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        return {
+          ...this.currentContext.crmContext,
+          freshCRMData: {
+            contacts: {
+              total: contacts.length,
+              recent: contacts.filter(c => new Date(c.created_at || '') > weekAgo).length,
+              needsAttention: contacts.filter(c => !c.last_contacted || new Date(c.last_contacted) < weekAgo).length,
+              highPriority: contacts.filter(c => c.lead_score && c.lead_score >= 80).length
+            },
+            deals: {
+              total: deals.length,
+              open: deals.filter(d => d.status === 'open').length,
+              closingThisWeek: deals.filter(d => {
+                if (!d.expected_close_date) return false;
+                const closeDate = new Date(d.expected_close_date);
+                const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                return closeDate <= weekFromNow && closeDate >= now;
+              }).length,
+              totalValue: deals.reduce((sum, d) => sum + (d.value || 0), 0)
+            }
+          }
+        };
+      }
+      
+      return this.currentContext.crmContext;
+    } catch (error) {
+      console.error('Failed to build enhanced CRM context:', error);
+      return this.currentContext.crmContext;
+    }
+  }
+
+  // Extract key topics using GPT-5's improved understanding
+  private extractKeyTopics(messages: ConversationMessage[]): string {
+    const topics = new Set<string>();
+    
+    messages.forEach(msg => {
+      const content = msg.content.toLowerCase();
+      if (content.includes('lead') || content.includes('prospect')) topics.add('lead management');
+      if (content.includes('deal') || content.includes('sale')) topics.add('deal management');
+      if (content.includes('email') || content.includes('campaign')) topics.add('email marketing');
+      if (content.includes('meeting') || content.includes('calendar')) topics.add('scheduling');
+      if (content.includes('follow') && content.includes('up')) topics.add('follow-up');
+      if (content.includes('report') || content.includes('analyt')) topics.add('analytics');
+    });
+    
+    return Array.from(topics).join(', ') || 'general CRM usage';
+  }
+
+  // Infer current user intent with enhanced analysis
+  private inferCurrentUserIntent(messages: ConversationMessage[]): string {
+    const lastUserMessage = messages.filter(m => m.type === 'user').pop();
+    if (!lastUserMessage) return 'unknown';
+    
+    const content = lastUserMessage.content.toLowerCase();
+    
+    if (content.includes('create') || content.includes('add')) return 'creation';
+    if (content.includes('schedule') || content.includes('book')) return 'scheduling';
+    if (content.includes('send') || content.includes('email')) return 'communication';
+    if (content.includes('analyze') || content.includes('report')) return 'analysis';
+    if (content.includes('update') || content.includes('change')) return 'modification';
+    if (content.includes('find') || content.includes('search')) return 'search';
+    
+    return 'exploration';
+  }
+
+  // Calculate session duration
+  private getSessionDuration(): string {
+    if (!this.currentContext || this.currentContext.messages.length === 0) return '0 minutes';
+    
+    const start = this.currentContext.messages[0].timestamp;
+    const end = this.currentContext.messages[this.currentContext.messages.length - 1].timestamp;
+    const durationMs = end.getTime() - start.getTime();
+    const durationMin = Math.round(durationMs / 60000);
+    
+    return `${durationMin} minutes`;
   }
 
   // Search conversation history semantically

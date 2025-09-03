@@ -234,30 +234,53 @@ export class EnhancedNLUService {
     if (partialInput.length < 3) return [];
 
     try {
-      const instructions = `
-        Suggest 3-5 likely command completions that are:
+      const instructions = `You are an intelligent command completion system with deep understanding of CRM workflows and business automation.
+
+OBJECTIVE: Provide highly relevant command completions that:
         1. Relevant to CRM/sales activities
         2. Commonly used business actions
         3. Natural extensions of what they're typing
+        4. Contextually appropriate based on user patterns
+        5. Actionable and immediately executable
         
-        Examples for "create contact":
+        COMPLETION STRATEGY:
+        - Analyze the partial input for intent and likely next words
+        - Consider common CRM workflows and business processes
+        - Prioritize commands that deliver immediate value
+        - Include both simple and advanced completion options
+        - Ensure commands are properly formatted and specific
+        
+        EXAMPLES:
+        Partial: "create contact" → Completions:
         - "create contact for John Smith at TechCorp"
         - "create contact from business card scan"
         - "create contact and schedule demo"
+        - "create contact with lead score analysis"
         
-        Return as simple text array, one suggestion per line.
-      `;
-
-      const suggestionInput = `User is typing: "${partialInput}"
+        Partial: "send follow" → Completions:
+        - "send follow-up email to all warm leads"
+        - "send follow-up sequence to demo attendees"
+        - "send follow-up SMS to mobile-responsive contacts"
         
-        Recent command history: ${this.commandHistory.slice(-5).join(', ')}`;
+        Return 4-6 highly relevant completions as a simple text array.`;
 
-      const response = await realApiService.openai.generateAIResponse(
+      const suggestionInput = `PARTIAL INPUT: "${partialInput}"
+        
+CONTEXT:
+- Recent Commands: ${this.commandHistory.slice(-5).join(' → ')}
+- Current Session Focus: ${this.detectCurrentFocus() || 'General CRM usage'}
+- User Expertise Level: Intermediate (based on command patterns)
+
+Generate intelligent completions that build naturally from this partial input and align with the user's apparent workflow patterns.`;
+
+      const response = await realApiService.openai.generateAIResponse( 
         instructions,
         suggestionInput,
         {
-          maxTokens: 200,
-          temperature: 0.8
+          taskType: 'creative',
+          complexity: 'simple',
+          temperature: 0.8,
+          maxTokens: 300
         }
       );
       

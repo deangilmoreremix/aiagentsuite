@@ -192,8 +192,75 @@ export class GPT5TaskOrchestrator {
     taskInput: EnhancedTaskInput,
     analysis: GPT5TaskAnalysis
   ) {
-    const planningPrompt = `
-      As an expert AI task coordinator, create a detailed execution plan for this business task:
+    const planningPrompt = `You are an elite AI task coordination specialist with expertise in multi-agent orchestration, business process optimization, and risk management.
+
+MISSION: Create a comprehensive execution plan that maximizes success probability while minimizing risks and optimizing resource allocation.
+
+TASK CONTEXT:
+Task Title: ${taskInput.taskTitle}
+Task Description: ${taskInput.taskDescription}
+User-Provided Data: ${JSON.stringify(taskInput.userProvidedData, null, 2)}
+CRM Context: ${JSON.stringify(taskInput.crmContext, null, 2)}
+Expected Outcome: ${taskInput.expectedOutcome}
+Business Value Target: $${taskInput.businessValue.toLocaleString()}
+Priority Level: ${taskInput.priority}
+Complexity: ${taskInput.complexity}
+
+GPT-5 INITIAL ANALYSIS:
+Agent Recommendations: ${JSON.stringify(analysis.suggestedAgents, null, 2)}
+Estimated Steps: ${JSON.stringify(analysis.estimatedSteps, null, 2)}
+Risk Assessment: ${JSON.stringify(analysis.riskAssessment, null, 2)}
+Business Impact Projection: ${JSON.stringify(analysis.expectedBusinessImpact, null, 2)}
+
+OPTIMIZATION REQUIREMENTS:
+1. Agent Coordination Excellence:
+   - Identify optimal agent sequence and parallel execution opportunities
+   - Minimize handoff complexity and data loss between agents
+   - Ensure proper error handling and recovery at each step
+
+2. Resource Optimization:
+   - Balance speed vs. cost considerations
+   - Optimize API call efficiency and token usage
+   - Identify opportunities for batch processing
+
+3. Quality Assurance:
+   - Build in validation checkpoints at critical steps
+   - Include success criteria for each phase
+   - Plan for user feedback integration points
+
+4. Business Value Maximization:
+   - Prioritize steps that deliver immediate value
+   - Identify quick wins and milestone celebrations
+   - Plan for measurable outcome tracking
+
+Please think through this systematically and create a detailed execution plan that leverages GPT-5's advanced reasoning capabilities.
+
+Return a comprehensive JSON execution plan with:
+- Optimized agent workflow with clear dependencies
+- Parallel execution opportunities mapped out
+- Risk mitigation strategies for each major step  
+- Resource allocation and timing optimization
+- Success validation checkpoints
+- Real-time monitoring and adaptation strategies
+
+Focus on creating a plan that not only completes the task but does so with exceptional quality and measurable business impact.`;
+
+    const response = await realApiService.openai.generateAIResponse(
+      planningPrompt,
+      `Create optimal execution plan for: ${taskInput.taskTitle}`,
+      {
+        taskType: 'analytical',
+        complexity: 'advanced',
+        enableChainOfThought: true,
+        temperature: 0.2,
+        maxTokens: 2000,
+        store: true
+      }
+    );
+
+    const planText = response.output_text || '';
+    return JSON.parse(planText);
+  }
       
       Task: ${taskInput.taskTitle}
       Description: ${taskInput.taskDescription}
