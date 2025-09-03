@@ -234,11 +234,7 @@ export class EnhancedNLUService {
     if (partialInput.length < 3) return [];
 
     try {
-      const suggestionPrompt = `
-        User is typing: "${partialInput}"
-        
-        Recent command history: ${this.commandHistory.slice(-5).join(', ')}
-        
+      const instructions = `
         Suggest 3-5 likely command completions that are:
         1. Relevant to CRM/sales activities
         2. Commonly used business actions
@@ -252,7 +248,20 @@ export class EnhancedNLUService {
         Return as simple text array, one suggestion per line.
       `;
 
-      const suggestions = await realApiService.openai.generateText(suggestionPrompt, 200, 0.8);
+      const suggestionInput = `User is typing: "${partialInput}"
+        
+        Recent command history: ${this.commandHistory.slice(-5).join(', ')}`;
+
+      const response = await realApiService.openai.generateAIResponse(
+        instructions,
+        suggestionInput,
+        {
+          maxTokens: 200,
+          temperature: 0.8
+        }
+      );
+      
+      const suggestions = response.output_text || '';
       return suggestions.split('\n').filter(s => s.trim().length > 0);
 
     } catch (error) {

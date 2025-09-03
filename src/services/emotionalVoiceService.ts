@@ -94,17 +94,11 @@ export class EmotionalVoiceService {
   ): Promise<string> {
     try {
       const emotionalContext = this.currentEmotionalContext;
-      const conversationSummary = await contextualMemoryService.getContextualSummary();
+      const summaryResult = await contextualMemoryService.getContextualSummary();
+      const conversationSummary = summaryResult.summary;
 
-      const emotionalResponsePrompt = `
+      const instructions = `
         You are ${agentName}, responding with emotional intelligence.
-        
-        Your response: "${content}"
-        
-        Emotional Context: ${JSON.stringify(emotionalContext, null, 2)}
-        Conversation Context: ${conversationSummary}
-        Additional Context: ${context ? JSON.stringify(context, null, 2) : 'None'}
-        
         Rewrite your response to match the emotional context:
         
         User Emotion: ${emotionalContext.userEmotion}
@@ -138,7 +132,23 @@ export class EmotionalVoiceService {
         Return only the enhanced response text.
       `;
 
-      const enhancedResponse = await realApiService.openai.generateText(emotionalResponsePrompt, 400, 0.6);
+      const responseInput = `Your response: "${content}"
+        
+        Emotional Context: ${JSON.stringify(emotionalContext, null, 2)}
+        Conversation Context: ${conversationSummary}
+        Additional Context: ${context ? JSON.stringify(context, null, 2) : 'None'}`;
+
+      const response = await realApiService.openai.generateAIResponse(
+        instructions,
+        responseInput,
+        {
+          maxTokens: 400,
+          temperature: 0.6,
+          previousResponseId: summaryResult.lastResponseId
+        }
+      );
+      
+      const enhancedResponse = response.output_text || content;
       return enhancedResponse;
     } catch (error) {
       console.error('Failed to generate emotional response:', error);

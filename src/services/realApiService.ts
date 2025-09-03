@@ -417,13 +417,27 @@ export const realApiService = {
 
     // Test OpenAI
     try {
-      if (realOpenAiService && typeof realOpenAiService.generateText === 'function') {
+      if (openaiClient) {
         await realOpenAiService.generateText('Test connection', 10);
+        results.openai = true;
+        console.log('✅ OpenAI connection test passed');
       }
-      results.openai = true;
-      console.log('✅ OpenAI connection test passed');
     } catch (error) {
       console.log('❌ OpenAI connection test failed:', error);
+    }
+
+    // Test new Responses API specifically
+    try {
+      if (openaiClient) {
+        await realOpenAiService.generateAIResponse(
+          'You are a helpful assistant.',
+          'Test connection',
+          { maxTokens: 10 }
+        );
+        console.log('✅ OpenAI Responses API test passed');
+      }
+    } catch (error) {
+      console.log('❌ OpenAI Responses API test failed:', error);
     }
 
     // Test ElevenLabs (handle gracefully)

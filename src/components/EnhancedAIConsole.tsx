@@ -227,7 +227,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
           };
 
           setMessages(prev => [...prev, clarificationMessage]);
-          await contextualMemoryService.addMessage('ai', clarificationMessage.content, 'Enhanced NLU Agent');
+          await contextualMemoryService.addMessage('ai', clarificationMessage.content, 'Enhanced NLU Agent', []);
           return;
         }
 
@@ -241,17 +241,35 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         setMessages(prev => [...prev, thinkingMessage]);
 
         // Generate enhanced response
-        const contextSummary = await contextualMemoryService.getContextualSummary();
-        const enhancedPrompt = `
-          Context: ${contextSummary}
-          User Request: ${currentInput}
+        const contextSummaryResult = await contextualMemoryService.getContextualSummary();
+        const instructions = `
+          You are an Enhanced AI Assistant with access to CRM data and contextual understanding.
+          Use the provided context to give intelligent, personalized responses.
+          
+          Context: ${contextSummaryResult.summary}
           Parsed Command: ${JSON.stringify(parsedCommand, null, 2)}
           Emotional Context: ${JSON.stringify(emotionalContext, null, 2)}
           
           Execute this request with full contextual understanding and emotional intelligence.
         `;
+        
+        const enhancedInput = `
+          User Request: ${currentInput}
+          
+          Please provide a helpful response that addresses the user's request using the available context.
+        `;
 
-        const result = await realApiService.openai.generateText(enhancedPrompt, 600);
+        const response = await realApiService.openai.generateAIResponse(
+          instructions,
+          enhancedInput,
+          {
+            maxTokens: 600,
+            previousResponseId: contextSummaryResult.lastResponseId,
+            store: true
+          }
+        );
+        
+        const result = response.output_text || 'I apologize, but I encountered an error processing your request.';
 
         // Remove thinking message
         setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id));
@@ -287,7 +305,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         };
 
         setMessages(prev => [...prev, aiResponse]);
-        await contextualMemoryService.addMessage('ai', enhancedResponse, 'Enhanced AI Assistant');
+        await contextualMemoryService.addMessage('ai', enhancedResponse, 'Enhanced AI Assistant', [], response.id);
 
         // Play audio if available
         if (audioUrl) {
