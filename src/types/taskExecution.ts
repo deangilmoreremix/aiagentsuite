@@ -240,6 +240,9 @@ export interface BusinessImpact {
   qualityImprovement: number;
   riskReduction: number;
   customerSatisfaction: number;
+  scalabilityFactor: number;
+  competitiveAdvantage: string;
+  longTermValue: string;
 }
 
 export interface AlternativeApproach {

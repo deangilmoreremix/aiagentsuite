@@ -83,26 +83,48 @@ export class AgentLearningService {
             "agentName": "AI SDR Agent",
             "insightType": "performance_improvement",
             "title": "Improve email personalization success",
-            "description": "Email Agent shows 15% lower success rate with tech prospects",
+            "description": "Advanced pattern analysis reveals Email Agent shows 15% lower success rate with tech prospects due to insufficient technical context",
             "actionable": true,
-            "implementationSuggestion": "Add technical terminology to email templates",
-            "expectedImprovement": "Increase tech prospect response rate by 20%",
-            "confidence": 85
+            "implementationSuggestion": "Implement dynamic technical content insertion based on prospect company technology stack analysis",
+            "expectedImprovement": "Increase tech prospect response rate by 20-25% with 95% confidence based on pattern analysis",
+            "confidence": 95,
+            "sophisticatedReasoning": "GPT-5 analysis identified correlation between technical depth and engagement rates",
+            "crossAgentSynergy": ["Lead Scoring Agent can provide technical intelligence", "Research Agent can gather tech stack data"],
+            "predictiveValue": "This optimization will likely improve performance across all technical verticals",
+            "implementationComplexity": "medium",
+            "expectedTimeToValue": "2-3 weeks",
+            "measurementStrategy": "A/B test technical vs standard templates with engagement rate tracking"
           }
         ]
         
-        Focus on actionable insights that can be implemented to improve agent effectiveness.
+        Focus on sophisticated, actionable insights that leverage GPT-5's advanced analytical capabilities for maximum agent optimization.
       `;
 
-      const insights = await realApiService.openai.generateText(learningPrompt, 1000, 0.3);
-      const parsedInsights: LearningInsight[] = JSON.parse(insights).map((insight: any) => ({
+      const response = await realApiService.openai.generateAIResponse(
+        learningPrompt,
+        'Generate advanced learning insights with GPT-5 intelligence',
+        {
+          taskType: 'complex_reasoning',
+          complexity: 'advanced',
+          enableChainOfThought: true,
+          temperature: 0.2,
+          maxTokens: 2000,
+          outputFormat: 'json',
+          qualityMode: 'accuracy',
+          fewShotExamples: learningExamples,
+          store: true
+        }
+      );
+      
+      const insightsText = response.output_text || '';
+      const parsedInsights: LearningInsight[] = JSON.parse(insightsText).map((insight: any) => ({
         ...insight,
         id: `insight-${Date.now()}-${Math.random()}`,
         createdAt: new Date()
       }));
 
       this.learningInsights.set(userId, parsedInsights);
-      console.log(`✅ Generated ${parsedInsights.length} learning insights`);
+      console.log(`✅ Generated ${parsedInsights.length} GPT-5 enhanced learning insights`);
       return parsedInsights;
 
     } catch (error) {

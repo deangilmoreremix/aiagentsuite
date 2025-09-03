@@ -371,20 +371,32 @@ Here's your task: ${task}`;
 
   // If we have executed tools, make a follow-up call to summarize the results
   if (executionResults.length > 0) {
-    const toolResultsPrompt = `${systemPrompt}
+    const enhancedToolResultsPrompt = `${systemPrompt}
 
-You previously used tools to help with this task: ${task}
+ADVANCED RESULT SYNTHESIS:
+Apply sophisticated analysis to synthesize tool execution results into actionable intelligence.
 
-Here are the results of the tool execution:
+ORIGINAL TASK: ${task}
+
+TOOL EXECUTION RESULTS:
 ${JSON.stringify(executionResults, null, 2)}
 
-Please provide a summary of what was accomplished and what it means for the user.`;
+SYNTHESIS REQUIREMENTS:
+Provide a comprehensive yet clear summary that includes:
+1. What was accomplished with specific business impact
+2. How results align with user objectives and expectations
+3. Quality assessment of the execution outcomes
+4. Strategic implications and opportunities identified
+5. Recommended next actions for value amplification
+6. Any insights or optimizations discovered during execution
+
+Use advanced reasoning to connect tactical execution to strategic business value.`;
 
     apiCallsMade++;
     const finalResponse = await realApiService.gemini.generateContent(
-      toolResultsPrompt,
-      maxTokens,
-      temperature
+      enhancedToolResultsPrompt,
+      qualityMode === 'accuracy' ? maxTokens * 1.3 : maxTokens,
+      qualityMode === 'accuracy' ? Math.max(0.1, temperature - 0.1) : temperature
     );
 
     cleanedResponse = finalResponse || cleanedResponse;
@@ -398,8 +410,12 @@ Please provide a summary of what was accomplished and what it means for the user
     result: {
       message: cleanedResponse,
       thinking: thinking,
+      businessImpact: businessImpact,
       toolExecutions: executionResults,
-      aiResponse: geminiResponse
+      aiResponse: geminiResponse,
+      gpt5Enhanced: true,
+      qualityMode,
+      enhancedReasoning: thinking
     },
     executionTime,
     apiCallsMade,

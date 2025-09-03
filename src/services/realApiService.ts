@@ -77,39 +77,75 @@ Conduct sophisticated analysis of agent performance, user behavior, and business
 LEARNING FRAMEWORK:
 1. PERFORMANCE PATTERN ANALYSIS
    - Identify success patterns and failure modes
-    outputFormat?: 'json' | 'text' | 'structured';
-    qualityMode?: 'speed' | 'balanced' | 'accuracy';
-        
-        Agent Performance Data:
-        ${JSON.stringify(performanceData, null, 2)}
-        
-        User Interaction Patterns:
-        ${JSON.stringify(userPatterns, null, 2)}
-        
-        Generate insights that help:
-        1. Improve agent performance based on success/failure patterns
-        2. Adapt to user preferences and communication styles
-        3. Optimize workflows based on usage patterns
-        4. Identify training opportunities for better results
-        
-        Return JSON array:
-        [
-          {
-            "agentName": "AI SDR Agent",
-            "insightType": "performance_improvement",
-            "title": "Improve email personalization success",
-            "description": "Email Agent shows 15% lower success rate with tech prospects",
-            "actionable": true,
-            "implementationSuggestion": "Add technical terminology to email templates",
-            "expectedImprovement": "Increase tech prospect response rate by 20%",
-            "confidence": 85
-          }
-        ]
-        
-        Focus on actionable insights that can be implemented to improve agent effectiveness.
-      `;
+   - Analyze correlation between agent configurations and outcomes
+   - Detect performance degradation or improvement trends
+   - Map user satisfaction to specific agent behaviors
 
-      const insights = await realApiService.openai.generateText(learningPrompt, 1000, 0.3);
+2. USER BEHAVIOR INSIGHTS
+   - Understand user preferences and communication styles
+   - Identify workflow optimization opportunities
+   - Recognize patterns in successful vs. unsuccessful interactions
+   - Predict user needs based on historical patterns
+
+3. BUSINESS IMPACT ASSESSMENT
+   - Connect agent performance to business outcomes
+   - Identify high-value optimization opportunities
+   - Assess ROI potential of different improvements
+   - Benchmark against industry standards
+
+4. PREDICTIVE RECOMMENDATIONS
+   - Forecast performance improvements from proposed changes
+   - Identify potential risks or unintended consequences
+   - Prioritize improvements by impact and feasibility
+   - Generate implementation roadmaps
+
+ANALYSIS DATA:
+Agent Performance Metrics:
+${JSON.stringify(performanceData, null, 2)}
+
+User Interaction Patterns:
+${JSON.stringify(userPatterns, null, 2)}
+
+Business Context:
+${JSON.stringify(businessOutcomes, null, 2)}
+
+Industry Benchmarks:
+${JSON.stringify(competitiveContext, null, 2)}
+
+INSIGHT GENERATION REQUIREMENTS:
+Generate 5-8 high-value learning insights that are:
+1. Actionable - Can be implemented with specific steps
+2. Measurable - Include expected improvement metrics
+3. Prioritized - Focus on highest impact opportunities
+4. Evidence-based - Supported by the performance data
+5. User-centric - Consider user experience and satisfaction
+6. Business-aligned - Connect to revenue and efficiency goals
+
+For each insight, provide:
+- Clear problem identification
+- Root cause analysis
+- Specific implementation steps
+- Expected quantitative improvements
+- Risk assessment and mitigation
+- Success measurement criteria
+
+Return as JSON array with this structure:
+[
+  {
+    "agentName": "specific agent name",
+    "insightType": "performance_improvement|user_preference|process_optimization|error_pattern",
+    "title": "Clear, actionable title",
+    "description": "Detailed analysis of the issue and opportunity",
+    "actionable": true,
+    "implementationSuggestion": "Specific steps to implement the improvement",
+    "expectedImprovement": "Quantified expected improvement with metrics",
+    "confidence": 85
+  }
+]
+
+Focus on insights that will drive measurable business value and user satisfaction improvements.`;
+
+      const insights = await realApiService.openai.generateText(instructions, 1000, 0.3);
       const parsedInsights: LearningInsight[] = JSON.parse(insights).map((insight: any) => ({
         ...insight,
         id: `insight-${Date.now()}-${Math.random()}`,
@@ -198,6 +234,34 @@ LEARNING FRAMEWORK:
         learningOpportunities: []
       };
     }
+  }
+
+  // Get business outcomes data
+  private async getBusinessOutcomesData(userId: string): Promise<any> {
+    // This would fetch actual business metrics
+    return {
+      revenueImpact: Math.floor(Math.random() * 50000) + 10000,
+      conversionRates: {
+        leadToOpportunity: Math.floor(Math.random() * 20) + 15,
+        opportunityToClose: Math.floor(Math.random() * 15) + 20
+      },
+      timeToClose: Math.floor(Math.random() * 30) + 45,
+      customerSatisfaction: Math.floor(Math.random() * 10) + 85
+    };
+  }
+
+  // Get industry benchmarks
+  private async getIndustryBenchmarks(userId: string): Promise<any> {
+    // This would fetch industry benchmark data
+    return {
+      averageResponseTime: 2400,
+      industrySuccessRate: 78,
+      competitorPerformance: {
+        emailOpenRate: 22,
+        callConnectRate: 35,
+        meetingBookRate: 12
+      }
+    };
   }
 
   // Get common failure reasons for specific agents

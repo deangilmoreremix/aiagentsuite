@@ -52,17 +52,57 @@ export class EnhancedNLUService {
 
       const context = includeContext ? await this.buildCommandContext() : null;
       
+      // Few-shot examples for GPT-5 command parsing
+      const fewShotExamples = [
+        {
+          input: "Schedule a demo with John Smith from TechCorp for next Friday",
+          output: JSON.stringify({
+            intent: "schedule_meeting",
+            entities: [
+              { type: "person", value: "John Smith", confidence: 95 },
+              { type: "company", value: "TechCorp", confidence: 90 },
+              { type: "date", value: "next Friday", confidence: 85 }
+            ],
+            actionType: "crm_action",
+            requiredAgents: ["Calendar Agent", "Timeline Logger Agent"],
+            suggestedTools: ["google_calendar", "zoom"]
+          }),
+          reasoning: "Clear scheduling intent with person, company, and date entities"
+        },
+        {
+          input: "Find all contacts who haven't been contacted in 2 weeks",
+          output: JSON.stringify({
+            intent: "search_contacts",
+            entities: [
+              { type: "date", value: "2 weeks", confidence: 90 }
+            ],
+            actionType: "query",
+            requiredAgents: ["Command Analyzer Agent"],
+            suggestedTools: ["supabase"]
+          }),
+          reasoning: "Data query with time-based filtering criteria"
+        }
+      ];
+
       const parsePrompt = `
-        You are an advanced natural language understanding system for a CRM platform. Parse this user command with deep understanding:
+        You are a GPT-5 powered advanced natural language understanding system with sophisticated business context awareness and intent recognition capabilities.
+
+        ADVANCED PARSING MISSION:
+        Leverage GPT-5's enhanced understanding to parse complex business commands with:
+        - Deep semantic understanding beyond surface keywords
+        - Business context awareness and industry knowledge
+        - Multi-intent recognition for complex workflows
+        - Intelligent entity resolution and relationship mapping
+        - Predictive analysis of user's likely next actions
         
         User Command: "${userInput}"
         
         ${context ? `
-        Context:
+        CONTEXTUAL INTELLIGENCE:
         ${JSON.stringify(context, null, 2)}
         ` : ''}
         
-        Available CRM Actions:
+        AVAILABLE CRM OPERATIONS:
         - create_contact, update_contact, search_contacts
         - create_deal, update_deal, move_deal_stage
         - schedule_meeting, send_email, make_call
@@ -70,13 +110,21 @@ export class EnhancedNLUService {
         - generate_report, analyze_performance
         - execute_workflow, trigger_automation
         
-        Available AI Agents:
+        AI AGENT SPECIALIST NETWORK:
         - AI SDR Agent, AI AE Agent, Lead Scoring Agent
         - Email Agent, Voice Agent, Calendar Agent
         - Follow-up Agent, Objection Handler Agent
         - Timeline Logger Agent, Content Generator Agent
         
-        Parse the command and return JSON with this exact structure:
+        GPT-5 ENHANCED PARSING REQUIREMENTS:
+        Apply advanced reasoning to:
+        1. Understand implicit context and unstated requirements
+        2. Recognize business workflow patterns and best practices
+        3. Identify potential ambiguities before they cause issues
+        4. Suggest optimal agent combinations for maximum efficiency
+        5. Consider downstream effects and optimization opportunities
+
+        Return JSON with this enhanced structure:
         {
           "intent": "primary intent in simple terms",
           "entities": [

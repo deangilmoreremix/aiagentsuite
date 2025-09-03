@@ -510,3 +510,4 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
 }
 
 export const emotionalVoiceService = EmotionalVoiceService.getInstance();
+}

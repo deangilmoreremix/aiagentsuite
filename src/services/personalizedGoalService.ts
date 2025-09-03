@@ -136,23 +136,51 @@ export class PersonalizedGoalService {
           {
             "goalId": "goal-id-from-available-goals",
             "relevanceScore": 95,
-            "reasoning": "Based on your TechCorp industry focus and need for lead generation...",
-            "expectedImpact": "Should generate 50+ qualified SaaS leads per week",
+            "reasoning": "GPT-5 comprehensive analysis: Based on your TechCorp industry focus, current CRM data quality, team size, and strategic priorities, this goal offers exceptional value multiplication...",
+            "expectedImpact": "Quantified impact: Generate 50+ qualified SaaS leads per week, increasing pipeline value by $125k monthly, reducing manual effort by 85%",
             "setupPriority": 1,
-            "personalizedDescription": "Customized description for this user",
+            "personalizedDescription": "Hyper-personalized description leveraging deep context understanding",
             "estimatedROI": 25000,
+            "roiBreakdown": {
+              "timeValueSavings": 15000,
+              "opportunityCostRecovery": 8000,
+              "efficiencyMultiplier": 2000
+            },
             "timeToValue": "2 weeks",
-            "prerequisites": ["Clean up existing contact data"],
-            "customizationSuggestions": ["Focus on enterprise SaaS prospects", "Use technical messaging"]
+            "valueTimeline": {
+              "week1": "Initial setup and first results",
+              "week2": "Full optimization and measurable impact",
+              "month1": "Compound value and workflow mastery"
+            },
+            "prerequisites": ["Clean up existing contact data", "Verify email deliverability"],
+            "customizationSuggestions": ["Focus on enterprise SaaS prospects", "Use technical messaging", "Integrate with existing lead scoring"],
+            "successAmplifiers": ["Combine with follow-up automation", "Layer on sentiment analysis"],
+            "competitiveAdvantage": "Unique positioning opportunity in your market"
           }
         ]
       `;
 
-      const recommendations = await realApiService.openai.generateText(recommendationPrompt, 2000, 0.3);
-      const parsedRecommendations = JSON.parse(recommendations);
+      const response = await realApiService.openai.generateAIResponse(
+        recommendationPrompt,
+        'Generate strategic goal recommendations with GPT-5 intelligence',
+        {
+          taskType: 'complex_reasoning',
+          complexity: 'advanced',
+          enableChainOfThought: true,
+          temperature: 0.2,
+          maxTokens: 4000,
+          outputFormat: 'json',
+          qualityMode: 'accuracy',
+          fewShotExamples,
+          store: true
+        }
+      );
+      
+      const recommendationsText = response.output_text || '';
+      const parsedRecommendations = JSON.parse(recommendationsText);
 
       // Map to full recommendation objects
-      const fullRecommendations: PersonalizedRecommendation[] = parsedRecommendations
+      const enhancedRecommendations: PersonalizedRecommendation[] = parsedRecommendations
         .map((rec: any) => {
           const goal = allGoals.find(g => g.id === rec.goalId);
           if (!goal) return null;
@@ -164,20 +192,25 @@ export class PersonalizedGoalService {
             expectedImpact: rec.expectedImpact,
             setupPriority: rec.setupPriority,
             personalizedDescription: rec.personalizedDescription,
-            estimatedROI: rec.estimatedROI,
-            timeToValue: rec.timeToValue,
+            estimatedROI: rec.roiBreakdown ? 
+              rec.roiBreakdown.timeValueSavings + rec.roiBreakdown.opportunityCostRecovery + rec.roiBreakdown.efficiencyMultiplier :
+              rec.estimatedROI,
+            timeToValue: rec.valueTimeline ? rec.valueTimeline.week2 : rec.timeToValue,
             prerequisites: rec.prerequisites || [],
-            customizationSuggestions: rec.customizationSuggestions || []
+            customizationSuggestions: [
+              ...(rec.customizationSuggestions || []),
+              ...(rec.successAmplifiers || [])
+            ]
           };
         })
         .filter(Boolean)
         .sort((a, b) => b.relevanceScore - a.relevanceScore);
 
       // Cache recommendations
-      this.recommendationCache.set(userId, fullRecommendations);
+      this.recommendationCache.set(userId, enhancedRecommendations);
       
-      console.log(`✅ Generated ${fullRecommendations.length} personalized recommendations`);
-      return fullRecommendations;
+      console.log(`✅ Generated ${enhancedRecommendations.length} GPT-5 enhanced recommendations`);
+      return enhancedRecommendations;
 
     } catch (error) {
       console.error('❌ Failed to generate personalized recommendations:', error);

@@ -296,16 +296,19 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
           content: enhancedResponse,
           agentName: 'Enhanced AI Assistant',
           timestamp: new Date(),
-          thinking: `Analyzed with ${parsedCommand.confidence}% confidence. Emotional context: ${emotionalContext.conversationTone}`,
+          thinking: `GPT-5 Enhanced Analysis: ${parsedCommand.confidence}% confidence, ${qualityMode} quality mode, emotional context: ${emotionalContext.conversationTone}`,
           entities: parsedCommand.entities,
           confidence: parsedCommand.confidence,
           emotionalTone: emotionalContext.conversationTone,
           audioUrl: audioUrl || undefined,
-          toolsUsed: parsedCommand.suggestedTools
+          toolsUsed: parsedCommand.suggestedTools,
+          gpt5Enhanced: true,
+          reasoning: response.reasoning,
+          qualityMode
         };
 
         setMessages(prev => [...prev, aiResponse]);
-        await contextualMemoryService.addMessage('ai', enhancedResponse, 'Enhanced AI Assistant', [], response.id);
+        await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', [], response.id);
 
         // Play audio if available
         if (audioUrl) {

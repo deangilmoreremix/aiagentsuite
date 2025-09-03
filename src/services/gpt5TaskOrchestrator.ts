@@ -106,7 +106,10 @@ export class GPT5TaskOrchestrator {
               "severity": "low|medium|high",
               "description": "string",
               "mitigation": "string",
-              "probability": 0-100
+              "probability": 0-100,
+              "impact": 0-100,
+              "detectionMethod": "how to identify this risk early",
+              "contingencyPlan": "backup approach if risk materializes"
             }
           ],
           "expectedBusinessImpact": {
@@ -115,15 +118,45 @@ export class GPT5TaskOrchestrator {
             "efficiencyGain": 0,
             "qualityImprovement": 0,
             "riskReduction": 0,
-            "customerSatisfaction": 0
+            "customerSatisfaction": 0,
+            "scalabilityFactor": 0-100,
+            "competitiveAdvantage": "string",
+            "longTermValue": "string"
+          },
+          "optimizationOpportunities": [
+            {
+              "type": "efficiency|quality|cost|scale",
+              "description": "specific optimization opportunity",
+              "potentialImpact": "quantified benefit",
+              "implementationComplexity": "low|medium|high"
+            }
+          ],
+          "successPrediction": {
+            "overallProbability": 0-100,
+            "keySuccessFactors": ["string"],
+            "potentialBottlenecks": ["string"],
+            "mitigation": ["string"]
           }
         }
       `;
 
-      const response = await realApiService.openai.generateText(analysisPrompt, 2000, 0.3);
+      const response = await realApiService.openai.generateAIResponse(
+        analysisPrompt,
+        `Perform comprehensive GPT-5 analysis of: ${userInput}`,
+        {
+          taskType: 'complex_reasoning',
+          complexity: 'advanced',
+          enableChainOfThought: true,
+          temperature: 0.2,
+          maxTokens: 3000,
+          outputFormat: 'json',
+          qualityMode: 'accuracy'
+        }
+      );
       
       // Parse GPT-5 response
-      const analysis = JSON.parse(response) as GPT5TaskAnalysis;
+      const analysisText = response.output_text || response.content || '';
+      const analysis = JSON.parse(analysisText) as GPT5TaskAnalysis;
       analysis.taskId = `task-${Date.now()}`;
       
       console.log('✅ GPT-5 task analysis completed');
@@ -518,3 +551,4 @@ Focus on creating a plan that not only completes the task but does so with excep
 
 // Export singleton instance
 export const gpt5TaskOrchestrator = GPT5TaskOrchestrator.getInstance();
+}
