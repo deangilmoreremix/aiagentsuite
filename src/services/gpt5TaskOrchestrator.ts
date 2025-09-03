@@ -295,27 +295,6 @@ Focus on creating a plan that not only completes the task but does so with excep
     const planText = response.output_text || '';
     return JSON.parse(planText);
   }
-      
-      Task: ${taskInput.taskTitle}
-      Description: ${taskInput.taskDescription}
-      User Data: ${JSON.stringify(taskInput.userProvidedData, null, 2)}
-      CRM Context: ${JSON.stringify(taskInput.crmContext, null, 2)}
-      
-      Available Agents Analysis: ${JSON.stringify(analysis.suggestedAgents, null, 2)}
-      Estimated Steps: ${JSON.stringify(analysis.estimatedSteps, null, 2)}
-      
-      Create a detailed execution plan that:
-      1. Optimizes agent coordination and tool usage
-      2. Identifies parallel execution opportunities
-      3. Includes error recovery strategies
-      4. Provides clear success metrics for each step
-      
-      Respond in JSON format with the execution plan.
-    `;
-
-    const plan = await realApiService.openai.generateText(planningPrompt, 1500, 0.2);
-    return JSON.parse(plan);
-  }
 
   // Execute coordinated agent workflow
   private async executeCoordinatedAgentWorkflow(
