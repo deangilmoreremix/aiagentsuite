@@ -2,8 +2,10 @@
 export const apiConfig = {
   openai: {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-    defaultModel: 'gpt-5-main', // Updated for GPT-5
-    reasoningModel: 'gpt-5-thinking', // For complex reasoning tasks
+    // NOTE: verify these model IDs exist on your OpenAI account. As of GPT-5,
+    // common chat-completions IDs are 'gpt-5', 'gpt-5-mini', 'gpt-5-nano'.
+    defaultModel: import.meta.env.VITE_OPENAI_MODEL || 'gpt-5',
+    reasoningModel: import.meta.env.VITE_OPENAI_REASONING_MODEL || 'gpt-5-thinking',
     isConfigured: !!import.meta.env.VITE_OPENAI_API_KEY && 
                   import.meta.env.VITE_OPENAI_API_KEY !== 'your_openai_api_key_here' &&
                   import.meta.env.VITE_OPENAI_API_KEY.startsWith('sk-')
@@ -15,6 +17,8 @@ export const apiConfig = {
   },
   gemini: {
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+    // NOTE: verify this model ID exists on your Google AI Studio project.
+    defaultModel: import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.0-flash',
     isConfigured: !!import.meta.env.VITE_GEMINI_API_KEY && 
                   import.meta.env.VITE_GEMINI_API_KEY !== 'your_gemini_api_key_here'
   },
