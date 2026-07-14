@@ -6,6 +6,29 @@ const openai = apiConfig.openai.isConfigured ? new OpenAI({
   dangerouslyAllowBrowser: true
 }) : null;
 
+// Build chat.completions params that respect model family differences:
+//  - GPT-5 / o1 / o3 use `max_completion_tokens` and do NOT accept `temperature`
+//    (only the default 1). "Reasoning" is selected via `reasoning_effort`.
+//  - Older models (gpt-4o, gpt-4, gpt-3.5) use `max_tokens` + `temperature`.
+function chatParams(
+  model: string,
+  maxTokens: number,
+  temperature: number,
+  advanced: boolean
+): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
+  if (/^(gpt-5|o1|o3)/.test(model)) {
+    params.max_completion_tokens = maxTokens;
+  } else {
+    params.max_tokens = maxTokens;
+    params.temperature = temperature;
+  }
+  if (/^gpt-5/.test(model) && advanced) {
+    params.reasoning_effort = 'high';
+  }
+  return params;
+}
+
 // ---------------------------------------------------------------------------
 // Gemini (Google Generative Language API)
 // ---------------------------------------------------------------------------
@@ -153,11 +176,11 @@ class RealApiService {
       }
 
       try {
+        // Use GPT-5 with optimized parameters
         const completion = await this.openaiClient.chat.completions.create({
-          model: apiConfig.openai.defaultModel,
+          model: apiConfig.openai.defaultModel, // GPT-5 main
           messages: [{ role: 'user', content: prompt }],
-          max_tokens: maxTokens,
-          temperature
+          ...chatParams(apiConfig.openai.defaultModel, maxTokens, temperature, false)
         });
 
         return completion.choices[0]?.message?.content || '';
@@ -198,8 +221,7 @@ class RealApiService {
         const completion = await this.openaiClient.chat.completions.create({
           model: modelSelection.model,
           messages: enhancedPrompt.messages,
-          max_tokens: modelSelection.maxTokens,
-          temperature: modelSelection.temperature,
+          ...chatParams(modelSelection.model, modelSelection.maxTokens, modelSelection.temperature, modelSelection.reasoning),
           response_format: options.taskType === 'complex_reasoning' ? { type: 'json_object' } : undefined
         });
 
@@ -220,12 +242,14 @@ class RealApiService {
     },
 
     selectOptimalModel(taskType?: string, complexity?: string, qualityMode?: string) {
+      // GPT-5 uses a single model; "reasoning" is selected via reasoning_effort.
       let model = apiConfig.openai.defaultModel;
       let maxTokens = 1000;
       let temperature = 0.7;
+      let reasoning = false;
 
       if (taskType === 'complex_reasoning' || complexity === 'advanced') {
-        model = apiConfig.openai.reasoningModel;
+        reasoning = true;
         maxTokens = 2000;
         temperature = 0.2;
       }
@@ -238,7 +262,7 @@ class RealApiService {
         temperature = Math.max(0.1, temperature - 0.2);
       }
 
-      return { model, maxTokens, temperature };
+      return { model, maxTokens, temperature, reasoning };
     },
 
     buildGPT5Prompt(instructions: string, input: string, options: any) {
@@ -278,11 +302,11 @@ class RealApiService {
       }
 
       try {
+        const model = options.model || apiConfig.openai.defaultModel;
         const completion = await this.openaiClient.chat.completions.create({
-          model: options.model || apiConfig.openai.defaultModel,
+          model,
           messages,
-          max_tokens: options.max_tokens || 500,
-          temperature: options.temperature ?? 0.7
+          ...chatParams(model, options.max_tokens || 500, options.temperature ?? 0.7, false)
         });
         return completion;
       } catch (error) {

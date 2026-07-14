@@ -3,9 +3,11 @@ export const apiConfig = {
   openai: {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
     // NOTE: verify these model IDs exist on your OpenAI account. As of GPT-5,
-    // common chat-completions IDs are 'gpt-5', 'gpt-5-mini', 'gpt-5-nano'.
+    // chat-completions IDs are 'gpt-5', 'gpt-5-mini', 'gpt-5-nano'. GPT-5 uses a
+    // single model; "reasoning" is controlled via the `reasoning_effort` param
+    // (see realApiService), so reasoningModel === defaultModel here.
     defaultModel: import.meta.env.VITE_OPENAI_MODEL || 'gpt-5',
-    reasoningModel: import.meta.env.VITE_OPENAI_REASONING_MODEL || 'gpt-5-thinking',
+    reasoningModel: import.meta.env.VITE_OPENAI_REASONING_MODEL || 'gpt-5',
     isConfigured: !!import.meta.env.VITE_OPENAI_API_KEY && 
                   import.meta.env.VITE_OPENAI_API_KEY !== 'your_openai_api_key_here' &&
                   import.meta.env.VITE_OPENAI_API_KEY.startsWith('sk-')
