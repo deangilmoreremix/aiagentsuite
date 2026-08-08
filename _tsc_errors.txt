@@ -1,0 +1,379 @@
+src/App.tsx(1,17): error TS6133: 'useState' is declared but its value is never read.
+src/agents/composioAgentRunner.ts(127,13): error TS7034: Variable 'results' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/agents/composioAgentRunner.ts(134,17): error TS6133: 'dependencies' is declared but its value is never read.
+src/agents/composioAgentRunner.ts(134,60): error TS7005: Variable 'results' implicitly has an 'any[]' type.
+src/agents/realAgentExecutor.ts(84,11): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/agents/realAgentExecutor.ts(84,24): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/agents/realAgentExecutor.ts(84,35): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+src/agents/realAgentExecutor.ts(96,11): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/agents/realAgentExecutor.ts(96,24): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/agents/realAgentExecutor.ts(96,35): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+src/agents/realAgentExecutor.ts(109,7): error TS2322: Type '"gemini" | "openai" | undefined' is not assignable to type '"gemini" | "openai"'.
+  Type 'undefined' is not assignable to type '"gemini" | "openai"'.
+src/agents/realAgentExecutor.ts(315,54): error TS2551: Property 'generateContent' does not exist on type 'GeminiService'. Did you mean 'generateText'?
+src/agents/realAgentExecutor.ts(405,55): error TS2551: Property 'generateContent' does not exist on type 'GeminiService'. Did you mean 'generateText'?
+src/agents/realAgentExecutor.ts(407,7): error TS2304: Cannot find name 'qualityMode'.
+src/agents/realAgentExecutor.ts(408,7): error TS2304: Cannot find name 'qualityMode'.
+src/agents/realAgentExecutor.ts(422,23): error TS2304: Cannot find name 'businessImpact'.
+src/agents/realAgentExecutor.ts(426,7): error TS18004: No value exists in scope for the shorthand property 'qualityMode'. Either declare one or provide an initializer.
+src/agents/realAgentExecutor.ts(440,44): error TS2339: Property 'sendEmail' does not exist on type 'ComposioService'.
+src/agents/realAgentExecutor.ts(447,44): error TS2339: Property 'createCalendarEvent' does not exist on type 'ComposioService'.
+src/agents/realAgentExecutor.ts(455,44): error TS2339: Property 'sendSlackMessage' does not exist on type 'ComposioService'.
+src/agents/realAgentExecutor.ts(472,9): error TS2554: Expected 2 arguments, but got 3.
+src/agents/useOpenAIAgentSuite.tsx(7,5): error TS6133: 'openai' is declared but its value is never read.
+src/agents/useOpenAIAgentSuite.tsx(27,45): error TS6133: 'p1' is declared but its value is never read.
+src/agents/useOpenAIAgentSuite.tsx(31,76): error TS2554: Expected 2 arguments, but got 3.
+src/agents/useOpenAIAgentSuite.tsx(181,31): error TS6133: 'toolsUsed' is declared but its value is never read.
+src/agents/useOpenAIAgentSuite.tsx(226,41): error TS2339: Property 'sendEmail' does not exist on type 'ComposioService'.
+src/components/AgentLearningPanel.tsx(8,3): error TS6133: 'CheckCircle' is declared but its value is never read.
+src/components/AgentLearningPanel.tsx(10,3): error TS6133: 'Star' is declared but its value is never read.
+src/components/AgentLearningPanel.tsx(11,3): error TS6133: 'Award' is declared but its value is never read.
+src/components/AgentLearningPanel.tsx(15,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/AgentLearningPanel.tsx(18,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/AgentShowcase.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/AgentShowcase.tsx(9,3): error TS6133: 'Shield' is declared but its value is never read.
+src/components/AgentShowcase.tsx(10,3): error TS6133: 'RotateCcw' is declared but its value is never read.
+src/components/AgentShowcase.tsx(11,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/AgentShowcase.tsx(13,3): error TS6133: 'Target' is declared but its value is never read.
+src/components/AgentShowcase.tsx(14,3): error TS6133: 'Database' is declared but its value is never read.
+src/components/AgentShowcase.tsx(16,3): error TS6133: 'MessageCircle' is declared but its value is never read.
+src/components/AgentShowcase.tsx(17,3): error TS6133: 'Send' is declared but its value is never read.
+src/components/AgentShowcase.tsx(18,3): error TS6133: 'Heart' is declared but its value is never read.
+src/components/AgentShowcase.tsx(20,3): error TS6133: 'Star' is declared but its value is never read.
+src/components/AgentShowcase.tsx(23,3): error TS6133: 'Smartphone' is declared but its value is never read.
+src/components/AgentShowcase.tsx(25,3): error TS6133: 'Brain' is declared but its value is never read.
+src/components/AgentShowcase.tsx(26,3): error TS6133: 'Mic' is declared but its value is never read.
+src/components/AgentShowcase.tsx(28,3): error TS6133: 'Pause' is declared but its value is never read.
+src/components/AgentShowcase.tsx(31,3): error TS6133: 'GitBranch' is declared but its value is never read.
+src/components/AgentShowcase.tsx(32,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/AgentShowcase.tsx(36,3): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/components/AgentShowcase.tsx(37,3): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/components/AgentShowcase.tsx(40,3): error TS6133: 'FileText' is declared but its value is never read.
+src/components/AgentShowcase.tsx(41,3): error TS6133: 'Lightbulb' is declared but its value is never read.
+src/components/AgentShowcase.tsx(42,3): error TS6133: 'Sparkles' is declared but its value is never read.
+src/components/AgentShowcase.tsx(44,3): error TS6133: 'Globe' is declared but its value is never read.
+src/components/AgentShowcase.tsx(45,3): error TS6133: 'Link' is declared but its value is never read.
+src/components/AgentShowcase.tsx(46,3): error TS6133: 'PlusCircle' is declared but its value is never read.
+src/components/AgentShowcase.tsx(47,3): error TS6133: 'MinusCircle' is declared but its value is never read.
+src/components/AgentShowcase.tsx(48,3): error TS6133: 'RefreshCw' is declared but its value is never read.
+src/components/AgentShowcase.tsx(50,3): error TS6133: 'Layers' is declared but its value is never read.
+src/components/AgentShowcase.tsx(51,3): error TS6133: 'Command' is declared but its value is never read.
+src/components/AgentShowcase.tsx(53,1): error TS6192: All imports in import declaration are unused.
+src/components/AgentShowcase.tsx(54,1): error TS6133: 'ModeToggle' is declared but its value is never read.
+src/components/AgentShowcase.tsx(407,10): error TS6133: 'activeAgent' is declared but its value is never read.
+src/components/ApiSetupGuide.tsx(9,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/ApiSetupGuide.tsx(11,3): error TS6133: 'Link' is declared but its value is never read.
+src/components/ApiSetupGuide.tsx(18,3): error TS6133: 'Globe' is declared but its value is never read.
+src/components/ApiSetupGuide.tsx(48,44): error TS2339: Property 'testConnections' does not exist on type 'RealApiService'.
+src/components/CRMModules.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/CRMModules.tsx(5,3): error TS6133: 'CheckSquare' is declared but its value is never read.
+src/components/CRMModules.tsx(7,3): error TS6133: 'Megaphone' is declared but its value is never read.
+src/components/CRMModules.tsx(9,3): error TS6133: 'MessageCircle' is declared but its value is never read.
+src/components/CRMModules.tsx(20,3): error TS6133: 'Shield' is declared but its value is never read.
+src/components/CRMModules.tsx(21,3): error TS6133: 'Database' is declared but its value is never read.
+src/components/CRMModules.tsx(22,3): error TS6133: 'Heart' is declared but its value is never read.
+src/components/CRMModules.tsx(24,3): error TS6133: 'FileText' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(9,3): error TS6133: 'TrendingUp' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(11,3): error TS6133: 'Edit' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(12,3): error TS6133: 'Check' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(13,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(20,3): error TS6133: 'DollarSign' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(21,3): error TS6133: 'Star' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(22,3): error TS6133: 'AlertCircle' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(26,3): error TS6133: 'MapPin' is declared but its value is never read.
+src/components/CRMWorkspace.tsx(27,3): error TS6133: 'Globe' is declared but its value is never read.
+src/components/ComposioIntegrationModal.tsx(8,3): error TS6133: 'Filter' is declared but its value is never read.
+src/components/ComposioIntegrationModal.tsx(20,69): error TS6133: 'getToolsByStatus' is declared but its value is never read.
+src/components/ConversationInsightsPanel.tsx(8,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/ConversationInsightsPanel.tsx(9,3): error TS6133: 'Star' is declared but its value is never read.
+src/components/ConversationInsightsPanel.tsx(11,3): error TS6133: 'CheckCircle' is declared but its value is never read.
+src/components/ConversationInsightsPanel.tsx(13,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/ConversationInsightsPanel.tsx(15,3): error TS6133: 'Activity' is declared but its value is never read.
+src/components/ConversationInsightsPanel.tsx(16,3): error TS6133: 'Award' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(5,3): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(6,3): error TS6133: 'TrendingUp' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(10,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(13,3): error TS6133: 'Target' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(14,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(15,3): error TS6133: 'Star' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(16,3): error TS6133: 'Activity' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(17,3): error TS6133: 'Award' is declared but its value is never read.
+src/components/DataQualityDashboard.tsx(60,10): error TS6133: 'showDetails' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(11,3): error TS6133: 'Search' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(13,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(15,3): error TS6133: 'Zap' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(17,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(18,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(20,3): error TS6133: 'TrendingUp' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(21,3): error TS6133: 'Target' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(23,3): error TS6133: 'Info' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(24,3): error TS6133: 'HelpCircle' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(25,3): error TS6133: 'Activity' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(69,3): error TS6133: 'onModeToggle' is declared but its value is never read.
+src/components/EnhancedAIConsole.tsx(153,36): error TS2345: Argument of type '{ summary: string; lastResponseId?: string | undefined; }' is not assignable to parameter of type 'SetStateAction<string>'.
+src/components/EnhancedAIConsole.tsx(303,90): error TS2304: Cannot find name 'qualityMode'.
+src/components/EnhancedAIConsole.tsx(309,11): error TS2353: Object literal may only specify known properties, and 'gpt5Enhanced' does not exist in type 'Message'.
+src/components/EnhancedAIConsole.tsx(311,11): error TS18004: No value exists in scope for the shorthand property 'qualityMode'. Either declare one or provide an initializer.
+src/components/EnhancedAIConsole.tsx(315,109): error TS2554: Expected 2-4 arguments, but got 5.
+src/components/EnhancedAIConsole.tsx(325,41): error TS2532: Object is possibly 'undefined'.
+src/components/EnhancedAIConsole.tsx(343,9): error TS6133: 'generateEnhancedDemo' is declared but its value is never read.
+src/components/EnhancedModeToggle.tsx(2,35): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/components/EnhancedModeToggle.tsx(2,49): error TS6133: 'Info' is declared but its value is never read.
+src/components/EnhancedTaskBuilder.tsx(6,3): error TS6133: 'Zap' is declared but its value is never read.
+src/components/EnhancedTaskBuilder.tsx(13,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/EnhancedTaskBuilder.tsx(16,3): error TS6133: 'Info' is declared but its value is never read.
+src/components/EnhancedTaskBuilder.tsx(20,3): error TS6133: 'Database' is declared but its value is never read.
+src/components/EnhancedTaskBuilder.tsx(129,26): error TS2339: Property 'taskType' does not exist on type 'GPT5TaskAnalysis'.
+src/components/EnhancedTaskBuilder.tsx(141,41): error TS2339: Property 'taskType' does not exist on type 'GPT5TaskAnalysis'.
+src/components/EnhancedTaskBuilder.tsx(462,27): error TS2367: This comparison appears to be unintentional because the types '"number" | "text" | "date" | "email" | "phone" | "contact" | "deal" | "multiselect"' and '"textarea"' have no overlap.
+src/components/EnhancedTaskBuilder.tsx(534,81): error TS2339: Property 'taskType' does not exist on type 'GPT5TaskAnalysis'.
+src/components/EnhancedTaskExecution.tsx(1,27): error TS6133: 'useEffect' is declared but its value is never read.
+src/components/EnhancedTaskExecution.tsx(10,3): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/components/EnhancedTaskExecution.tsx(12,3): error TS6133: 'Activity' is declared but its value is never read.
+src/components/EnhancedTaskExecution.tsx(26,1): error TS6133: 'Tooltip' is declared but its value is never read.
+src/components/EnhancedTaskExecution.tsx(62,13): error TS6133: 'result' is declared but its value is never read.
+src/components/EnhancedTaskExecution.tsx(64,10): error TS6133: 'stepUpdate' is declared but its value is never read.
+src/components/ErrorBoundary.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/ErrorBoundary.tsx(2,41): error TS6133: 'Eye' is declared but its value is never read.
+src/components/Features.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/FileUploadManager.tsx(13,3): error TS6133: 'CheckCircle' is declared but its value is never read.
+src/components/FileUploadManager.tsx(14,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/FileUploadManager.tsx(128,13): error TS6133: 'fileExtension' is declared but its value is never read.
+src/components/Footer.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(7,3): error TS6133: 'Zap' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(9,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(12,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(13,3): error TS6133: 'Target' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(14,3): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(16,3): error TS6133: 'Pause' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(21,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(22,3): error TS6133: 'TrendingUp' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(25,1): error TS6133: 'gpt5TaskOrchestrator' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(59,3): error TS6133: 'onComplete' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(60,3): error TS6133: 'onCancel' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(61,3): error TS6133: 'realMode' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(66,24): error TS6133: 'setCurrentPhase' is declared but its value is never read.
+src/components/GPT5AgentCoordinator.tsx(115,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 'AI SDR Agent': string; 'AI AE Agent': string; 'Email Agent': string; 'Voice Agent': string; 'Calendar Agent': string; 'Follow-up Agent': string; 'Lead Scoring Agent': string; 'Timeline Logger Agent': string; 'Content Generator Agent': string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ 'AI SDR Agent': string; 'AI AE Agent': string; 'Email Agent': string; 'Voice Agent': string; 'Calendar Agent': string; 'Follow-up Agent': string; 'Lead Scoring Agent': string; 'Timeline Logger Agent': string; 'Content Generator Agent': string; }'.
+src/components/GPT5AgentCoordinator.tsx(208,48): error TS2304: Cannot find name 'Calendar'.
+src/components/GPT5AgentCoordinator.tsx(303,55): error TS6133: 'index' is declared but its value is never read.
+src/components/GoalAchievementFlow.tsx(3,1): error TS6133: 'allGoals' is declared but its value is never read.
+src/components/GoalAchievementFlow.tsx(4,1): error TS6133: 'executeAgentWithTools' is declared but its value is never read.
+src/components/GoalAchievementFlow.tsx(10,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/GoalAchievementFlow.tsx(12,3): error TS6133: 'Zap' is declared but its value is never read.
+src/components/GoalDashboard.tsx(5,3): error TS6133: 'TrendingUp' is declared but its value is never read.
+src/components/GoalDashboard.tsx(12,3): error TS6133: 'Users' is declared but its value is never read.
+src/components/GoalDashboard.tsx(14,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/GoalDashboard.tsx(26,3): error TS6133: 'userGoals' is declared but its value is never read.
+src/components/GoalExecutionModal.tsx(4,24): error TS6133: 'Minimize2' is declared but its value is never read.
+src/components/GoalExecutionModal.tsx(4,35): error TS6133: 'HelpCircle' is declared but its value is never read.
+src/components/GoalExecutionModal.tsx(4,47): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/components/GoalSelector.tsx(2,36): error TS6133: 'getGoalsByCategory' is declared but its value is never read.
+src/components/GoalSelector.tsx(3,16): error TS6133: 'GoalCategory' is declared but its value is never read.
+src/components/Hero.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/HowItWorks.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/HowToUse.tsx(9,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/HowToUse.tsx(17,3): error TS6133: 'Activity' is declared but its value is never read.
+src/components/HowToUse.tsx(18,3): error TS6133: 'Database' is declared but its value is never read.
+src/components/HowToUse.tsx(19,3): error TS6133: 'Globe' is declared but its value is never read.
+src/components/Integrations.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/Integrations.tsx(2,31): error TS6133: 'Search' is declared but its value is never read.
+src/components/Integrations.tsx(2,39): error TS6133: 'Filter' is declared but its value is never read.
+src/components/Integrations.tsx(2,47): error TS6133: 'Grid' is declared but its value is never read.
+src/components/Integrations.tsx(2,53): error TS6133: 'List' is declared but its value is never read.
+src/components/Integrations.tsx(3,1): error TS6133: 'composioToolCategories' is declared but its value is never read.
+src/components/InteractiveGoalCard.tsx(5,3): error TS6133: 'Pause' is declared but its value is never read.
+src/components/InteractiveGoalCard.tsx(11,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/InteractiveGoalCard.tsx(17,3): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/components/InteractiveGoalCard.tsx(21,3): error TS6133: 'HelpCircle' is declared but its value is never read.
+src/components/InteractiveGoalCard.tsx(23,1): error TS6133: 'runComposioAgent' is declared but its value is never read.
+src/components/InteractiveGoalCard.tsx(389,20): error TS2304: Cannot find name 'AlertTriangle'.
+src/components/InteractiveGoalExplorer.tsx(17,3): error TS6133: 'Play' is declared but its value is never read.
+src/components/InteractiveGoalExplorer.tsx(23,3): error TS6133: 'BarChart3' is declared but its value is never read.
+src/components/InteractiveGoalExplorer.tsx(29,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/InteractiveGoalExplorer.tsx(30,3): error TS6133: 'Info' is declared but its value is never read.
+src/components/InteractiveGoalExplorer.tsx(54,10): error TS6133: 'hasSeenWalkthrough' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(4,1): error TS6133: 'executeAgentWithTools' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(12,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(13,3): error TS6133: 'Zap' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(14,3): error TS6133: 'Users' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(19,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(22,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(23,3): error TS6133: 'Sparkles' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(32,3): error TS6133: 'Info' is declared but its value is never read.
+src/components/LiveGoalExecution.tsx(64,10): error TS6133: 'currentStep' is declared but its value is never read.
+src/components/MultiAgentDemo.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/MultiAgentDemo.tsx(1,27): error TS6133: 'useEffect' is declared but its value is never read.
+src/components/MultiAgentDemo.tsx(2,20): error TS6133: 'Send' is declared but its value is never read.
+src/components/MultiAgentDemo.tsx(2,38): error TS6133: 'MessageSquare' is declared but its value is never read.
+src/components/MultiAgentDemo.tsx(2,68): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/MultiAgentDemo.tsx(82,10): error TS6133: 'currentStep' is declared but its value is never read.
+src/components/MultiAgentDemo.tsx(175,44): error TS6133: 'index' is declared but its value is never read.
+src/components/PageWalkthrough.tsx(3,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/PageWalkthrough.tsx(6,3): error TS6133: 'Play' is declared but its value is never read.
+src/components/PageWalkthrough.tsx(11,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/PageWalkthrough.tsx(22,3): error TS6133: 'Info' is declared but its value is never read.
+src/components/PersonalizedGoalRecommendations.tsx(13,3): error TS6133: 'Award' is declared but its value is never read.
+src/components/PersonalizedGoalRecommendations.tsx(17,3): error TS6133: 'Info' is declared but its value is never read.
+src/components/PersonalizedGoalRecommendations.tsx(18,3): error TS6133: 'DollarSign' is declared but its value is never read.
+src/components/PersonalizedGoalRecommendations.tsx(49,3): error TS6133: 'showReasoningDetails' is declared but its value is never read.
+src/components/PersonalizedGoalRecommendations.tsx(55,10): error TS6133: 'showAllRecommendations' is declared but its value is never read.
+src/components/PersonalizedGoalRecommendations.tsx(59,24): error TS2304: Cannot find name 'useRef'.
+src/components/PersonalizedGoalRecommendations.tsx(158,12): error TS2304: Cannot find name 'AlertTriangle'.
+src/components/PersonalizedGoalRecommendations.tsx(234,60): error TS6133: 'index' is declared but its value is never read.
+src/components/Pricing.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(9,3): error TS6133: 'Users' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(10,3): error TS6133: 'BarChart3' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(15,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(19,3): error TS6133: 'Award' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(21,3): error TS6133: 'Bell' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(22,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(53,3): error TS6133: 'onInsightView' is declared but its value is never read.
+src/components/ProactiveAssistantPanel.tsx(63,24): error TS2304: Cannot find name 'useRef'.
+src/components/ProactiveAssistantPanel.tsx(391,24): error TS2304: Cannot find name 'DollarSign'.
+src/components/SmartWorkflowSuggestions.tsx(7,3): error TS6133: 'Target' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(9,3): error TS6133: 'Play' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(13,3): error TS6133: 'Star' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(15,3): error TS6133: 'Users' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(16,3): error TS6133: 'Bot' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(17,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(19,3): error TS6133: 'Award' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(20,3): error TS6133: 'Lightbulb' is declared but its value is never read.
+src/components/SmartWorkflowSuggestions.tsx(23,1): error TS6133: 'Tooltip' is declared but its value is never read.
+src/components/TaskExecutionEntry.tsx(10,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/TaskExecutionEntry.tsx(12,3): error TS6133: 'Zap' is declared but its value is never read.
+src/components/TaskExecutionEntry.tsx(13,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/TaskExecutionEntry.tsx(23,1): error TS6133: 'Tooltip' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(9,3): error TS6133: 'Award' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(12,3): error TS6133: 'Calendar' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(15,3): error TS6133: 'Star' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(17,3): error TS6133: 'Search' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(22,3): error TS6133: 'FileText' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(23,3): error TS6133: 'Mail' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(24,3): error TS6133: 'Phone' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(28,31): error TS6133: 'BusinessOutcome' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(28,48): error TS6133: 'AgentPerformanceMetric' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(29,1): error TS6133: 'Tooltip' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(41,10): error TS6133: 'searchQuery' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(41,23): error TS6133: 'setSearchQuery' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(42,10): error TS6133: 'sortBy' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(42,18): error TS6133: 'setSortBy' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(185,44): error TS6133: 'index' is declared but its value is never read.
+src/components/TaskResultsDashboard.tsx(385,24): error TS2304: Cannot find name 'Brain'.
+src/data/goalsData.ts(883,11): error TS6133: 'businessType' is declared but its value is never read.
+src/hooks/useTheme.ts(13,15): error TS2459: Module '"../contexts/ThemeContext"' declares 'Theme' locally, but it is not exported.
+src/lib/audioTools.ts(2,55): error TS6133: 'options' is declared but its value is never read.
+src/lib/elevenlabs.ts(2,47): error TS6133: 'voice' is declared but its value is never read.
+src/lib/ffmpegTools.ts(2,41): error TS6133: 'audioPath' is declared but its value is never read.
+src/lib/ffmpegTools.ts(2,60): error TS6133: 'videoPath' is declared but its value is never read.
+src/pages/CoreInteractionPage.tsx(19,3): error TS6133: 'Eye' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(17,3): error TS6133: 'Sparkles' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(20,3): error TS6133: 'Users' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(21,3): error TS6133: 'TrendingUp' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(22,3): error TS6133: 'Database' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(23,3): error TS6133: 'Workflow' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(24,3): error TS6133: 'Eye' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(26,3): error TS6133: 'Lightbulb' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(28,1): error TS6133: 'Tooltip' is declared but its value is never read.
+src/pages/FeaturesAnalyticsPage.tsx(259,23): error TS2322: Type '{ onOpenComposioModal: () => void; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'onOpenComposioModal' does not exist on type 'IntrinsicAttributes'.
+src/services/agentLearningService.ts(119,11): error TS2353: Object literal may only specify known properties, and 'outputFormat' does not exist in type '{ taskType?: "analytical" | "creative" | "complex_reasoning" | "simple_query" | undefined; complexity?: "simple" | "intermediate" | "advanced" | undefined; enableChainOfThought?: boolean | undefined; ... 4 more ...; store?: boolean | undefined; }'.
+src/services/agentLearningService.ts(121,28): error TS2304: Cannot find name 'learningExamples'.
+src/services/agentLearningService.ts(144,39): error TS6133: 'userId' is declared but its value is never read.
+src/services/agentLearningService.ts(288,5): error TS6133: 'context' is declared but its value is never read.
+src/services/callGemini.ts(2,50): error TS6133: 'options' is declared but its value is never read.
+src/services/contextualMemoryService.ts(53,11): error TS6133: 'embeddings' is declared but its value is never read.
+src/services/contextualMemoryService.ts(154,5): error TS6133: 'maxContextLength' is declared but its value is never read.
+src/services/contextualMemoryService.ts(230,42): error TS2339: Property 'lastResponseId' does not exist on type 'CRMContext'.
+src/services/contextualMemoryService.ts(363,11): error TS6133: 'calculateComplexityScore' is declared but its value is never read.
+src/services/contextualMemoryService.ts(387,11): error TS6133: 'calculateEngagementLevel' is declared but its value is never read.
+src/services/contextualMemoryService.ts(404,11): error TS6133: 'calculateSessionValue' is declared but its value is never read.
+src/services/contextualMemoryService.ts(430,11): error TS6133: 'predictNextActions' is declared but its value is never read.
+src/services/contextualMemoryService.ts(454,11): error TS6133: 'detectWorkflowPatterns' is declared but its value is never read.
+src/services/contextualMemoryService.ts(485,17): error TS6133: 'action' is declared but its value is never read.
+src/services/contextualMemoryService.ts(556,35): error TS6133: 'text' is declared but its value is never read.
+src/services/contextualMemoryService.ts(637,33): error TS6133: 'userId' is declared but its value is never read.
+src/services/contextualMemoryService.ts(646,29): error TS6133: 'userId' is declared but its value is never read.
+src/services/contextualMemoryService.ts(646,45): error TS6133: 'sessionId' is declared but its value is never read.
+src/services/conversationInsightsService.ts(3,1): error TS6133: 'supabaseService' is declared but its value is never read.
+src/services/dataValidationService.ts(128,5): error TS6133: 'userId' is declared but its value is never read.
+src/services/dataValidationService.ts(169,29): error TS2345: Argument of type 'string' is not assignable to parameter of type 'never'.
+src/services/dataValidationService.ts(256,49): error TS6133: 'deals' is declared but its value is never read.
+src/services/dataValidationService.ts(264,48): error TS6133: 'deals' is declared but its value is never read.
+src/services/emotionalVoiceService.ts(11,11): error TS6196: 'VoicePersonality' is declared but never used.
+src/services/emotionalVoiceService.ts(175,11): error TS6133: 'getGPT5PersonalityMode' is declared but its value is never read.
+src/services/emotionalVoiceService.ts(189,11): error TS6133: 'getGPT5ResponseAdaptation' is declared but its value is never read.
+src/services/emotionalVoiceService.ts(236,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ excited: string; frustrated: string; confused: string; satisfied: string; urgent: string; neutral: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ excited: string; frustrated: string; confused: string; satisfied: string; urgent: string; neutral: string; }'.
+src/services/emotionalVoiceService.ts(268,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ professional: string; casual: string; supportive: string; celebratory: string; instructional: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ professional: string; casual: string; supportive: string; celebratory: string; instructional: string; }'.
+src/services/emotionalVoiceService.ts(300,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ success: string; challenge: string; learning: string; planning: string; execution: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ success: string; challenge: string; learning: string; planning: string; execution: string; }'.
+src/services/emotionalVoiceService.ts(332,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ concise: string; detailed: string; encouraging: string; technical: string; strategic: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ concise: string; detailed: string; encouraging: string; technical: string; strategic: string; }'.
+src/services/emotionalVoiceService.ts(403,13): error TS6133: 'voiceParams' is declared but its value is never read.
+src/services/enhancedNLUService.ts(56,13): error TS6133: 'fewShotExamples' is declared but its value is never read.
+src/services/enhancedSupabaseService.ts(5,3): error TS6133: 'TaskExecutionStep' is declared but its value is never read.
+src/services/enhancedSupabaseService.ts(8,3): error TS6133: 'CrmUpdateRecord' is declared but its value is never read.
+src/services/enhancedSupabaseService.ts(25,16): error TS2783: 'id' is specified more than once, so this usage will be overwritten.
+src/services/gpt5TaskOrchestrator.ts(6,3): error TS6133: 'RequiredTaskField' is declared but its value is never read.
+src/services/gpt5TaskOrchestrator.ts(7,3): error TS6133: 'TaskExecutionStep' is declared but its value is never read.
+src/services/gpt5TaskOrchestrator.ts(9,3): error TS6133: 'AgentRecommendation' is declared but its value is never read.
+src/services/gpt5TaskOrchestrator.ts(10,3): error TS6133: 'RiskFactor' is declared but its value is never read.
+src/services/gpt5TaskOrchestrator.ts(11,3): error TS6133: 'BusinessImpact' is declared but its value is never read.
+src/services/gpt5TaskOrchestrator.ts(153,11): error TS2353: Object literal may only specify known properties, and 'outputFormat' does not exist in type '{ taskType?: "analytical" | "creative" | "complex_reasoning" | "simple_query" | undefined; complexity?: "simple" | "intermediate" | "advanced" | undefined; enableChainOfThought?: boolean | undefined; ... 4 more ...; store?: boolean | undefined; }'.
+src/services/gpt5TaskOrchestrator.ts(154,11): error TS1117: An object literal cannot have multiple properties with the same name.
+src/services/gpt5TaskOrchestrator.ts(159,61): error TS2339: Property 'content' does not exist on type '{ output_text: string; id?: string | undefined; reasoning?: string | undefined; }'.
+src/services/gpt5TaskOrchestrator.ts(178,11): error TS6133: 'taskId' is declared but its value is never read.
+src/services/gpt5TaskOrchestrator.ts(328,9): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/services/gpt5TaskOrchestrator.ts(394,7): error TS2554: Expected 1-2 arguments, but got 4.
+src/services/personalizedGoalService.ts(2,10): error TS6133: 'apiConfig' is declared but its value is never read.
+src/services/personalizedGoalService.ts(5,20): error TS6133: 'goalCategories' is declared but its value is never read.
+src/services/personalizedGoalService.ts(81,9): error TS2322: Type '{ summary: string; lastResponseId?: string | undefined; }' is not assignable to type 'string'.
+src/services/personalizedGoalService.ts(180,11): error TS2353: Object literal may only specify known properties, and 'outputFormat' does not exist in type '{ taskType?: "analytical" | "creative" | "complex_reasoning" | "simple_query" | undefined; complexity?: "simple" | "intermediate" | "advanced" | undefined; enableChainOfThought?: boolean | undefined; ... 4 more ...; store?: boolean | undefined; }'.
+src/services/personalizedGoalService.ts(182,11): error TS18004: No value exists in scope for the shorthand property 'fewShotExamples'. Either declare one or provide an initializer.
+src/services/personalizedGoalService.ts(215,16): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/services/personalizedGoalService.ts(215,19): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/services/personalizedGoalService.ts(279,11): error TS6133: 'parsedRecommendations' is declared but its value is never read.
+src/services/personalizedGoalService.ts(281,74): error TS2552: Cannot find name 'recommendationPrompt'. Did you mean 'recommendations'?
+src/services/personalizedGoalService.ts(285,9): error TS2739: Type 'PersonalizedRecommendation[]' is missing the following properties from type 'UserBusinessProfile': currentChallenges, technicalSkill, priorities, crmUsage, goalHistory
+src/services/personalizedGoalService.ts(304,38): error TS6133: 'userId' is declared but its value is never read.
+src/services/personalizedGoalService.ts(447,72): error TS6133: 'context' is declared but its value is never read.
+src/services/proactiveAssistantService.ts(45,11): error TS6133: 'lastAnalysis' is declared but its value is never read.
+src/services/proactiveAssistantService.ts(83,13): error TS6133: 'context' is declared but its value is never read.
+src/services/realApiService.ts(9,11): error TS6196: 'OpenAIService' is declared but never used.
+src/services/realApiService.ts(39,11): error TS6133: 'openaiClient' is declared but its value is never read.
+src/services/realApiService.ts(43,17): error TS2339: Property 'openaiClient' does not exist on type '{ generateText(prompt: string, maxTokens?: number, temperature?: number): Promise<string>; generateAIResponse(instructions: string, input: string, options?: { taskType?: "analytical" | "creative" | "complex_reasoning" | "simple_query" | undefined; ... 6 more ...; store?: boolean | undefined; }): Promise<...>; select...'.
+src/services/realApiService.ts(50,39): error TS2339: Property 'openaiClient' does not exist on type '{ generateText(prompt: string, maxTokens?: number, temperature?: number): Promise<string>; generateAIResponse(instructions: string, input: string, options?: { taskType?: "analytical" | "creative" | "complex_reasoning" | "simple_query" | undefined; ... 6 more ...; store?: boolean | undefined; }): Promise<...>; select...'.
+src/services/realApiService.ts(78,17): error TS2339: Property 'openaiClient' does not exist on type '{ generateText(prompt: string, maxTokens?: number, temperature?: number): Promise<string>; generateAIResponse(instructions: string, input: string, options?: { taskType?: "analytical" | "creative" | "complex_reasoning" | "simple_query" | undefined; ... 6 more ...; store?: boolean | undefined; }): Promise<...>; select...'.
+src/services/realApiService.ts(93,39): error TS2339: Property 'openaiClient' does not exist on type '{ generateText(prompt: string, maxTokens?: number, temperature?: number): Promise<string>; generateAIResponse(instructions: string, input: string, options?: { taskType?: "analytical" | "creative" | "complex_reasoning" | "simple_query" | undefined; ... 6 more ...; store?: boolean | undefined; }): Promise<...>; select...'.
+src/services/realApiService.ts(169,49): error TS6133: 'options' is declared but its value is never read.
+src/services/realApiService.ts(182,40): error TS6133: 'maxTokens' is declared but its value is never read.
+src/services/realApiService.ts(189,25): error TS6133: 'action' is declared but its value is never read.
+src/services/realApiService.ts(189,41): error TS6133: 'params' is declared but its value is never read.
+src/services/realApiService.ts(201,26): error TS6133: 'text' is declared but its value is never read.
+src/services/realApiService.ts(201,40): error TS6133: 'voice' is declared but its value is never read.
+src/services/smartWorkflowService.ts(259,35): error TS6133: 'userId' is declared but its value is never read.
+src/services/supabaseClient.ts(117,21): error TS6133: 'customerId' is declared but its value is never read.
+src/services/supabaseClient.ts(162,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(176,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(189,17): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(230,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(244,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(256,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(277,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(295,12): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(312,12): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(336,15): error TS6133: 'data' is declared but its value is never read.
+src/services/supabaseClient.ts(367,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(380,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(390,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(400,22): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(413,35): error TS18047: 'client' is possibly 'null'.
+src/services/supabaseClient.ts(423,35): error TS18047: 'client' is possibly 'null'.
