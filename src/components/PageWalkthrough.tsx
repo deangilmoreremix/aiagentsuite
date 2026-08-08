@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  ArrowRight, 
   ArrowLeft, 
   X, 
-  Play, 
   ChevronRight,
   Lightbulb,
   Target,
   Zap,
-  Eye,
   Star,
   Sparkles,
   Bot,
@@ -19,7 +16,6 @@ import {
   ArrowRightIcon,
   Settings,
   AlertTriangle,
-  Info,
   Brain,
   MessageSquare
 } from 'lucide-react';

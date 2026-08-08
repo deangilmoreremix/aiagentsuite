@@ -7,10 +7,7 @@ import {
   Activity,
   Sparkles,
   ArrowRight,
-  Clock,
   TrendingUp,
-  Zap,
-  Settings,
   BarChart3,
   Bot,
   Play
@@ -20,7 +17,6 @@ import EnhancedTaskExecution from './EnhancedTaskExecution';
 import TaskResultsDashboard from './TaskResultsDashboard';
 import { EnhancedTaskInput } from '../types/taskExecution';
 import { gpt5TaskOrchestrator } from '../services/gpt5TaskOrchestrator';
-import Tooltip from './Tooltip';
 
 interface TaskExecutionEntryProps {
   realMode?: boolean;

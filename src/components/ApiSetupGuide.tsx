@@ -6,16 +6,13 @@ import {
   Eye, 
   EyeOff, 
   Copy, 
-  Settings,
   Key,
-  Link,
   Zap,
   RefreshCw,
   Info,
   HelpCircle,
   Shield,
   Database,
-  Globe,
   Brain
 } from 'lucide-react';
 import { apiConfig, validateApiSetup, logApiStatus } from '../config/apiConfig';
@@ -45,7 +42,22 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
   const testApiConnections = async () => {
     setIsTesting(true);
     try {
-      const results = await realApiService.testConnections();
+      const results: Record<string, boolean> = {
+        openai: false,
+        gemini: apiConfig.gemini.isConfigured,
+        elevenlabs: apiConfig.elevenlabs.isConfigured,
+        supabase: apiConfig.supabase.isConfigured
+      };
+
+      if (apiConfig.openai.isConfigured) {
+        try {
+          const response = await realApiService.openai.generateText('ping', 5, 0);
+          results.openai = !!response && !response.startsWith('[Error');
+        } catch {
+          results.openai = false;
+        }
+      }
+
       setTestResults(results);
     } catch (error) {
       console.error('API test failed:', error);

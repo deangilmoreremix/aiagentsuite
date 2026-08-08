@@ -1,57 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Bot, 
-  Phone, 
-  User, 
-  Workflow, 
-  Volume2, 
-  Calendar, 
-  Shield, 
-  RotateCcw,
-  ArrowRight,
+import { useState, useEffect } from 'react';
+import {
+  Bot,
+  Phone,
+  User,
+  Workflow,
+  Volume2,
+  Calendar,
   Mail,
-  Target,
-  Database,
   Presentation,
-  MessageCircle,
-  Send,
-  Heart,
   Zap,
-  Star,
   TrendingUp,
   Users,
-  Smartphone,
   Trophy,
-  Brain,
-  Mic,
   Play,
-  Pause,
   Activity,
   Network,
-  GitBranch,
-  Settings,
   Eye,
   Clock,
   CheckCircle,
-  ExternalLink,
-  AlertTriangle,
   BarChart3,
   DollarSign,
-  FileText,
-  Lightbulb,
-  Sparkles,
   Award,
-  Globe,
-  Link,
-  PlusCircle,
-  MinusCircle,
-  RefreshCw,
-  Monitor,
-  Layers,
-  Command
+  Monitor
 } from 'lucide-react';
-import { executeAgentWithTools } from '../agents/useOpenAIAgentSuite';
-import ModeToggle from './ModeToggle';
 
 interface TaskStep {
   id: string;
@@ -404,7 +375,7 @@ const specializedAgents = [
 ];
 
 const AgentShowcase = () => {
-  const [activeAgent, setActiveAgent] = useState(specializedAgents[0]);
+  const [, setActiveAgent] = useState(specializedAgents[0]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [viewMode, setViewMode] = useState<'grid' | 'execution' | 'metrics'>('grid');
   const [realMode, setRealMode] = useState(false);

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Check, Search, Filter, Grid, List } from 'lucide-react';
+import { useState } from 'react';
+import { Check } from 'lucide-react';
 
 const integrations = [
   {

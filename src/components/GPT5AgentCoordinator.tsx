@@ -4,25 +4,17 @@ import {
   Bot, 
   Activity, 
   Brain, 
-  Zap, 
   CheckCircle, 
-  Clock,
   ArrowRight,
   Users,
-  Settings,
-  Target,
-  AlertTriangle,
   Play,
-  Pause,
   Star,
   GitBranch,
   Database,
   MessageSquare,
-  Eye,
-  TrendingUp
+  Calendar
 } from 'lucide-react';
 import { EnhancedTaskInput } from '../types/taskExecution';
-import { gpt5TaskOrchestrator } from '../services/gpt5TaskOrchestrator';
 import Tooltip from './Tooltip';
 
 interface AgentStatus {
@@ -55,15 +47,12 @@ interface GPT5AgentCoordinatorProps {
 
 const GPT5AgentCoordinator: React.FC<GPT5AgentCoordinatorProps> = ({
   task,
-  isExecuting,
-  onComplete,
-  onCancel,
-  realMode = false
+  isExecuting
 }) => {
   const [agentStatuses, setAgentStatuses] = useState<Record<string, AgentStatus>>({});
   const [coordinationEvents, setCoordinationEvents] = useState<CoordinationEvent[]>([]);
   const [overallProgress, setOverallProgress] = useState(0);
-  const [currentPhase, setCurrentPhase] = useState<'planning' | 'execution' | 'validation' | 'completion'>('planning');
+  const [currentPhase] = useState<'planning' | 'execution' | 'validation' | 'completion'>('planning');
   const [networkVisualization, setNetworkVisualization] = useState<any[]>([]);
   const [gpt5Insights, setGPT5Insights] = useState<string[]>([]);
 
@@ -101,7 +90,7 @@ const GPT5AgentCoordinator: React.FC<GPT5AgentCoordinatorProps> = ({
   }, [isExecuting]);
 
   const generateBusinessImpact = (agentName: string): string => {
-    const impacts = {
+    const impacts: Record<string, string> = {
       'AI SDR Agent': 'Generating qualified leads and prospect data',
       'AI AE Agent': 'Managing deal progression and closing activities',
       'Email Agent': 'Creating and sending personalized communications',
@@ -300,7 +289,7 @@ const GPT5AgentCoordinator: React.FC<GPT5AgentCoordinatorProps> = ({
           </div>
 
           <div className="space-y-4">
-            {Object.values(agentStatuses).map((agent, index) => {
+            {Object.values(agentStatuses).map((agent) => {
               const IconComponent = getAgentIcon(agent.name);
               
               return (

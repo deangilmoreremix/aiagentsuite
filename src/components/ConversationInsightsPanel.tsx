@@ -5,15 +5,9 @@ import {
   Lightbulb, 
   MessageSquare, 
   BarChart3,
-  Clock,
-  Star,
   Target,
-  CheckCircle,
   ArrowRight,
-  Eye,
   Sparkles,
-  Activity,
-  Award,
   RefreshCw
 } from 'lucide-react';
 import { conversationInsightsService } from '../services/conversationInsightsService';

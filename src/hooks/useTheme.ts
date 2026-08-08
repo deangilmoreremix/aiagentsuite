@@ -10,4 +10,4 @@ export const useTheme = () => {
 };
 
 // Re-export for convenience
-export type { Theme } from '../contexts/ThemeContext';
+export type Theme = ReturnType<typeof useTheme>['theme'];

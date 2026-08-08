@@ -15,7 +15,6 @@ import {
   Target, 
   BarChart3, 
   Settings,
-  Eye,
   Book,
   Bot
 } from 'lucide-react';

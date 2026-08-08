@@ -1,28 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Bot, 
-  Mic, 
-  Send, 
-  Volume2, 
-  Brain, 
-  Lightbulb, 
+import {
+  Bot,
+  Mic,
+  Send,
+  Volume2,
+  Brain,
+  Lightbulb,
   Sparkles,
   History,
-  Search,
   MicOff,
-  Eye,
   MessageSquare,
-  Zap,
   Star,
-  ArrowRight,
-  Clock,
   User,
-  TrendingUp,
-  Target,
-  CheckCircle,
-  Info,
-  HelpCircle,
-  Activity
+  CheckCircle
 } from 'lucide-react';
 import { contextualMemoryService } from '../services/contextualMemoryService';
 import { proactiveAssistantService } from '../services/proactiveAssistantService';
@@ -44,6 +34,9 @@ interface Message {
   confidence?: number;
   emotionalTone?: string;
   audioUrl?: string;
+  gpt5Enhanced?: boolean;
+  reasoning?: any;
+  qualityMode?: string;
 }
 
 interface ProactiveSuggestion {
@@ -66,7 +59,6 @@ interface EnhancedAIConsoleProps {
 
 const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
   realMode = false,
-  onModeToggle,
   className = '',
   showProactiveSuggestions = true
 }) => {
@@ -150,7 +142,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         try {
           const summary = await contextualMemoryService.getContextualSummary();
           if (isMountedRef.current) {
-            setConversationSummary(summary);
+            setConversationSummary(summary.summary);
           }
         } catch (error) {
           console.error('Failed to update conversation summary:', error);
@@ -205,126 +197,127 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
       const emotionalContext = await emotionalVoiceService.analyzeEmotionalContext(currentInput);
       setCurrentEmotionalContext(emotionalContext);
 
-      if (realMode) {
-        // Enhanced NLU parsing
-        const parsedCommand = await enhancedNLUService.parseCommand(currentInput);
-        
-        // Check for ambiguities
-        if (parsedCommand.ambiguities.length > 0) {
-          const clarificationQuestions = await enhancedNLUService.handleAmbiguousCommand(
-            currentInput,
-            parsedCommand.ambiguities
+        if (realMode) {
+          // Enhanced NLU parsing
+          const parsedCommand = await enhancedNLUService.parseCommand(currentInput);
+          const qualityMode = 'balanced';
+          
+          // Check for ambiguities
+          if (parsedCommand.ambiguities.length > 0) {
+            const clarificationQuestions = await enhancedNLUService.handleAmbiguousCommand(
+              currentInput,
+              parsedCommand.ambiguities
+            );
+
+            const clarificationMessage: Message = {
+              id: (Date.now() + 1).toString(),
+              type: 'ai',
+              content: `I need some clarification: ${clarificationQuestions.join(' ')}`,
+              agentName: 'Enhanced NLU Agent',
+              timestamp: new Date(),
+              confidence: parsedCommand.confidence,
+              emotionalTone: emotionalContext.conversationTone
+            };
+
+            setMessages(prev => [...prev, clarificationMessage]);
+            await contextualMemoryService.addMessage('ai', clarificationMessage.content, 'Enhanced NLU Agent', []);
+            return;
+          }
+
+          // Execute with real agents
+          const thinkingMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            type: 'system',
+            content: 'Enhanced AI agents analyzing your request with full context...',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, thinkingMessage]);
+
+          // Generate enhanced response
+          const contextSummaryResult = await contextualMemoryService.getContextualSummary();
+          const instructions = `
+            You are an Enhanced AI Assistant with access to CRM data and contextual understanding.
+            Use the provided context to give intelligent, personalized responses.
+            
+            Context: ${contextSummaryResult.summary}
+            Parsed Command: ${JSON.stringify(parsedCommand, null, 2)}
+            Emotional Context: ${JSON.stringify(emotionalContext, null, 2)}
+            
+            Execute this request with full contextual understanding and emotional intelligence.
+          `;
+          
+          const enhancedInput = `
+            User Request: ${currentInput}
+            
+            Please provide a helpful response that addresses the user's request using the available context.
+          `;
+
+          const response = await realApiService.openai.generateAIResponse(
+            instructions,
+            enhancedInput,
+            {
+              taskType: 'complex_reasoning',
+              complexity: 'intermediate', 
+              enableChainOfThought: true,
+              maxTokens: 800, // Increased for GPT-5
+              qualityMode,
+              previousResponseId: contextSummaryResult.lastResponseId,
+              store: true
+            }
+          );
+          
+          const result = response.output_text || 'I apologize, but I encountered an error processing your request.';
+
+          // Remove thinking message
+          setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id));
+
+          // Generate emotionally intelligent response
+          const enhancedResponse = await emotionalVoiceService.generateEmotionalResponse(
+            result,
+            'Enhanced AI Assistant',
+            { parsedCommand, emotionalContext }
           );
 
-          const clarificationMessage: Message = {
-            id: (Date.now() + 1).toString(),
+          // Generate voice response if available
+          let audioUrl: string | null = null;
+          if (realMode) {
+            audioUrl = await emotionalVoiceService.generateEmotionalVoiceResponse(
+              enhancedResponse,
+              'Enhanced AI Assistant'
+            );
+          }
+
+          const aiResponse: Message = {
+            id: (Date.now() + 2).toString(),
             type: 'ai',
-            content: `I need some clarification: ${clarificationQuestions.join(' ')}`,
-            agentName: 'Enhanced NLU Agent',
+            content: enhancedResponse,
+            agentName: 'Enhanced AI Assistant',
             timestamp: new Date(),
+            thinking: `GPT-5 Enhanced Analysis: ${parsedCommand.confidence}% confidence, ${qualityMode} quality mode, emotional context: ${emotionalContext.conversationTone}`,
+            entities: parsedCommand.entities,
             confidence: parsedCommand.confidence,
-            emotionalTone: emotionalContext.conversationTone
+            emotionalTone: emotionalContext.conversationTone,
+            audioUrl: audioUrl || undefined,
+            toolsUsed: parsedCommand.suggestedTools,
+            gpt5Enhanced: true,
+            reasoning: response.reasoning,
+            qualityMode
           };
 
-          setMessages(prev => [...prev, clarificationMessage]);
-          await contextualMemoryService.addMessage('ai', clarificationMessage.content, 'Enhanced NLU Agent', []);
-          return;
-        }
+          setMessages(prev => [...prev, aiResponse]);
+          await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', []);
 
-        // Execute with real agents
-        const thinkingMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          type: 'system',
-          content: 'Enhanced AI agents analyzing your request with full context...',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, thinkingMessage]);
-
-        // Generate enhanced response
-        const contextSummaryResult = await contextualMemoryService.getContextualSummary();
-        const instructions = `
-          You are an Enhanced AI Assistant with access to CRM data and contextual understanding.
-          Use the provided context to give intelligent, personalized responses.
-          
-          Context: ${contextSummaryResult.summary}
-          Parsed Command: ${JSON.stringify(parsedCommand, null, 2)}
-          Emotional Context: ${JSON.stringify(emotionalContext, null, 2)}
-          
-          Execute this request with full contextual understanding and emotional intelligence.
-        `;
-        
-        const enhancedInput = `
-          User Request: ${currentInput}
-          
-          Please provide a helpful response that addresses the user's request using the available context.
-        `;
-
-        const response = await realApiService.openai.generateAIResponse(
-          instructions,
-          enhancedInput,
-          {
-            taskType: 'complex_reasoning',
-            complexity: 'intermediate', 
-            enableChainOfThought: true,
-            maxTokens: 800, // Increased for GPT-5
-            qualityMode: 'balanced',
-            previousResponseId: contextSummaryResult.lastResponseId,
-            store: true
+          // Play audio if available
+          if (audioUrl) {
+            const audio = new Audio(audioUrl);
+            audio.play().catch(e => console.log('Audio playback failed:', e));
           }
-        );
-        
-        const result = response.output_text || 'I apologize, but I encountered an error processing your request.';
 
-        // Remove thinking message
-        setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id));
-
-        // Generate emotionally intelligent response
-        const enhancedResponse = await emotionalVoiceService.generateEmotionalResponse(
-          result,
-          'Enhanced AI Assistant',
-          { parsedCommand, emotionalContext }
-        );
-
-        // Generate voice response if available
-        let audioUrl: string | null = null;
-        if (realMode) {
-          audioUrl = await emotionalVoiceService.generateEmotionalVoiceResponse(
-            enhancedResponse,
-            'Enhanced AI Assistant'
-          );
+        } else {
+          // Demo mode with enhanced simulation
+          const simulatedResponse = await generateEnhancedDemo(currentInput);
+          setMessages(prev => [...prev, simulatedResponse]);
         }
-
-        const aiResponse: Message = {
-          id: (Date.now() + 2).toString(),
-          type: 'ai',
-          content: enhancedResponse,
-          agentName: 'Enhanced AI Assistant',
-          timestamp: new Date(),
-          thinking: `GPT-5 Enhanced Analysis: ${parsedCommand.confidence}% confidence, ${qualityMode} quality mode, emotional context: ${emotionalContext.conversationTone}`,
-          entities: parsedCommand.entities,
-          confidence: parsedCommand.confidence,
-          emotionalTone: emotionalContext.conversationTone,
-          audioUrl: audioUrl || undefined,
-          toolsUsed: parsedCommand.suggestedTools,
-          gpt5Enhanced: true,
-          reasoning: response.reasoning,
-          qualityMode
-        };
-
-        setMessages(prev => [...prev, aiResponse]);
-        await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', [], response.id);
-
-        // Play audio if available
-        if (audioUrl) {
-          const audio = new Audio(audioUrl);
-          audio.play().catch(e => console.log('Audio playback failed:', e));
-        }
-
-      } else {
-        // Demo mode with enhanced simulation
-        const simulatedResponse = await this.generateEnhancedDemo(currentInput);
-        setMessages(prev => [...prev, simulatedResponse]);
-      }
 
     } catch (error) {
       console.error('Enhanced AI processing failed:', error);

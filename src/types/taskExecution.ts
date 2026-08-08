@@ -192,7 +192,7 @@ export interface GPT5TaskAnalysis {
 
 export interface RequiredTaskField {
   fieldName: string;
-  fieldType: 'text' | 'email' | 'phone' | 'date' | 'select' | 'multiselect' | 'contact' | 'deal' | 'number';
+  fieldType: 'text' | 'email' | 'phone' | 'date' | 'select' | 'multiselect' | 'contact' | 'deal' | 'number' | 'textarea';
   fieldLabel: string;
   fieldDescription: string;
   isRequired: boolean;

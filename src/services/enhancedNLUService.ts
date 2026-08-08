@@ -52,38 +52,6 @@ export class EnhancedNLUService {
 
       const context = includeContext ? await this.buildCommandContext() : null;
       
-      // Few-shot examples for GPT-5 command parsing
-      const fewShotExamples = [
-        {
-          input: "Schedule a demo with John Smith from TechCorp for next Friday",
-          output: JSON.stringify({
-            intent: "schedule_meeting",
-            entities: [
-              { type: "person", value: "John Smith", confidence: 95 },
-              { type: "company", value: "TechCorp", confidence: 90 },
-              { type: "date", value: "next Friday", confidence: 85 }
-            ],
-            actionType: "crm_action",
-            requiredAgents: ["Calendar Agent", "Timeline Logger Agent"],
-            suggestedTools: ["google_calendar", "zoom"]
-          }),
-          reasoning: "Clear scheduling intent with person, company, and date entities"
-        },
-        {
-          input: "Find all contacts who haven't been contacted in 2 weeks",
-          output: JSON.stringify({
-            intent: "search_contacts",
-            entities: [
-              { type: "date", value: "2 weeks", confidence: 90 }
-            ],
-            actionType: "query",
-            requiredAgents: ["Command Analyzer Agent"],
-            suggestedTools: ["supabase"]
-          }),
-          reasoning: "Data query with time-based filtering criteria"
-        }
-      ];
-
       const parsePrompt = `
         You are an expert GPT-5 powered natural language understanding system with advanced business intelligence and predictive capabilities.
 

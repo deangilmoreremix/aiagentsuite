@@ -2,23 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Goal } from '../types/goals';
 import { 
   Play, 
-  Pause, 
   CheckCircle, 
   Clock, 
   Zap, 
   Users, 
   Target,
-  ArrowRight,
   Star,
   TrendingUp,
   Activity,
   Bot,
   Settings,
-  ExternalLink,
   Sparkles,
   GitBranch,
   Info,
-  HelpCircle
+  AlertTriangle
 } from 'lucide-react';
 import Tooltip from './Tooltip';
 

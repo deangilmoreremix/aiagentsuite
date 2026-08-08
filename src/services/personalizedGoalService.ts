@@ -1,8 +1,8 @@
 import { realApiService } from './realApiService';
-import { apiConfig, validateApiSetup } from '../config/apiConfig';
+import { validateApiSetup } from '../config/apiConfig';
 import { contextualMemoryService } from './contextualMemoryService';
 import { supabaseService } from './supabaseClient';
-import { allGoals, goalCategories } from '../data/goalsData';
+import { allGoals } from '../data/goalsData';
 import { Goal } from '../types/goals';
 
 interface PersonalizedRecommendation {
@@ -78,7 +78,8 @@ export class PersonalizedGoalService {
       
       try {
         console.log('💬 Getting conversation context...');
-        contextSummary = await contextualMemoryService.getContextualSummary();
+        const contextResult = await contextualMemoryService.getContextualSummary();
+        contextSummary = contextResult.summary;
       } catch (contextError) {
         console.warn('⚠️ Failed to get context summary:', contextError);
         contextSummary = 'No conversation context available yet.';
@@ -177,19 +178,17 @@ export class PersonalizedGoalService {
           enableChainOfThought: true,
           temperature: 0.2,
           maxTokens: 4000,
-          outputFormat: 'json',
           qualityMode: 'accuracy',
-          fewShotExamples,
           store: true
         }
       );
       
       const recommendationsText = response.output_text || '';
-      const parsedRecommendations = JSON.parse(recommendationsText);
+      const parsedRecommendations: any[] = JSON.parse(recommendationsText);
 
       // Map to full recommendation objects
       const enhancedRecommendations: PersonalizedRecommendation[] = parsedRecommendations
-        .map((rec: any) => {
+        .map((rec: any): PersonalizedRecommendation | null => {
           const goal = allGoals.find(g => g.id === rec.goalId);
           if (!goal) return null;
 
@@ -211,7 +210,7 @@ export class PersonalizedGoalService {
             ]
           };
         })
-        .filter(Boolean)
+        .filter((rec): rec is PersonalizedRecommendation => rec !== null)
         .sort((a, b) => b.relevanceScore - a.relevanceScore);
 
       // Cache recommendations
@@ -276,15 +275,6 @@ export class PersonalizedGoalService {
         }
       `;
 
-      let parsedRecommendations;
-      try {
-        const recommendations = await realApiService.openai.generateText(recommendationPrompt, 2000, 0.3);
-        parsedRecommendations = JSON.parse(recommendations);
-      } catch (error) {
-        console.warn('OpenAI API not available, using fallback recommendations');
-        return this.getFallbackRecommendations();
-      }
-
       const profile = await realApiService.openai.generateText(profilePrompt, 500, 0.3);
       const parsedProfile: UserBusinessProfile = {
         ...JSON.parse(profile),
@@ -301,7 +291,7 @@ export class PersonalizedGoalService {
   }
 
   // Analyze CRM data to determine goal fit
-  private async analyzeCRMForGoalFit(userId: string): Promise<any> {
+  private async analyzeCRMForGoalFit(_userId: string): Promise<any> {
     try {
       if (!supabaseService.isAvailable()) {
         console.log('📊 Supabase not available, using mock CRM analysis');
@@ -444,7 +434,7 @@ export class PersonalizedGoalService {
   }
 
   // Learn from user goal selections to improve future recommendations
-  async learnFromGoalSelection(userId: string, selectedGoalId: string, context?: string): Promise<void> {
+  async learnFromGoalSelection(userId: string, selectedGoalId: string, _context?: string): Promise<void> {
     try {
       const profile = this.userProfiles.get(userId) || this.getDefaultProfile();
       profile.goalHistory.push(selectedGoalId);

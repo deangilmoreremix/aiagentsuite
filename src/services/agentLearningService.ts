@@ -116,9 +116,7 @@ export class AgentLearningService {
           enableChainOfThought: true,
           temperature: 0.2,
           maxTokens: 2000,
-          outputFormat: 'json',
           qualityMode: 'accuracy',
-          fewShotExamples: learningExamples,
           store: true
         }
       );
@@ -141,7 +139,7 @@ export class AgentLearningService {
   }
 
   // Gather agent performance data
-  private async gatherPerformanceData(userId: string): Promise<Record<string, AgentPerformanceData>> {
+  private async gatherPerformanceData(_userId: string): Promise<Record<string, AgentPerformanceData>> {
     try {
       // In a real implementation, this would query actual execution logs
       // For now, we'll simulate based on available data
@@ -285,7 +283,7 @@ export class AgentLearningService {
     agentName: string,
     success: boolean,
     executionTime: number,
-    context?: any
+    _context?: any
   ): void {
     const currentData = this.performanceData.get(agentName) || {
       agentName,

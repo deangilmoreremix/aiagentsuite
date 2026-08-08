@@ -14,20 +14,16 @@ import {
   Star, 
   TrendingUp,
   ArrowRight,
-  Play,
   Eye,
   Sparkles,
   Brain,
   Users,
   Activity,
-  BarChart3,
   Network,
   Bot,
   Award,
   Lightbulb,
-  HelpCircle,
-  Settings,
-  Info
+  HelpCircle
 } from 'lucide-react';
 
 interface InteractiveGoalExplorerProps {
@@ -51,7 +47,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
   const [executionProgress, setExecutionProgress] = useState<Record<string, number>>({});
   const [completedGoals, setCompletedGoals] = useState<Set<string>>(new Set());
   const [showWalkthrough, setShowWalkthrough] = useState(false);
-  const [hasSeenWalkthrough, setHasSeenWalkthrough] = useState(false);
+  const [, setHasSeenWalkthrough] = useState(false);
   const [liveStats, setLiveStats] = useState({
     totalGoals: allGoals.length,
     executing: 0,

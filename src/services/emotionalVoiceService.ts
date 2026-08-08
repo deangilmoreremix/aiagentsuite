@@ -8,21 +8,6 @@ interface EmotionalContext {
   responseStyle: 'concise' | 'detailed' | 'encouraging' | 'technical' | 'strategic';
 }
 
-interface VoicePersonality {
-  baseVoice: string; // ElevenLabs voice ID
-  emotionalRange: {
-    excited: { speed: number; pitch: number; emphasis: number };
-    supportive: { speed: number; pitch: number; emphasis: number };
-    professional: { speed: number; pitch: number; emphasis: number };
-    celebratory: { speed: number; pitch: number; emphasis: number };
-  };
-  speakingPatterns: {
-    pauseBetweenSentences: number;
-    emphasisWords: string[];
-    transitionPhrases: string[];
-  };
-}
-
 export class EmotionalVoiceService {
   private static instance: EmotionalVoiceService;
   private currentEmotionalContext: EmotionalContext = {
@@ -171,34 +156,9 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
     }
   }
 
-  // GPT-5 personality mode selection
-  private getGPT5PersonalityMode(emotionalContext: EmotionalContext): string {
-    const personalityModes = {
-      excited: 'Enthusiastic Collaborator - energetic, action-oriented, celebration-focused',
-      frustrated: 'Supportive Guide - calm, solution-focused, empathetic problem-solver',
-      confused: 'Patient Teacher - clear, educational, step-by-step instructor',
-      satisfied: 'Success Partner - warm, building on momentum, opportunity-focused',
-      urgent: 'Efficient Executor - direct, fast-acting, priority-focused',
-      neutral: 'Professional Advisor - balanced, comprehensive, strategically-minded'
-    };
-    
-    return personalityModes[emotionalContext.userEmotion] || personalityModes.neutral;
-  }
-
-  // GPT-5 response adaptation strategy
-  private getGPT5ResponseAdaptation(emotionalContext: EmotionalContext): string {
-    return `Tone: ${emotionalContext.conversationTone} | Context: ${emotionalContext.businessContext} | Style: ${emotionalContext.responseStyle}
-    
-    GPT-5 Enhanced Adaptation:
-    - Apply personality-driven response patterns
-    - Leverage advanced empathy and business context understanding
-    - Optimize language patterns for maximum engagement and clarity
-    - Integrate strategic business intelligence naturally into conversational flow`;
-  }
-
   // Get emotional response strategy for GPT-5
   private getEmotionalResponseStrategy(emotion: string): string {
-    const strategies = {
+    const strategies: Record<string, string> = {
       excited: `- Match their enthusiasm with energetic language
 - Use action-oriented words and immediate next steps
 - Celebrate their momentum and build on their energy
@@ -238,7 +198,7 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
 
   // Get communication style guide for GPT-5
   private getCommunicationStyleGuide(tone: string): string {
-    const guides = {
+    const guides: Record<string, string> = {
       professional: `- Use formal business language and structure
 - Focus on ROI, metrics, and business outcomes
 - Include specific data points and measurable results
@@ -270,7 +230,7 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
 
   // Get business context guide for GPT-5
   private getBusinessContextGuide(context: string): string {
-    const guides = {
+    const guides: Record<string, string> = {
       success: `- Reinforce positive outcomes and build on momentum
 - Suggest scaling successful strategies
 - Highlight achievement metrics and ROI
@@ -302,7 +262,7 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
 
   // Get response style guide for GPT-5
   private getResponseStyleGuide(style: string): string {
-    const guides = {
+    const guides: Record<string, string> = {
       concise: `- Keep responses brief and action-focused
 - Use bullet points and numbered lists
 - Prioritize essential information only
@@ -400,7 +360,6 @@ Transform the response to be emotionally intelligent and contextually perfect.`;
       const enhancedText = await this.generateEmotionalResponse(text, agentName, context);
       
       // Generate voice parameters based on emotional context
-      const voiceParams = this.generateVoiceParameters();
       
       // Generate speech with ElevenLabs if available
       if (!realApiService.elevenlabs) {

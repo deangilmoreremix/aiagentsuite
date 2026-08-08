@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Lightbulb, 
   TrendingUp, 
@@ -6,20 +6,15 @@ import {
   CheckCircle, 
   Clock,
   Target,
-  Users,
-  BarChart3,
   Zap,
   ArrowRight,
   X,
   Star,
-  Eye,
   Activity,
   Brain,
   Sparkles,
-  Award,
   Info,
-  Bell,
-  Settings
+  DollarSign
 } from 'lucide-react';
 import { proactiveAssistantService } from '../services/proactiveAssistantService';
 import Tooltip from './Tooltip';
@@ -50,7 +45,6 @@ const ProactiveAssistantPanel: React.FC<ProactiveAssistantPanelProps> = ({
   userId = 'default-user',
   realMode = false,
   onSuggestionExecute,
-  onInsightView,
   compact = false
 }) => {
   const [suggestions, setSuggestions] = useState<ProactiveSuggestion[]>([]);

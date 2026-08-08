@@ -14,18 +14,10 @@ import {
   ArrowLeft, 
   BarChart3, 
   Brain, 
-  Sparkles, 
   Target, 
   Activity,
-  Users,
-  TrendingUp,
-  Database,
-  Workflow,
-  Eye,
-  Home,
-  Lightbulb
+  Home
 } from 'lucide-react';
-import Tooltip from '../components/Tooltip';
 
 // Lazy load heavy showcase components
 const AgentShowcase = React.lazy(() => import('../components/AgentShowcase'));

@@ -880,7 +880,7 @@ export function getRecommendedGoalsForUser(userProfile: {
   experience: string;
 }): Goal[] {
   // Simple recommendation logic - can be enhanced with ML later
-  const { businessType, teamSize, experience } = userProfile;
+  const { teamSize, experience } = userProfile;
   
   let recommended = allGoals.filter(goal => goal.priority === 'High');
   

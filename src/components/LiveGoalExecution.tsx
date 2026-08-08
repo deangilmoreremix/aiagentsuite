@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Goal } from '../types/goals';
 import { runComposioAgent } from '../agents/composioAgentRunner';
-import { executeAgentWithTools } from '../agents/useOpenAIAgentSuite';
 import CRMWorkspace from './CRMWorkspace';
 import Tooltip from './Tooltip';
 import { 
@@ -9,18 +8,12 @@ import {
   Pause, 
   CheckCircle, 
   XCircle, 
-  Clock, 
-  Zap, 
-  Users, 
   Bot,
   Activity,
   Network,
   GitBranch,
-  Settings,
   BarChart3,
   Target,
-  ArrowRight,
-  Sparkles,
   Brain,
   Eye,
   Volume2,
@@ -29,7 +22,6 @@ import {
   TrendingUp,
   Award,
   Lightbulb,
-  Info,
   AlertTriangle,
   HelpCircle
 } from 'lucide-react';
@@ -61,7 +53,7 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
   onCancel
 }) => {
   const [isExecuting, setIsExecuting] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [, setCurrentStep] = useState(0);
   const [executionSteps, setExecutionSteps] = useState<ExecutionStep[]>([]);
   const [overallProgress, setOverallProgress] = useState(0);
   const [executionMetrics, setExecutionMetrics] = useState({

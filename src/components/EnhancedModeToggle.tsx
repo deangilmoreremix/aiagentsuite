@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, PlayCircle, Shield, ExternalLink, Info, AlertTriangle, CheckCircle, Settings, Eye } from 'lucide-react';
+import { Zap, PlayCircle, Shield, AlertTriangle, CheckCircle, Settings, Eye } from 'lucide-react';
 import Tooltip from './Tooltip';
 
 interface EnhancedModeToggleProps {

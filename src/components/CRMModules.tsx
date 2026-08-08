@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Users, 
   Target, 
-  CheckSquare, 
   Calendar, 
-  Megaphone,
   Mail,
-  MessageCircle,
   Phone,
   Video,
   BarChart3,
@@ -17,11 +14,7 @@ import {
   Brain,
   Volume2,
   Presentation,
-  Shield,
-  Database,
-  Heart,
   Mic,
-  FileText,
   UserCheck,
   PlayCircle,
   Settings,

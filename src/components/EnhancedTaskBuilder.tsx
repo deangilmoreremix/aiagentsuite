@@ -3,21 +3,17 @@ import {
   Brain, 
   Target, 
   Users, 
-  Zap, 
   ArrowRight, 
   CheckCircle, 
   AlertTriangle,
   Lightbulb,
   Settings,
   Play,
-  Clock,
   Star,
   TrendingUp,
-  Info,
   Bot,
   Sparkles,
-  Activity,
-  Database
+  Activity
 } from 'lucide-react';
 import { gpt5TaskOrchestrator } from '../services/gpt5TaskOrchestrator';
 import { EnhancedTaskInput, GPT5TaskAnalysis, RequiredTaskField } from '../types/taskExecution';
@@ -126,7 +122,7 @@ const EnhancedTaskBuilder: React.FC<EnhancedTaskBuilderProps> = ({
       id: `task-${Date.now()}`,
       taskTitle: userInput.split('.')[0] || userInput.substring(0, 50),
       taskDescription: userInput,
-      taskType: analysis.taskType as any,
+      taskType: 'custom',
       priority: 'medium',
       complexity: 'intermediate',
       requiredAgents: selectedAgents,
@@ -138,7 +134,7 @@ const EnhancedTaskBuilder: React.FC<EnhancedTaskBuilderProps> = ({
       successCriteria: analysis.estimatedSteps.map(step => step.businessImpact),
       estimatedDuration: analysis.estimatedSteps.reduce((acc, step) => acc + step.estimatedDuration, 0),
       businessValue: analysis.expectedBusinessImpact?.estimatedRevenue || 10000,
-      tags: ['gpt5-generated', analysis.taskType],
+      tags: ['gpt5-generated', 'custom'],
       createdBy: 'user',
       createdAt: new Date().toISOString()
     };
@@ -531,7 +527,7 @@ const EnhancedTaskBuilder: React.FC<EnhancedTaskBuilderProps> = ({
                     </div>
                     <div>
                       <span className="text-gray-400">Type:</span>
-                      <span className="text-blue-400 ml-2 capitalize">{analysis.taskType}</span>
+                      <span className="text-blue-400 ml-2 capitalize">{'custom'}</span>
                     </div>
                     <div>
                       <span className="text-gray-400">Agents:</span>

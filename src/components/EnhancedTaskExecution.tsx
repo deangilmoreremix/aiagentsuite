@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { EnhancedTaskInput, CompletedTaskResult } from '../types/taskExecution';
 import { gpt5TaskOrchestrator } from '../services/gpt5TaskOrchestrator';
 import GPT5AgentCoordinator from './GPT5AgentCoordinator';
@@ -6,10 +6,8 @@ import TaskResultsDashboard from './TaskResultsDashboard';
 import { 
   Play, 
   Pause, 
-  CheckCircle, 
-  AlertTriangle,
+  CheckCircle,
   Brain,
-  Activity,
   Target,
   TrendingUp,
   Users,
@@ -23,7 +21,6 @@ import {
   Share,
   Sparkles
 } from 'lucide-react';
-import Tooltip from './Tooltip';
 
 interface EnhancedTaskExecutionProps {
   task: EnhancedTaskInput;
@@ -59,9 +56,9 @@ const EnhancedTaskExecution: React.FC<EnhancedTaskExecutionProps> = ({
     try {
       console.log('🚀 Starting GPT-5 coordinated task execution...');
       
-      const result = await gpt5TaskOrchestrator.executeTaskWithGPT5Coordination(
+      await gpt5TaskOrchestrator.executeTaskWithGPT5Coordination(
         task,
-        (stepUpdate) => {
+        (_stepUpdate) => {
           // Handle step updates
           setExecutionMetrics(prev => ({
             ...prev,

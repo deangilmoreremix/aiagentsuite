@@ -6,7 +6,6 @@ import {
   MessageSquare, 
   Target, 
   Users, 
-  ArrowRight,
   CheckCircle,
   AlertTriangle,
   Info,
@@ -14,9 +13,6 @@ import {
   Rocket,
   Eye,
   Bot,
-  Activity,
-  Database,
-  Globe,
   Key,
   ExternalLink
 } from 'lucide-react';

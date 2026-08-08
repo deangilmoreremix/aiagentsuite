@@ -2,10 +2,8 @@ import { supabase } from './supabaseClient';
 import { 
   EnhancedTaskInput, 
   CompletedTaskResult, 
-  TaskExecutionStep,
   AgentPerformanceMetric,
-  BusinessOutcome,
-  CrmUpdateRecord 
+  BusinessOutcome
 } from '../types/taskExecution';
 
 export class EnhancedSupabaseService {
@@ -22,7 +20,7 @@ export class EnhancedSupabaseService {
   async createTaskExecution(task: EnhancedTaskInput, customerId: string = 'default') {
     if (!supabase) {
       console.warn('⚠️ Supabase not configured - storing task locally');
-      return { id: task.id, ...task };
+      return { ...task, id: task.id };
     }
 
     try {
