@@ -1,8 +1,8 @@
 import { realApiService } from './realApiService';
-import { apiConfig, validateApiSetup } from '../config/apiConfig';
+import { validateApiSetup } from '../config/apiConfig';
 import { contextualMemoryService } from './contextualMemoryService';
 import { supabaseService } from './supabaseClient';
-import { allGoals, goalCategories } from '../data/goalsData';
+import { allGoals } from '../data/goalsData';
 import { Goal } from '../types/goals';
 
 interface PersonalizedRecommendation {
@@ -78,7 +78,7 @@ export class PersonalizedGoalService {
       
       try {
         console.log('💬 Getting conversation context...');
-        contextSummary = await contextualMemoryService.getContextualSummary();
+        contextSummary = (await contextualMemoryService.getContextualSummary()).summary;
       } catch (contextError) {
         console.warn('⚠️ Failed to get context summary:', contextError);
         contextSummary = 'No conversation context available yet.';
@@ -177,9 +177,7 @@ export class PersonalizedGoalService {
           enableChainOfThought: true,
           temperature: 0.2,
           maxTokens: 4000,
-          outputFormat: 'json',
           qualityMode: 'accuracy',
-          fewShotExamples,
           store: true
         }
       );
@@ -212,7 +210,7 @@ export class PersonalizedGoalService {
           };
         })
         .filter(Boolean)
-        .sort((a, b) => b.relevanceScore - a.relevanceScore);
+        .sort((a: PersonalizedRecommendation, b: PersonalizedRecommendation) => b.relevanceScore - a.relevanceScore);
 
       // Cache recommendations
       this.recommendationCache.set(userId, enhancedRecommendations);
@@ -276,15 +274,6 @@ export class PersonalizedGoalService {
         }
       `;
 
-      let parsedRecommendations;
-      try {
-        const recommendations = await realApiService.openai.generateText(recommendationPrompt, 2000, 0.3);
-        parsedRecommendations = JSON.parse(recommendations);
-      } catch (error) {
-        console.warn('OpenAI API not available, using fallback recommendations');
-        return this.getFallbackRecommendations();
-      }
-
       const profile = await realApiService.openai.generateText(profilePrompt, 500, 0.3);
       const parsedProfile: UserBusinessProfile = {
         ...JSON.parse(profile),
@@ -301,7 +290,7 @@ export class PersonalizedGoalService {
   }
 
   // Analyze CRM data to determine goal fit
-  private async analyzeCRMForGoalFit(userId: string): Promise<any> {
+  private async analyzeCRMForGoalFit(_userId: string): Promise<any> {
     try {
       if (!supabaseService.isAvailable()) {
         console.log('📊 Supabase not available, using mock CRM analysis');
@@ -444,7 +433,7 @@ export class PersonalizedGoalService {
   }
 
   // Learn from user goal selections to improve future recommendations
-  async learnFromGoalSelection(userId: string, selectedGoalId: string, context?: string): Promise<void> {
+  async learnFromGoalSelection(userId: string, selectedGoalId: string): Promise<void> {
     try {
       const profile = this.userProfiles.get(userId) || this.getDefaultProfile();
       profile.goalHistory.push(selectedGoalId);

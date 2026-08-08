@@ -124,16 +124,13 @@ export function createAgentWorkflow(steps: Array<{
   return {
     steps,
     async execute(setProgress?: (progress: any) => void) {
-      const results = [];
+      const results: any[] = [];
       
       for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
         
         // Wait for dependencies if any
-        if (step.dependsOn) {
-          const dependencies = step.dependsOn.map(index => results[index]);
-          // Could add logic here to check if dependencies completed successfully
-        }
+        // Could add logic here to check if dependencies (step.dependsOn) completed successfully
         
         if (setProgress) {
           setProgress({

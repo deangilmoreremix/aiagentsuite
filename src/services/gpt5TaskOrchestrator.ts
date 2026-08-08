@@ -3,12 +3,7 @@ import { supabaseService } from './supabaseClient';
 import { 
   EnhancedTaskInput, 
   GPT5TaskAnalysis, 
-  RequiredTaskField, 
-  TaskExecutionStep,
-  CompletedTaskResult,
-  AgentRecommendation,
-  RiskFactor,
-  BusinessImpact
+  CompletedTaskResult
 } from '../types/taskExecution';
 
 export class GPT5TaskOrchestrator {
@@ -149,14 +144,12 @@ export class GPT5TaskOrchestrator {
           enableChainOfThought: true,
           temperature: 0.2,
           maxTokens: 3000, // Increased for GPT-5
-          qualityMode: 'accuracy',
-          outputFormat: 'json',
           qualityMode: 'accuracy'
         }
       );
       
       // Parse GPT-5 response
-      const analysisText = response.output_text || response.content || '';
+      const analysisText = response.output_text || '';
       const analysis = JSON.parse(analysisText) as GPT5TaskAnalysis;
       analysis.taskId = `task-${Date.now()}`;
       
@@ -175,7 +168,6 @@ export class GPT5TaskOrchestrator {
     onStepUpdate?: (step: any) => void,
     onCompletion?: (result: CompletedTaskResult) => void
   ): Promise<CompletedTaskResult> {
-    const taskId = taskInput.id;
     const startTime = Date.now();
 
     try {
@@ -307,8 +299,8 @@ Focus on creating a plan that not only completes the task but does so with excep
       taskId: taskInput.id,
       userInput: taskInput.userProvidedData,
       crmContext: taskInput.crmContext,
-      intermediateResults: {},
-      businessMetrics: {}
+      intermediateResults: {} as Record<string, any>,
+      businessMetrics: {} as Record<string, any>
     };
 
     for (const step of executionPlan.steps || []) {
@@ -390,9 +382,11 @@ Focus on creating a plan that not only completes the task but does so with excep
 
     const result = await realApiService.openai.createChatCompletion(
       [{ role: 'user', content: stepPrompt }],
-      [], // Tool definitions would be added here
-      0.3,
-      1000
+      {
+        tools: [], // Tool definitions would be added here
+        temperature: 0.3,
+        maxTokens: 1000
+      }
     );
 
     return result.choices[0]?.message?.content || 'Step completed';

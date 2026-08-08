@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { goalCategories, allGoals, getGoalsByCategory } from '../data/goalsData';
-import { Goal, GoalCategory } from '../types/goals';
+import { goalCategories, allGoals } from '../data/goalsData';
+import { Goal } from '../types/goals';
 import { ArrowRight, CheckCircle, Clock, Zap, Users, Target, Star } from 'lucide-react';
 
 interface GoalSelectorProps {

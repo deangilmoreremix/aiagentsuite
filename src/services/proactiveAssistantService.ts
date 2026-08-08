@@ -42,7 +42,6 @@ interface CRMAnalysis {
 export class ProactiveAssistantService {
   private static instance: ProactiveAssistantService;
   private suggestionCache: Map<string, ProactiveSuggestion[]> = new Map();
-  private lastAnalysis: Date | null = null;
   private analysisInterval: NodeJS.Timeout | null = null;
 
   static getInstance(): ProactiveAssistantService {
@@ -80,7 +79,6 @@ export class ProactiveAssistantService {
     try {
       console.log('🧠 Generating proactive suggestions with GPT-5...');
 
-      const context = contextualMemoryService.getCurrentContext();
       const crmAnalysis = await this.analyzeCRMState(userId);
       const contextSummary = await contextualMemoryService.getContextualSummary();
 

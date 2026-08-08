@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Goal } from '../types/goals';
 import LiveGoalExecution from './LiveGoalExecution';
-import { X, Maximize2, Minimize2, HelpCircle, AlertTriangle } from 'lucide-react';
+import { X, Maximize2 } from 'lucide-react';
 import Tooltip from './Tooltip';
 
 interface GoalExecutionModalProps {

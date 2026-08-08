@@ -6,25 +6,16 @@ import {
   Calendar, 
   Mail, 
   Phone, 
-  TrendingUp,
   Plus,
-  Edit,
-  Check,
-  Clock,
   ArrowRight,
   Bot,
   Activity,
   Zap,
   FileText,
   MessageSquare,
-  DollarSign,
-  Star,
-  AlertCircle,
   CheckCircle,
   User,
-  Building,
-  MapPin,
-  Globe
+  Building
 } from 'lucide-react';
 
 interface Contact {

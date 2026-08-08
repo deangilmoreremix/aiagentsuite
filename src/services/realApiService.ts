@@ -1,25 +1,10 @@
 import OpenAI from 'openai';
 import { apiConfig } from '../config/apiConfig';
 
-const openai = apiConfig.openai.isConfigured ? new OpenAI({
+const openaiClient = apiConfig.openai.isConfigured ? new OpenAI({
   apiKey: apiConfig.openai.apiKey,
   dangerouslyAllowBrowser: true
 }) : null;
-
-interface OpenAIService {
-  generateText(prompt: string, maxTokens?: number, temperature?: number): Promise<string>;
-  generateAIResponse(instructions: string, input: string, options?: {
-    taskType?: 'analytical' | 'creative' | 'complex_reasoning' | 'simple_query';
-    complexity?: 'simple' | 'intermediate' | 'advanced';
-    enableChainOfThought?: boolean;
-    qualityMode?: 'speed' | 'balanced' | 'accuracy';
-    maxTokens?: number;
-    temperature?: number;
-    previousResponseId?: string;
-    store?: boolean;
-  }): Promise<{ output_text: string; id?: string; reasoning?: string }>;
-  createChatCompletion(messages: any[], options?: any): Promise<any>;
-}
 
 interface GeminiService {
   generateText(prompt: string, maxTokens?: number): Promise<string>;
@@ -28,6 +13,14 @@ interface GeminiService {
 interface ComposioService {
   executeAction(action: string, params: any): Promise<any>;
   getAvailableActions(): Promise<any[]>;
+  sendEmail(to: string, subject: string, body: string): Promise<any>;
+  createCalendarEvent(
+    title: string,
+    startTime: string,
+    endTime: string,
+    attendees?: string[]
+  ): Promise<any>;
+  sendSlackMessage(channel: string, message: string): Promise<any>;
 }
 
 interface ElevenLabsService {
@@ -36,18 +29,16 @@ interface ElevenLabsService {
 }
 
 class RealApiService {
-  private openaiClient = openai;
-
   openai = {
     async generateText(prompt: string, maxTokens: number = 500, temperature: number = 0.7): Promise<string> {
-      if (!this.openaiClient) {
+      if (!openaiClient) {
         console.warn('OpenAI API not configured');
         return `[Simulated response to: ${prompt.substring(0, 100)}...]`;
       }
 
       try {
         // Use GPT-5 with optimized parameters
-        const completion = await this.openaiClient.chat.completions.create({
+        const completion = await openaiClient.chat.completions.create({
           model: apiConfig.openai.defaultModel, // GPT-5 main
           messages: [{ role: 'user', content: prompt }],
           max_tokens: maxTokens,
@@ -75,7 +66,7 @@ class RealApiService {
         store?: boolean;
       } = {}
     ): Promise<{ output_text: string; id?: string; reasoning?: string }> {
-      if (!this.openaiClient) {
+      if (!openaiClient) {
         console.warn('OpenAI API not configured');
         return {
           output_text: `[Simulated response to: ${input.substring(0, 100)}...]`,
@@ -90,7 +81,7 @@ class RealApiService {
         // Build GPT-5 optimized prompt
         const enhancedPrompt = this.buildGPT5Prompt(instructions, input, options);
 
-        const completion = await this.openaiClient.chat.completions.create({
+        const completion = await openaiClient.chat.completions.create({
           model: modelSelection.model,
           messages: enhancedPrompt.messages,
           max_tokens: modelSelection.maxTokens,
@@ -159,14 +150,14 @@ class RealApiService {
 
       return {
         messages: [
-          { role: 'system', content: systemMessage },
-          { role: 'user', content: input }
+          { role: 'system' as const, content: systemMessage },
+          { role: 'user' as const, content: input }
         ],
         reasoning: `GPT-5 ${options.taskType || 'standard'} mode with ${options.qualityMode || 'balanced'} quality`
       };
     },
 
-    async createChatCompletion(messages: any[], options: any = {}): Promise<any> {
+    async createChatCompletion(messages: any[], _options: any = {}): Promise<any> {
       console.warn('OpenAI API not configured. Please set up your API key in the settings.');
       return {
         choices: [{
@@ -179,14 +170,14 @@ class RealApiService {
   };
 
   gemini: GeminiService = {
-    async generateText(prompt: string, maxTokens: number = 500): Promise<string> {
+    async generateText(prompt: string, _maxTokens: number = 500): Promise<string> {
       console.warn('Gemini API not configured. Please set up your API key in the settings.');
       return `[Simulated Gemini response to: ${prompt.substring(0, 100)}...]`;
     }
   };
 
   composio: ComposioService = {
-    async executeAction(action: string, params: any): Promise<any> {
+    async executeAction(_action: string, _params: any): Promise<any> {
       console.warn('Composio API not configured. Please set up your API key in the settings.');
       return { success: false, message: 'Composio not configured' };
     },
@@ -194,11 +185,33 @@ class RealApiService {
     async getAvailableActions(): Promise<any[]> {
       console.warn('Composio API not configured. Please set up your API key in the settings.');
       return [];
+    },
+
+    async sendEmail(to: string, subject: string, body: string): Promise<any> {
+      return this.executeAction('gmail.send_email', { to, subject, body });
+    },
+
+    async createCalendarEvent(
+      title: string,
+      startTime: string,
+      endTime: string,
+      attendees: string[] = []
+    ): Promise<any> {
+      return this.executeAction('google_calendar.create_event', {
+        title,
+        startTime,
+        endTime,
+        attendees
+      });
+    },
+
+    async sendSlackMessage(channel: string, message: string): Promise<any> {
+      return this.executeAction('slack.send_message', { channel, message });
     }
   };
 
   elevenlabs: ElevenLabsService = {
-    async generateSpeech(text: string, voice: string = 'default'): Promise<string> {
+    async generateSpeech(_text: string, _voice: string = 'default'): Promise<string> {
       console.warn('ElevenLabs API not configured. Please set up your API key in the settings.');
       return '';
     },

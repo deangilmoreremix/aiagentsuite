@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Check, ExternalLink, Search, Filter, Grid, List, Globe } from 'lucide-react';
-import { composioToolCategories } from '../data/composioToolsData';
+import { useState } from 'react';
+import { Check, ExternalLink, Globe } from 'lucide-react';
 import ComposioIntegrationModal from './ComposioIntegrationModal';
 import Tooltip from './Tooltip';
 

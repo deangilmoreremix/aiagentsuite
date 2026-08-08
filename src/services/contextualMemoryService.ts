@@ -50,7 +50,6 @@ interface CRMEntity {
 export class ContextualMemoryService {
   private static instance: ContextualMemoryService;
   private currentContext: ConversationContext | null = null;
-  private embeddings: Map<string, number[]> = new Map();
 
   static getInstance(): ContextualMemoryService {
     if (!ContextualMemoryService.instance) {
@@ -151,7 +150,7 @@ export class ContextualMemoryService {
 
   // Get contextual summary for AI agents
   async getContextualSummary(
-    maxContextLength: number = 8000,
+    _maxContextLength: number = 8000,
     includeDetailedCRM: boolean = true,
     prioritizeRecentInteractions: boolean = true
   ): Promise<{ summary: string; lastResponseId?: string }> {
@@ -227,7 +226,7 @@ Keep the summary comprehensive but under 500 words, focusing on actionable insig
           complexity: 'intermediate',
           temperature: 0.2,
           maxTokens: 600,
-          previousResponseId: crmContext.lastResponseId,
+          previousResponseId: (crmContext as any).lastResponseId,
           store: true
         }
       );
@@ -359,139 +358,6 @@ Keep the summary comprehensive but under 500 words, focusing on actionable insig
     return `${durationMin} minutes`;
   }
 
-  // New GPT-5 enhanced analytics methods
-  private calculateComplexityScore(): number {
-    if (!this.currentContext) return 0;
-    
-    const messages = this.currentContext.messages;
-    let complexityScore = 0;
-    
-    messages.forEach(msg => {
-      // Factor in message length
-      complexityScore += Math.min(msg.content.length / 100, 5);
-      
-      // Factor in technical terms
-      const technicalTerms = ['API', 'CRM', 'integration', 'automation', 'workflow'];
-      technicalTerms.forEach(term => {
-        if (msg.content.toLowerCase().includes(term.toLowerCase())) complexityScore += 2;
-      });
-      
-      // Factor in entities and actions
-      complexityScore += (msg.crmEntities?.length || 0) * 3;
-      complexityScore += (msg.actions?.length || 0) * 4;
-    });
-    
-    return Math.min(Math.round(complexityScore / messages.length), 100);
-  }
-
-  private calculateEngagementLevel(): string {
-    if (!this.currentContext) return 'unknown';
-    
-    const messages = this.currentContext.messages;
-    const userMessages = messages.filter(m => m.type === 'user');
-    
-    if (userMessages.length === 0) return 'none';
-    
-    const avgLength = userMessages.reduce((sum, msg) => sum + msg.content.length, 0) / userMessages.length;
-    const responseRatio = messages.filter(m => m.type === 'ai').length / userMessages.length;
-    
-    if (avgLength > 100 && responseRatio > 0.8) return 'highly_engaged';
-    if (avgLength > 50 && responseRatio > 0.6) return 'engaged';
-    if (avgLength > 20 && responseRatio > 0.4) return 'moderately_engaged';
-    return 'low_engagement';
-  }
-
-  private calculateSessionValue(): number {
-    if (!this.currentContext) return 0;
-    
-    const messages = this.currentContext.messages;
-    let valueScore = 0;
-    
-    messages.forEach(msg => {
-      // High value actions
-      const highValueKeywords = ['create', 'schedule', 'send', 'close', 'sign'];
-      highValueKeywords.forEach(keyword => {
-        if (msg.content.toLowerCase().includes(keyword)) valueScore += 1000;
-      });
-      
-      // Medium value actions
-      const mediumValueKeywords = ['update', 'follow', 'analyze', 'review'];
-      mediumValueKeywords.forEach(keyword => {
-        if (msg.content.toLowerCase().includes(keyword)) valueScore += 500;
-      });
-      
-      // Entity-based value (entities typically indicate concrete actions)
-      valueScore += (msg.crmEntities?.length || 0) * 750;
-    });
-    
-    return Math.round(valueScore);
-  }
-
-  private predictNextActions(messages: ConversationMessage[]): string {
-    const patterns = [];
-    const lastUserMsg = messages.filter(m => m.type === 'user').pop();
-    
-    if (!lastUserMsg) return 'unknown';
-    
-    const content = lastUserMsg.content.toLowerCase();
-    
-    if (content.includes('create') && content.includes('contact')) {
-      patterns.push('likely to schedule follow-up or send introduction email');
-    }
-    if (content.includes('schedule') && content.includes('meeting')) {
-      patterns.push('likely to prepare meeting agenda or send confirmation');
-    }
-    if (content.includes('send') && content.includes('email')) {
-      patterns.push('likely to track email engagement or schedule follow-up');
-    }
-    if (content.includes('analyze') || content.includes('report')) {
-      patterns.push('likely to want to take action based on insights');
-    }
-    
-    return patterns.join(', ') || 'general workflow continuation';
-  }
-
-  private detectWorkflowPatterns(messages: ConversationMessage[]): string {
-    const userMessages = messages.filter(m => m.type === 'user');
-    const patterns = [];
-    
-    // Sequential pattern detection
-    if (userMessages.length >= 2) {
-      const recent = userMessages.slice(-3).map(m => m.content.toLowerCase());
-      
-      if (recent.some(m => m.includes('create')) && recent.some(m => m.includes('send'))) {
-        patterns.push('create-then-communicate workflow');
-      }
-      if (recent.some(m => m.includes('search')) && recent.some(m => m.includes('contact'))) {
-        patterns.push('research-then-outreach workflow');
-      }
-      if (recent.some(m => m.includes('schedule')) && recent.some(m => m.includes('follow'))) {
-        patterns.push('schedule-then-follow-up workflow');
-      }
-    }
-    
-    // Frequency pattern detection
-    const actionCounts = new Map<string, number>();
-    userMessages.forEach(msg => {
-      const actions = ['create', 'send', 'schedule', 'update', 'analyze'];
-      actions.forEach(action => {
-        if (msg.content.toLowerCase().includes(action)) {
-          actionCounts.set(action, (actionCounts.get(action) || 0) + 1);
-        }
-      });
-    });
-    
-    const frequentActions = Array.from(actionCounts.entries())
-      .filter(([action, count]) => count >= 2)
-      .map(([action]) => action);
-    
-    if (frequentActions.length > 0) {
-      patterns.push(`frequent ${frequentActions.join('/')} user`);
-    }
-    
-    return patterns.join(', ') || 'exploratory usage pattern';
-  }
-
   // Search conversation history semantically
   async searchConversationHistory(query: string, limit: number = 5): Promise<ConversationMessage[]> {
     if (!this.currentContext) return [];
@@ -553,7 +419,7 @@ Keep the summary comprehensive but under 500 words, focusing on actionable insig
   }
 
   // Private helper methods
-  private async generateEmbedding(text: string): Promise<number[] | undefined> {
+  private async generateEmbedding(_text: string): Promise<number[] | undefined> {
     try {
       // This would use OpenAI's embedding API if available
       // For now, return undefined to indicate embedding generation is not available
@@ -634,7 +500,7 @@ Keep the summary comprehensive but under 500 words, focusing on actionable insig
     }
   }
 
-  private async loadUserProfile(userId: string): Promise<UserProfile> {
+  private async loadUserProfile(_userId: string): Promise<UserProfile> {
     // Load from Supabase or return default
     return {
       primaryGoals: [],
@@ -643,7 +509,7 @@ Keep the summary comprehensive but under 500 words, focusing on actionable insig
     };
   }
 
-  private async loadContext(userId: string, sessionId: string): Promise<ConversationContext | null> {
+  private async loadContext(_userId: string, _sessionId: string): Promise<ConversationContext | null> {
     // Implementation would load from Supabase
     return null;
   }

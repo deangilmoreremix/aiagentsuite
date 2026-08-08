@@ -125,11 +125,11 @@ export class DataValidationService {
 
   // Auto-fix data issues where possible
   async autoFixDataIssues(
-    userId: string, 
+    _userId: string, 
     issues: DataIssue[], 
     confirmationCallback?: (issue: DataIssue) => Promise<boolean>
   ): Promise<{ fixed: number; skipped: number; errors: string[] }> {
-    const results = { fixed: 0, skipped: 0, errors: [] };
+    const results: { fixed: number; skipped: number; errors: string[] } = { fixed: 0, skipped: 0, errors: [] };
 
     for (const issue of issues) {
       try {
@@ -253,7 +253,7 @@ export class DataValidationService {
     return totalRecords > 0 ? (accurateRecords / totalRecords) * 100 : 100;
   }
 
-  private calculateConsistency(contacts: any[], deals: any[]): number {
+  private calculateConsistency(contacts: any[], _deals: any[]): number {
     // Check for consistent company name formatting, etc.
     const companyNames = contacts.map(c => c.company).filter(Boolean);
     const uniqueNames = new Set(companyNames.map(name => name.toLowerCase().trim()));
@@ -261,7 +261,7 @@ export class DataValidationService {
     return companyNames.length > 0 ? (uniqueNames.size / companyNames.length) * 100 : 100;
   }
 
-  private calculateTimeliness(contacts: any[], deals: any[]): number {
+  private calculateTimeliness(contacts: any[], _deals: any[]): number {
     const now = new Date();
     const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     

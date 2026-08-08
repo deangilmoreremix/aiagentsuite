@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Bot, Mic, Send, Zap, Brain, MessageSquare, Play, Volume2, ArrowRight, Target, Database, Presentation, Users, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { Bot, Mic, Zap, Brain, Play, Volume2, Target, Database, Presentation, Users, Shield } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -79,7 +79,7 @@ const MultiAgentDemo = () => {
   const [currentScenario, setCurrentScenario] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [activeAgents, setActiveAgents] = useState<string[]>([]);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [, setCurrentStep] = useState(0);
 
   const runDemo = async () => {
     if (isRunning) return;
@@ -172,7 +172,7 @@ const MultiAgentDemo = () => {
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {demoAgentSystem.map((agent, index) => {
+              {demoAgentSystem.map((agent, _index) => {
                 const IconComponent = agent.icon;
                 const isActive = activeAgents.includes(agent.name);
                 

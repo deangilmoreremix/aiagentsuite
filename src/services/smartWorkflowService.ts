@@ -256,7 +256,7 @@ export class SmartWorkflowService {
   }
 
   // Get CRM data summary for workflow analysis
-  private async getCRMDataSummary(userId: string): Promise<any> {
+  private async getCRMDataSummary(_userId: string): Promise<any> {
     try {
       if (!supabaseService.isAvailable()) {
         return {

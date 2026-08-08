@@ -5,7 +5,6 @@ import {
   Check, 
   ExternalLink, 
   Star, 
-  Filter,
   Clock,
   ArrowRight,
   Globe,
@@ -17,7 +16,7 @@ import {
   Link as LinkIcon,
   HelpCircle
 } from 'lucide-react';
-import { composioTools, composioToolCategories, getToolsByCategory, getToolsByStatus, searchTools, ComposioTool } from '../data/composioToolsData';
+import { composioTools, composioToolCategories, getToolsByCategory, searchTools, ComposioTool } from '../data/composioToolsData';
 import { apiConfig } from '../config/apiConfig';
 import Tooltip from './Tooltip';
 

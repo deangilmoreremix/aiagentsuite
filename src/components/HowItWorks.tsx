@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowRight, Bot, Zap, Target, CheckCircle } from 'lucide-react';
 
 const steps = [

@@ -114,7 +114,7 @@ export const supabaseService = {
     return data;
   },
 
-  async getContacts(customerId?: string) {
+  async getContacts(_customerId?: string) {
     const client = checkSupabaseAvailable();
     if (!client) return [];
     
@@ -159,6 +159,8 @@ export const supabaseService = {
 
   async updateContact(id: string, updates: Partial<Contact>) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     const { data, error } = await client
       .from('contacts')
       .update(updates)
@@ -173,6 +175,8 @@ export const supabaseService = {
   // Deal operations
   async createDeal(deal: Partial<Deal>) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     const { data, error } = await client
       .from('deals')
       .insert(deal)
@@ -185,7 +189,8 @@ export const supabaseService = {
 
   async getDeals(customerId?: string) {
     const client = checkSupabaseAvailable();
-    
+    if (!client) return [];
+
     let query = client
       .from('deals')
       .select(`
@@ -227,6 +232,8 @@ export const supabaseService = {
 
   async updateDeal(id: string, updates: Partial<Deal>) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     const { data, error } = await client
       .from('deals')
       .update(updates)
@@ -241,6 +248,8 @@ export const supabaseService = {
   // Customer operations
   async createCustomer(customer: Partial<Customer>) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     const { data, error } = await client
       .from('customers')
       .insert(customer)
@@ -253,6 +262,8 @@ export const supabaseService = {
 
   async getCustomer(id: string) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     const { data, error } = await client
       .from('customers')
       .select('*')
@@ -274,6 +285,8 @@ export const supabaseService = {
     metadata?: any;
   }) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     const { data, error } = await client
       .from('sales_activities')
       .insert({
@@ -292,6 +305,8 @@ export const supabaseService = {
   // Real-time subscriptions
   subscribeToContacts(customerId: string, callback: (payload: any) => void) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     return client
       .channel(`contacts:${customerId}`)
       .on(
@@ -309,6 +324,8 @@ export const supabaseService = {
 
   subscribeToDeals(customerId: string, callback: (payload: any) => void) {
     const client = checkSupabaseAvailable();
+    if (!client) return null;
+
     return client
       .channel(`deals:${customerId}`)
       .on(
@@ -333,7 +350,7 @@ export const supabaseService = {
       }
       
       // Test with a simple query that should always work
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('contacts')
         .select('id')
         .limit(1);
@@ -364,6 +381,8 @@ export const supabaseService = {
     options?: { cacheControl?: string; upsert?: boolean }
   ) {
     const client = checkSupabaseAvailable();
+    if (!client) throw new Error('Supabase is not configured');
+
     const { data, error } = await client.storage
       .from(bucketName)
       .upload(filePath, file, {
@@ -377,6 +396,8 @@ export const supabaseService = {
 
   async downloadFile(bucketName: string, filePath: string) {
     const client = checkSupabaseAvailable();
+    if (!client) throw new Error('Supabase is not configured');
+
     const { data, error } = await client.storage
       .from(bucketName)
       .download(filePath);
@@ -387,6 +408,8 @@ export const supabaseService = {
 
   async deleteFile(bucketName: string, filePath: string) {
     const client = checkSupabaseAvailable();
+    if (!client) throw new Error('Supabase is not configured');
+
     const { data, error } = await client.storage
       .from(bucketName)
       .remove([filePath]);
@@ -397,6 +420,8 @@ export const supabaseService = {
 
   async getPublicUrl(bucketName: string, filePath: string) {
     const client = checkSupabaseAvailable();
+    if (!client) throw new Error('Supabase is not configured');
+
     const { data } = client.storage
       .from(bucketName)
       .getPublicUrl(filePath);
@@ -410,6 +435,8 @@ export const supabaseService = {
     expiresIn: number = 3600
   ) {
     const client = checkSupabaseAvailable();
+    if (!client) throw new Error('Supabase is not configured');
+
     const { data, error } = await client.storage
       .from(bucketName)
       .createSignedUrl(filePath, expiresIn);
@@ -420,6 +447,8 @@ export const supabaseService = {
 
   async listFiles(bucketName: string, folder?: string) {
     const client = checkSupabaseAvailable();
+    if (!client) throw new Error('Supabase is not configured');
+
     const { data, error } = await client.storage
       .from(bucketName)
       .list(folder);

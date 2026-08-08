@@ -6,27 +6,20 @@ import {
   TrendingUp, 
   Users, 
   Target,
-  Award,
   Activity,
   ArrowRight,
-  Calendar,
   DollarSign,
   Zap,
-  Star,
   Filter,
-  Search,
   Download,
   Eye,
   Bot,
   Database,
-  FileText,
-  Mail,
-  Phone,
-  MessageSquare
+  MessageSquare,
+  Brain
 } from 'lucide-react';
 import { gpt5TaskOrchestrator } from '../services/gpt5TaskOrchestrator';
-import { CompletedTaskResult, BusinessOutcome, AgentPerformanceMetric } from '../types/taskExecution';
-import Tooltip from './Tooltip';
+import { CompletedTaskResult } from '../types/taskExecution';
 
 interface TaskResultsDashboardProps {
   isOpen: boolean;
@@ -38,8 +31,6 @@ const TaskResultsDashboard: React.FC<TaskResultsDashboardProps> = ({ isOpen, onC
   const [selectedTask, setSelectedTask] = useState<CompletedTaskResult | null>(null);
   const [timeRange, setTimeRange] = useState<'today' | 'week' | 'month' | 'all'>('week');
   const [taskTypeFilter, setTaskTypeFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'date' | 'value' | 'duration'>('date');
 
   // Load completed tasks from orchestrator
   useEffect(() => {
@@ -182,7 +173,7 @@ const TaskResultsDashboard: React.FC<TaskResultsDashboardProps> = ({ isOpen, onC
 
               {/* Task List */}
               <div className="space-y-4">
-                {completedTasks.map((task, index) => {
+                {completedTasks.map((task, _index) => {
                   const IconComponent = getTaskTypeIcon(task.originalTask.taskType);
                   
                   return (

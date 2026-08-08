@@ -2,19 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { 
   Database, 
   CheckCircle, 
-  AlertTriangle, 
-  TrendingUp, 
   RefreshCw,
   Zap,
   Eye,
-  Settings,
   BarChart3,
   Shield,
-  Target,
-  Clock,
-  Star,
-  Activity,
-  Award,
   Lightbulb
 } from 'lucide-react';
 import { dataValidationService } from '../services/dataValidationService';
@@ -57,7 +49,7 @@ const DataQualityDashboard: React.FC<DataQualityDashboardProps> = ({
   const [validationResult, setValidationResult] = useState<any>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [isAutoFixing, setIsAutoFixing] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [, setShowDetails] = useState(false);
 
   useEffect(() => {
     if (realMode) {

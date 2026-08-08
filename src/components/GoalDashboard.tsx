@@ -2,16 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Goal, GoalProgress } from '../types/goals';
 import { allGoals, goalCategories } from '../data/goalsData';
 import { 
-  TrendingUp, 
   CheckCircle, 
   Clock, 
   AlertCircle, 
   BarChart3, 
   Target, 
   Zap,
-  Users,
   Star,
-  ArrowRight,
   Play,
   Trophy,
   Activity
@@ -23,7 +20,6 @@ interface GoalDashboardProps {
 }
 
 const GoalDashboard: React.FC<GoalDashboardProps> = ({ 
-  userGoals = [], 
   showRecommendations = true 
 }) => {
   const [goalProgress, setGoalProgress] = useState<Record<string, GoalProgress>>({});

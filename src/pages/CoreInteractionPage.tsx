@@ -9,14 +9,13 @@ import HowToUse from '../components/HowToUse';
 import ApiSetupGuide from '../components/ApiSetupGuide';
 import ComposioIntegrationModal from '../components/ComposioIntegrationModal';
 import { getDefaultMode, logApiStatus } from '../config/apiConfig';
-import { 
-  ArrowRight, 
-  Sparkles, 
-  Brain, 
-  Target, 
-  BarChart3, 
+import {
+  ArrowRight,
+  Sparkles,
+  Brain,
+  Target,
+  BarChart3,
   Settings,
-  Eye,
   Globe,
   Book,
   Bot

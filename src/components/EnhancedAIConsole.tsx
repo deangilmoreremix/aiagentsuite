@@ -8,21 +8,11 @@ import {
   Lightbulb, 
   Sparkles,
   History,
-  Search,
   MicOff,
-  Eye,
   MessageSquare,
-  Zap,
   Star,
-  ArrowRight,
-  Clock,
   User,
-  TrendingUp,
-  Target,
-  CheckCircle,
-  Info,
-  HelpCircle,
-  Activity
+  CheckCircle
 } from 'lucide-react';
 import { contextualMemoryService } from '../services/contextualMemoryService';
 import { proactiveAssistantService } from '../services/proactiveAssistantService';
@@ -44,6 +34,8 @@ interface Message {
   confidence?: number;
   emotionalTone?: string;
   audioUrl?: string;
+  reasoning?: string;
+  qualityMode?: string;
 }
 
 interface ProactiveSuggestion {
@@ -66,7 +58,7 @@ interface EnhancedAIConsoleProps {
 
 const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
   realMode = false,
-  onModeToggle,
+  onModeToggle: _onModeToggle,
   className = '',
   showProactiveSuggestions = true
 }) => {
@@ -150,7 +142,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         try {
           const summary = await contextualMemoryService.getContextualSummary();
           if (isMountedRef.current) {
-            setConversationSummary(summary);
+            setConversationSummary(summary.summary);
           }
         } catch (error) {
           console.error('Failed to update conversation summary:', error);
@@ -196,6 +188,8 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
     setInputValue('');
     setIsProcessing(true);
     setCommandSuggestions([]);
+
+    const qualityMode = 'balanced';
 
     try {
       // Add to contextual memory
@@ -306,13 +300,12 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
           emotionalTone: emotionalContext.conversationTone,
           audioUrl: audioUrl || undefined,
           toolsUsed: parsedCommand.suggestedTools,
-          gpt5Enhanced: true,
           reasoning: response.reasoning,
           qualityMode
         };
 
         setMessages(prev => [...prev, aiResponse]);
-        await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', [], response.id);
+        await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', []);
 
         // Play audio if available
         if (audioUrl) {
@@ -322,7 +315,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
 
       } else {
         // Demo mode with enhanced simulation
-        const simulatedResponse = await this.generateEnhancedDemo(currentInput);
+        const simulatedResponse = await generateEnhancedDemo(currentInput);
         setMessages(prev => [...prev, simulatedResponse]);
       }
 

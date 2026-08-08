@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Target, 
   Star, 
@@ -10,12 +10,10 @@ import {
   CheckCircle,
   Zap,
   Users,
-  Award,
   RefreshCw,
   Eye,
   Sparkles,
-  Info,
-  DollarSign
+  AlertTriangle
 } from 'lucide-react';
 import { personalizedGoalService } from '../services/personalizedGoalService';
 import { Goal } from '../types/goals';
@@ -38,7 +36,6 @@ interface PersonalizedGoalRecommendationsProps {
   userId?: string;
   onGoalSelect?: (goal: Goal) => void;
   maxRecommendations?: number;
-  showReasoningDetails?: boolean;
   compactView?: boolean;
 }
 
@@ -46,13 +43,12 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
   userId = 'default-user',
   onGoalSelect,
   maxRecommendations = 6,
-  showReasoningDetails = true,
   compactView = false
 }) => {
   const [recommendations, setRecommendations] = useState<PersonalizedRecommendation[]>([]);
   const [selectedRecommendation, setSelectedRecommendation] = useState<PersonalizedRecommendation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showAllRecommendations, setShowAllRecommendations] = useState(false);
+  const [, setShowAllRecommendations] = useState(false);
   const [filter, setFilter] = useState<'all' | 'high-impact' | 'quick-wins' | 'strategic'>('all');
   const [hasError, setHasError] = useState(false);
 
@@ -231,7 +227,7 @@ const PersonalizedGoalRecommendations: React.FC<PersonalizedGoalRecommendationsP
 
       {/* Recommendations Grid */}
       <div className={`grid ${compactView ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6`}>
-        {getFilteredRecommendations().map((recommendation, index) => (
+        {getFilteredRecommendations().map((recommendation, _index) => (
           <div
             key={recommendation.goal.id}
             className={`relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:border-blue-500/30 group ${

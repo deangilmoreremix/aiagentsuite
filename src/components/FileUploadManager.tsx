@@ -10,8 +10,6 @@ import {
   Music,
   Archive,
   AlertTriangle,
-  CheckCircle,
-  Clock,
   ExternalLink
 } from 'lucide-react';
 import { supabaseService } from '../services/supabaseClient';
@@ -125,7 +123,6 @@ const FileUploadManager: React.FC<FileUploadManagerProps> = ({
       }
 
       // Create file path with customer organization
-      const fileExtension = file.name.split('.').pop();
       const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
       const filePath = `${customerId}/${fileName}`;
 

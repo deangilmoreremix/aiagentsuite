@@ -4,23 +4,14 @@ import {
   GitBranch, 
   Zap, 
   Clock, 
-  Target,
-  Settings,
-  Play,
-  Plus,
-  ArrowRight,
-  CheckCircle,
-  Star,
-  TrendingUp,
-  Users,
-  Bot,
-  Eye,
-  Activity,
-  Award,
-  Lightbulb
+  Settings, 
+  Plus, 
+  ArrowRight, 
+  CheckCircle, 
+  TrendingUp, 
+  Activity
 } from 'lucide-react';
 import { smartWorkflowService } from '../services/smartWorkflowService';
-import Tooltip from './Tooltip';
 
 interface WorkflowSuggestion {
   id: string;

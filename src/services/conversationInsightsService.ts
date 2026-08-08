@@ -1,6 +1,5 @@
 import { realApiService } from './realApiService';
 import { contextualMemoryService } from './contextualMemoryService';
-import { supabaseService } from './supabaseClient';
 
 interface ConversationInsight {
   id: string;

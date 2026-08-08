@@ -6,20 +6,16 @@ import {
   Eye, 
   EyeOff, 
   Copy, 
-  Settings,
   Key,
-  Link,
   Zap,
   RefreshCw,
   Info,
   HelpCircle,
   Shield,
   Database,
-  Globe,
   Brain
 } from 'lucide-react';
 import { apiConfig, validateApiSetup, logApiStatus } from '../config/apiConfig';
-import { realApiService } from '../services/realApiService';
 import Tooltip from './Tooltip';
 
 interface ApiSetupGuideProps {
@@ -45,7 +41,13 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
   const testApiConnections = async () => {
     setIsTesting(true);
     try {
-      const results = await realApiService.testConnections();
+      const results: Record<string, boolean> = {
+        openai: apiConfig.openai.isConfigured,
+        gemini: apiConfig.gemini.isConfigured,
+        composio: apiConfig.composio.isConfigured,
+        elevenlabs: apiConfig.elevenlabs.isConfigured,
+        supabase: apiConfig.supabase.isConfigured
+      };
       setTestResults(results);
     } catch (error) {
       console.error('API test failed:', error);

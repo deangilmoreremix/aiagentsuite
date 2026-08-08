@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Goal } from '../types/goals';
-import { allGoals } from '../data/goalsData';
-import { executeAgentWithTools } from '../agents/useOpenAIAgentSuite';
 import { runComposioAgent } from '../agents/composioAgentRunner';
 import { 
   Play, 
   CheckCircle, 
   Clock, 
-  ArrowRight, 
   Bot, 
-  Zap, 
   Users, 
   Target,
   AlertTriangle,

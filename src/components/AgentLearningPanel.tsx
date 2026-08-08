@@ -5,17 +5,12 @@ import {
   Users, 
   Target, 
   Activity,
-  CheckCircle,
   AlertTriangle,
-  Star,
-  Award,
   BarChart3,
   Lightbulb,
   RefreshCw,
-  Eye,
   Bot,
-  Zap,
-  Clock
+  Zap
 } from 'lucide-react';
 import { agentLearningService } from '../services/agentLearningService';
 import Tooltip from './Tooltip';

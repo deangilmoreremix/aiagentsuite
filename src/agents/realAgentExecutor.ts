@@ -21,7 +21,7 @@ export interface AgentOptions {
 }
 
 // Default options
-const DEFAULT_AGENT_OPTIONS: AgentOptions = {
+const DEFAULT_AGENT_OPTIONS: Required<AgentOptions> = {
   llmProvider: 'openai', // Default to OpenAI
   temperature: 0.7,
   maxTokens: 1000,
@@ -268,7 +268,12 @@ async function executeWithGemini(
   options: { temperature: number; maxTokens: number; debug: boolean }
 ): Promise<RealAgentResult> {
   const { debug, temperature, maxTokens } = options;
-  
+
+  // Derive the quality mode from the generation settings:
+  // lower temperature means we favour accuracy, higher temperature favours speed.
+  const qualityMode: 'speed' | 'balanced' | 'accuracy' =
+    temperature <= 0.3 ? 'accuracy' : temperature >= 0.9 ? 'speed' : 'balanced';
+
   // Generate tool definitions for Gemini
   const geminiToolDefinitions = tools.map(tool => generateGeminiToolDefinition(tool));
   
@@ -312,10 +317,9 @@ Here's your task: ${task}`;
 
   // Make Gemini API call
   apiCallsMade++;
-  const geminiResponse = await realApiService.gemini.generateContent(
+  const geminiResponse = await realApiService.gemini.generateText(
     fullPrompt,
-    maxTokens,
-    temperature
+    maxTokens
   );
 
   if (!geminiResponse) {
@@ -402,16 +406,20 @@ Provide a comprehensive yet clear summary that includes:
 Use advanced reasoning to connect tactical execution to strategic business value.`;
 
     apiCallsMade++;
-    const finalResponse = await realApiService.gemini.generateContent(
+    const finalResponse = await realApiService.gemini.generateText(
       enhancedToolResultsPrompt,
-      qualityMode === 'accuracy' ? maxTokens * 1.3 : maxTokens,
-      qualityMode === 'accuracy' ? Math.max(0.1, temperature - 0.1) : temperature
+      qualityMode === 'accuracy' ? Math.floor(maxTokens * 1.3) : maxTokens
     );
 
     cleanedResponse = finalResponse || cleanedResponse;
   }
 
   const executionTime = Date.now() - startTime;
+
+  const successfulExecutions = executionResults.filter(result => result.success).length;
+  const businessImpact = executionResults.length > 0
+    ? `${successfulExecutions}/${executionResults.length} tool executions completed successfully`
+    : 'No tool executions were required for this task';
 
   return {
     success: true,
@@ -467,8 +475,7 @@ async function executeToolCall(toolName: string, parameters: any): Promise<any> 
       // Generic Composio action
       const [appName, actionName] = toolName.split('_');
       return await realApiService.composio.executeAction(
-        appName,
-        actionName,
+        `${appName}.${actionName}`,
         parameters
       );
   }
