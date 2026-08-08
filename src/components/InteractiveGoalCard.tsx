@@ -20,7 +20,6 @@ import {
   Info,
   HelpCircle
 } from 'lucide-react';
-import { runComposioAgent } from '../agents/composioAgentRunner';
 import Tooltip from './Tooltip';
 
 interface InteractiveGoalCardProps {

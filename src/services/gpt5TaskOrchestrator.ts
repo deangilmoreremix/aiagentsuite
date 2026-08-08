@@ -3,12 +3,7 @@ import { supabaseService } from './supabaseClient';
 import { 
   EnhancedTaskInput, 
   GPT5TaskAnalysis, 
-  RequiredTaskField, 
-  TaskExecutionStep,
-  CompletedTaskResult,
-  AgentRecommendation,
-  RiskFactor,
-  BusinessImpact
+  CompletedTaskResult
 } from '../types/taskExecution';
 
 export class GPT5TaskOrchestrator {
@@ -177,7 +172,6 @@ export class GPT5TaskOrchestrator {
     onStepUpdate?: (step: any) => void,
     onCompletion?: (result: CompletedTaskResult) => void
   ): Promise<CompletedTaskResult> {
-    const taskId = taskInput.id;
     const startTime = Date.now();
 
     try {

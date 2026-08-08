@@ -98,22 +98,6 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
       helpText: 'Gemini is Google\'s alternative to OpenAI, providing advanced LLM capabilities. You need either OpenAI or Gemini for Live Mode.'
     },
     {
-      name: 'Composio',
-      key: 'VITE_COMPOSIO_API_KEY',
-      description: 'Required for tool integrations (Gmail, Calendar, Slack, etc.)',
-      setupUrl: 'https://app.composio.dev/',
-      isConfigured: apiConfig.composio.isConfigured,
-      currentValue: apiConfig.composio.apiKey,
-      instructions: [
-        'Go to Composio Dashboard',
-        'Sign up for an account',
-        'Navigate to API Keys section',
-        'Generate a new API key',
-        'Copy and paste it into your .env file'
-      ],
-      helpText: 'Composio enables integration with 50+ business tools like Gmail, Calendar, Slack, etc. Without this, tool actions will be simulated.'
-    },
-    {
       name: 'ElevenLabs',
       key: 'VITE_ELEVENLABS_API_KEY',
       description: 'Optional: For AI voice generation and text-to-speech features',

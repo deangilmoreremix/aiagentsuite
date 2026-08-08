@@ -7,7 +7,6 @@ import CRMWorkspace from '../components/CRMWorkspace';
 import Footer from '../components/Footer';
 import HowToUse from '../components/HowToUse';
 import ApiSetupGuide from '../components/ApiSetupGuide';
-import ComposioIntegrationModal from '../components/ComposioIntegrationModal';
 import { getDefaultMode, logApiStatus } from '../config/apiConfig';
 import { 
   ArrowRight, 
@@ -17,7 +16,6 @@ import {
   BarChart3, 
   Settings,
   Eye,
-  Globe,
   Book,
   Bot
 } from 'lucide-react';
@@ -27,7 +25,6 @@ const CoreInteractionPage = () => {
   const [globalRealMode, setGlobalRealMode] = useState(false);
   const [showHowToUse, setShowHowToUse] = useState(false);
   const [showApiSetup, setShowApiSetup] = useState(false);
-  const [showComposioModal, setShowComposioModal] = useState(false);
   const [hasError, setHasError] = useState(false);
   const isMountedRef = useRef(true);
 
@@ -130,15 +127,6 @@ const CoreInteractionPage = () => {
           >
             <BarChart3 className="h-5 w-5" />
           </Link>
-        </Tooltip>
-
-        <Tooltip content="View all integrations" position="bottom">
-          <button
-            onClick={() => setShowComposioModal(true)}
-            className="p-3 rounded-xl bg-purple-500/20 dark:bg-purple-400/20 border border-purple-400/30 dark:border-purple-300/30 text-purple-600 dark:text-purple-200 hover:bg-purple-500/30 dark:hover:bg-purple-400/30 transition-all duration-300"
-          >
-            <Globe className="h-5 w-5" />
-          </button>
         </Tooltip>
 
         <Tooltip content="Setup guide and documentation" position="bottom">
@@ -359,11 +347,6 @@ const CoreInteractionPage = () => {
           setGlobalRealMode(true);
           setShowApiSetup(false);
         }}
-      />
-
-      <ComposioIntegrationModal
-        isOpen={showComposioModal}
-        onClose={() => setShowComposioModal(false)}
       />
     </div>
   );

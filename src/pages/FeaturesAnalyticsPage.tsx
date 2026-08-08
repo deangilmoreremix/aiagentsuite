@@ -256,7 +256,7 @@ const FeaturesAnalyticsPage = () => {
         <HowItWorks />
 
         {/* Tool Integrations */}
-        <Integrations onOpenComposioModal={() => {}} />
+        <Integrations />
 
         {/* Pricing */}
         <Pricing />

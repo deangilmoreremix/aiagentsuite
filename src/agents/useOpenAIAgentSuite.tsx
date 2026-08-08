@@ -1,79 +1,9 @@
 import { realApiService } from "../services/realApiService";
-import { apiConfig, validateApiSetup } from "../config/apiConfig";
+import { validateApiSetup } from "../config/apiConfig";
 
-// Initialize OpenAI client with error handling
 const validation = validateApiSetup();
 
-export const composioApps = [
-  "gmail", "slack", "google_calendar", "zoom", "trello", "google_sheets",
-  "shopify", "stripe", "calendly", "whatsapp_business", "twilio",
-  "facebook_ads", "typeform"
-];
-
-export const composioAuthMap = Object.fromEntries(
-  composioApps.map(app => [
-    `connect${app.replace(/(^|_)(\w)/g, (_, __, p2) => p2.toUpperCase())}OAuth`,
-    async () => {
-      try {
-        if (apiConfig.composio.isConfigured) {
-          await realApiService.composio.executeAction(app, 'authenticate', {});
-          console.log(`✅ ${app} connected via Composio.`);
-        } else {
-          console.log(`🔄 ${app} connection simulated (Composio not configured).`);
-        }
-      } catch (err) {
-        console.error(`❌ Composio ${app} Auth failed:`, err);
-      }
-    }
-  ])
-);
-
-export const composioToolPickerOptions = composioApps.map(app => ({
-  label: app.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-  value: `composio:${app}`,
-  icon: getAppIcon(app),
-  status: apiConfig.composio.isConfigured ? 'available' : 'demo'
-}));
-
-function getAppIcon(app: string) {
-  const icons: Record<string, string> = {
-    gmail: '📧',
-    slack: '💬',
-    google_calendar: '📅',
-    zoom: '📹',
-    trello: '📋',
-    google_sheets: '📊',
-    shopify: '🛒',
-    stripe: '💳',
-    calendly: '⏰',
-    whatsapp_business: '📱',
-    twilio: '📞',
-    facebook_ads: '📢',
-    typeform: '📝'
-  };
-  return icons[app] || '🔧';
-}
-
-export function getComposioToolPickerUI(onSelect: (value: string) => void) {
-  return (
-    <div className="grid grid-cols-2 gap-2 p-4">
-      {composioToolPickerOptions.map(option => (
-        <button
-          key={option.value}
-          className="border rounded-xl py-2 px-4 text-sm hover:bg-gray-100"
-          onClick={() => onSelect(option.value)}
-        >
-          {option.icon} {option.label}
-          {option.status === 'demo' && <span className="text-xs text-orange-500 ml-1">(Demo)</span>}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 export async function executeAgentWithTools(agentName: string, task: string, tools: string[]) {
-  const validation = validateApiSetup();
-  
   if (!validation.canUseRealMode) {
     const errorMsg = 'Real mode not available. Please configure your OpenAI API key.';
     console.error('❌', errorMsg);
@@ -90,7 +20,7 @@ export async function executeAgentWithTools(agentName: string, task: string, too
     console.log(`📋 Task: ${task}`);
     console.log(`🔧 Tools: ${tools.join(', ')}`);
 
-    // Use real OpenAI API
+    // Use the OpenAI Responses API for the real agent call.
     const result = await realApiService.openai.generateText(
       `You are ${agentName}. Task: ${task}. Available tools: ${tools.join(', ')}. 
        Provide a detailed response about how you would execute this task using the available tools.
@@ -104,22 +34,14 @@ export async function executeAgentWithTools(agentName: string, task: string, too
     } catch (error) {
       console.error('Failed to embed response UI:', error);
     }
-    
+
     // If voice is available, generate speech
     if (validation.hasVoice) {
-      try {
-        console.log('🎙️ Generating voice response...');
-        const audioUrl = await realApiService.elevenlabs.generateSpeech(
-          result.substring(0, 200) + '...' // Limit to 200 chars for demo
-        );
-        console.log('✅ Voice response generated');
-        
-        // Play the audio
-        const audio = new Audio(audioUrl);
-        audio.play().catch(e => console.log('Audio playback failed:', e));
-      } catch (voiceError) {
-        console.log('⚠️ Voice generation failed:', voiceError);
-      }
+      const audioUrl = await realApiService.elevenlabs.generateSpeech(
+        result.substring(0, 200) + '...' // Limit to 200 chars for demo
+      );
+      const audio = new Audio(audioUrl);
+      audio.play().catch(e => console.log('Audio playback failed:', e));
     }
 
     return result;
@@ -138,7 +60,6 @@ export async function executeAgentWithTools(agentName: string, task: string, too
 
 export const runAllAgents = async (task: string, tools: string[]) => {
   const validation = validateApiSetup();
-  
   if (!validation.canUseRealMode) {
     console.error('❌ Real mode not available. Please configure your APIs.');
     return;
@@ -155,8 +76,6 @@ export const runAllAgents = async (task: string, tools: string[]) => {
   for (const agent of agents) {
     console.log(`\n🤖 Running ${agent} with real APIs...`);
     await executeAgentWithTools(agent, task, tools);
-    
-    // Add delay between agents to avoid rate limiting
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 };
@@ -205,21 +124,6 @@ function embedAgentResponseUI(_toolsUsed: any, output: any) {
       link.click();
     };
 
-    if (validation.hasToolIntegration) {
-      const emailBtn = document.createElement("button");
-      emailBtn.className = "bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs";
-      emailBtn.innerText = "Send via Email";
-      emailBtn.onclick = async () => {
-        try {
-          await realApiService.composio.sendEmail("user@example.com", "Real AI Agent Response", content.innerText);
-          alert("✅ Email sent via real API!");
-        } catch (error) {
-          alert("⚠️ Email send failed: " + error);
-        }
-      };
-      buttonRow.appendChild(emailBtn);
-    }
-
     buttonRow.appendChild(copyBtn);
     buttonRow.appendChild(exportBtn);
 
@@ -238,7 +142,7 @@ if (typeof window !== 'undefined') {
     const validation = validateApiSetup();
     console.log('🔧 Agent Suite initialized');
     console.log('Mode:', validation.canUseRealMode ? '🔴 Real AI Mode' : '🔵 Demo Mode');
-    
+
     if (validation.canUseRealMode) {
       console.log('🚀 Ready for real AI agent execution!');
     } else {

@@ -50,7 +50,7 @@ import {
   Layers,
   Command
 } from 'lucide-react';
-import { executeAgentWithTools, composioToolPickerOptions } from '../agents/useOpenAIAgentSuite';
+import { executeAgentWithTools } from '../agents/useOpenAIAgentSuite';
 import ModeToggle from './ModeToggle';
 
 interface TaskStep {
