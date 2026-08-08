@@ -44,7 +44,7 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
       const results: Record<string, boolean> = {
         openai: apiConfig.openai.isConfigured,
         gemini: apiConfig.gemini.isConfigured,
-        composio: apiConfig.composio.isConfigured,
+        'openai agents': apiConfig.openai.isConfigured,
         elevenlabs: apiConfig.elevenlabs.isConfigured,
         supabase: apiConfig.supabase.isConfigured
       };
@@ -100,20 +100,20 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
       helpText: 'Gemini is Google\'s alternative to OpenAI, providing advanced LLM capabilities. You need either OpenAI or Gemini for Live Mode.'
     },
     {
-      name: 'Composio',
-      key: 'VITE_COMPOSIO_API_KEY',
-      description: 'Required for tool integrations (Gmail, Calendar, Slack, etc.)',
-      setupUrl: 'https://app.composio.dev/',
-      isConfigured: apiConfig.composio.isConfigured,
-      currentValue: apiConfig.composio.apiKey,
+      name: 'OpenAI Agents',
+      key: 'VITE_OPENAI_API_KEY',
+      description: 'Required for tool integrations (email, calendar, Slack, CRM records)',
+      setupUrl: 'https://platform.openai.com/docs/guides/agents',
+      isConfigured: apiConfig.openai.isConfigured,
+      currentValue: apiConfig.openai.apiKey,
       instructions: [
-        'Go to Composio Dashboard',
-        'Sign up for an account',
-        'Navigate to API Keys section',
-        'Generate a new API key',
+        'Go to the OpenAI Agents documentation',
+        'Sign in to your OpenAI account',
+        'Navigate to the API Keys section',
+        'Create a new secret key',
         'Copy and paste it into your .env file'
       ],
-      helpText: 'Composio enables integration with 50+ business tools like Gmail, Calendar, Slack, etc. Without this, tool actions will be simulated.'
+      helpText: 'The OpenAI Agents SDK enables CRM tool calls such as send_email, create_calendar_event, send_slack_message, create_contact, create_deal, log_activity and search_contacts. Without an OpenAI key, tool actions will be simulated.'
     },
     {
       name: 'ElevenLabs',
@@ -456,7 +456,7 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                       <p className="text-gray-300 text-sm">
                         <strong>Either OpenAI or Gemini</strong> is required for Live Mode to function. For full functionality:
                         <br /><br />
-                        • <strong>Composio</strong> enables integration with business tools<br />
+                        • <strong>OpenAI Agents</strong> enables integration with business tools<br />
                         • <strong>ElevenLabs</strong> provides voice capabilities<br />
                         • <strong>Supabase</strong> enables data persistence
                       </p>
@@ -511,7 +511,7 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                     <div className="bg-slate-700/30 rounded-lg p-4">
                       <h4 className="font-semibold text-white mb-2">Tool Connection Issues</h4>
                       <ul className="text-gray-300 text-sm space-y-2">
-                        <li>• Ensure your Composio account has the necessary tool connections</li>
+                        <li>• Ensure your OpenAI account has access to the Agents SDK tools</li>
                         <li>• Check that you've granted the required permissions</li>
                         <li>• Some tools require additional setup in their respective dashboards</li>
                         <li>• Verify your tool credentials are still valid and not expired</li>
@@ -599,7 +599,7 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
                     <div className="bg-slate-700/30 rounded-lg p-4">
                       <h4 className="font-semibold text-white mb-2">Tool Integration Security</h4>
                       <p className="text-gray-300 text-sm">
-                        When connecting tools via Composio, you grant access permissions to those services. Review the specific permissions requested during the OAuth flow to ensure they align with your security requirements.
+                        When connecting tools via OpenAI Agents, you grant access permissions to those services. Review the specific permissions requested during the OAuth flow to ensure they align with your security requirements.
                       </p>
                     </div>
                     

@@ -260,13 +260,13 @@ const HowToUse: React.FC<HowToUseProps> = ({ isOpen, onClose, onOpenApiSetup }) 
                   
                   <div className="bg-slate-700/30 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-purple-400">Composio (Recommended)</span>
+                      <span className="font-medium text-purple-400">OpenAI Agents (Recommended)</span>
                       <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">Tools</span>
                     </div>
-                    <p className="text-gray-300 text-sm">Enables 50+ tool integrations (Gmail, Calendar, Slack, etc.)</p>
-                    <a href="https://app.composio.dev/" target="_blank" rel="noopener noreferrer" 
+                    <p className="text-gray-300 text-sm">Enables CRM tool integrations (email, calendar, Slack, contacts, deals)</p>
+                    <a href="https://platform.openai.com/docs/guides/agents" target="_blank" rel="noopener noreferrer" 
                        className="text-purple-400 hover:text-purple-300 text-sm inline-flex items-center gap-1 mt-1">
-                      Get API Key <ExternalLink className="h-3 w-3" />
+                      View Agents Docs <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>
                   

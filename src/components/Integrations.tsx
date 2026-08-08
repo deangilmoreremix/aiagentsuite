@@ -243,7 +243,7 @@ const Integrations = () => {
         </div>
       </div>
 
-      {/* Composio Integration Modal */}
+      {/* OpenAI Agents Integration Modal */}
       <ComposioIntegrationModal 
         isOpen={showAllIntegrations} 
         onClose={() => setShowAllIntegrations(false)}

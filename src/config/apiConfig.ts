@@ -15,13 +15,8 @@ export const apiConfig = {
   },
   gemini: {
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-    isConfigured: !!import.meta.env.VITE_GEMINI_API_KEY && 
+    isConfigured: !!import.meta.env.VITE_GEMINI_API_KEY &&
                   import.meta.env.VITE_GEMINI_API_KEY !== 'your_gemini_api_key_here'
-  },
-  composio: {
-    apiKey: import.meta.env.VITE_COMPOSIO_API_KEY,
-    isConfigured: !!import.meta.env.VITE_COMPOSIO_API_KEY && 
-                  import.meta.env.VITE_COMPOSIO_API_KEY !== 'your_composio_api_key_here'
   },
   supabase: {
     url: import.meta.env.VITE_SUPABASE_URL,
@@ -46,15 +41,11 @@ export const validateApiSetup = () => {
   if (!apiConfig.elevenlabs.isConfigured) {
     warnings.push('ElevenLabs API key not configured (voice features will be unavailable)');
   }
-  
-  if (!apiConfig.composio.isConfigured) {
-    warnings.push('Composio API key not configured (tool integrations will use mock data)');
-  }
-  
+
   if (!apiConfig.supabase.isConfigured) {
     warnings.push('Supabase not configured (CRM data will be temporary)');
   }
-  
+
   return {
     isValid: issues.length === 0,
     issues,
@@ -64,7 +55,7 @@ export const validateApiSetup = () => {
     hasOpenAI: apiConfig.openai.isConfigured,
     hasGemini: apiConfig.gemini.isConfigured,
     hasVoice: apiConfig.elevenlabs.isConfigured,
-    hasToolIntegration: apiConfig.composio.isConfigured,
+    hasToolIntegration: apiConfig.openai.isConfigured,
     hasPersistence: apiConfig.supabase.isConfigured
   };
 };
@@ -91,7 +82,7 @@ export const logApiStatus = () => {
     console.log('OpenAI:', apiConfig.openai.isConfigured ? '✅ Configured' : '❌ Missing');
     console.log('Gemini:', apiConfig.gemini.isConfigured ? '✅ Configured' : '❌ Missing');
     console.log('ElevenLabs:', apiConfig.elevenlabs.isConfigured ? '✅ Configured' : '⚠️ Missing (optional)');
-    console.log('Composio:', apiConfig.composio.isConfigured ? '✅ Configured' : '⚠️ Missing (fallback available)');
+    console.log('Tools:', apiConfig.openai.isConfigured ? '✅ Configured (OpenAI Agents)' : '⚠️ Missing (demo tools)');
     console.log('Supabase:', apiConfig.supabase.isConfigured ? '✅ Configured' : '⚠️ Missing (temporary data)');
     console.log('Default Mode:', validation.canUseRealMode ? '🔴 Real Mode' : '🔵 Demo Mode');
     console.log('Available LLMs:', [

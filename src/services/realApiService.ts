@@ -6,23 +6,6 @@ const openaiClient = apiConfig.openai.isConfigured ? new OpenAI({
   dangerouslyAllowBrowser: true
 }) : null;
 
-interface GeminiService {
-  generateText(prompt: string, maxTokens?: number): Promise<string>;
-}
-
-interface ComposioService {
-  executeAction(action: string, params: any): Promise<any>;
-  getAvailableActions(): Promise<any[]>;
-  sendEmail(to: string, subject: string, body: string): Promise<any>;
-  createCalendarEvent(
-    title: string,
-    startTime: string,
-    endTime: string,
-    attendees?: string[]
-  ): Promise<any>;
-  sendSlackMessage(channel: string, message: string): Promise<any>;
-}
-
 interface ElevenLabsService {
   generateSpeech(text: string, voice?: string): Promise<string>;
   getAvailableVoices(): Promise<any[]>;
@@ -169,47 +152,6 @@ class RealApiService {
     }
   };
 
-  gemini: GeminiService = {
-    async generateText(prompt: string, _maxTokens: number = 500): Promise<string> {
-      console.warn('Gemini API not configured. Please set up your API key in the settings.');
-      return `[Simulated Gemini response to: ${prompt.substring(0, 100)}...]`;
-    }
-  };
-
-  composio: ComposioService = {
-    async executeAction(_action: string, _params: any): Promise<any> {
-      console.warn('Composio API not configured. Please set up your API key in the settings.');
-      return { success: false, message: 'Composio not configured' };
-    },
-
-    async getAvailableActions(): Promise<any[]> {
-      console.warn('Composio API not configured. Please set up your API key in the settings.');
-      return [];
-    },
-
-    async sendEmail(to: string, subject: string, body: string): Promise<any> {
-      return this.executeAction('gmail.send_email', { to, subject, body });
-    },
-
-    async createCalendarEvent(
-      title: string,
-      startTime: string,
-      endTime: string,
-      attendees: string[] = []
-    ): Promise<any> {
-      return this.executeAction('google_calendar.create_event', {
-        title,
-        startTime,
-        endTime,
-        attendees
-      });
-    },
-
-    async sendSlackMessage(channel: string, message: string): Promise<any> {
-      return this.executeAction('slack.send_message', { channel, message });
-    }
-  };
-
   elevenlabs: ElevenLabsService = {
     async generateSpeech(_text: string, _voice: string = 'default'): Promise<string> {
       console.warn('ElevenLabs API not configured. Please set up your API key in the settings.');
@@ -224,7 +166,7 @@ class RealApiService {
 
   // Check if APIs are configured
   isConfigured(): boolean {
-    return false; // Will be true when real API keys are configured
+    return apiConfig.openai.isConfigured;
   }
 }
 

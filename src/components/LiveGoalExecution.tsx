@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Goal } from '../types/goals';
-import { runComposioAgent } from '../agents/composioAgentRunner';
+import { runAgent } from '../agents/agentRunner';
 import CRMWorkspace from './CRMWorkspace';
 import Tooltip from './Tooltip';
 import {
@@ -177,7 +177,7 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
         if (realMode) {
           // Execute real agents
           try {
-            const result = await runComposioAgent(
+            const result = await runAgent(
               step.agentName,
               `Goal: ${goal.title}. Task: ${step.action}`,
               step.toolsUsed || goal.toolsNeeded
@@ -244,7 +244,7 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
       const results = [];
       for (const step of executionSteps) {
         if (isMountedRef.current) {
-          const result = await runComposioAgent(
+          const result = await runAgent(
             step.agentName,
             step.action,
             step.toolsUsed || []

@@ -8,7 +8,7 @@ export interface AgentStep {
   timestamp: Date;
 }
 
-export async function runComposioAgent(
+export async function runAgent(
   agentName: string, 
   prompt: string, 
   tools: string[], 
@@ -100,7 +100,7 @@ export async function runMultipleAgents(
       });
     }
 
-    const result = await runComposioAgent(
+    const result = await runAgent(
       agent.name,
       agent.prompt,
       agent.tools
@@ -141,7 +141,7 @@ export function createAgentWorkflow(steps: Array<{
           });
         }
 
-        const result = await runComposioAgent(
+        const result = await runAgent(
           step.agentName,
           step.prompt,
           step.tools

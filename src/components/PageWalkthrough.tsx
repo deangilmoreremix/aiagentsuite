@@ -135,7 +135,7 @@ const walkthroughSteps: WalkthroughStep[] = [
   {
     id: 'api-setup',
     title: 'Live Mode Setup 🔴',
-    description: 'To use Live Mode, you\'ll need to configure API keys for OpenAI (required), Composio (tool integrations), and optionally ElevenLabs (voice). Click "Settings" next to the mode toggle to begin setup.',
+    description: 'To use Live Mode, you\'ll need to configure API keys for OpenAI (required, also powers OpenAI Agents tool integrations) and optionally ElevenLabs (voice). Click "Settings" next to the mode toggle to begin setup.',
     targetSelector: '[data-walkthrough="mode-toggle"]',
     position: 'left',
     icon: Settings,

@@ -43,15 +43,14 @@ export class GPT5TaskOrchestrator {
         - Research Agent: Data gathering and analysis
         - Integration Agent: Tool coordination and data sync
         
-        Available Tools via Composio:
-        - Gmail, Outlook (email)
-        - Google Calendar, Calendly (scheduling)
-        - Slack, Teams (communication)
-        - HubSpot, Salesforce (CRM)
-        - Zoom, Meet (video conferencing)
-        - Trello, Asana (project management)
-        - Shopify, Stripe (e-commerce/payments)
-        - And 40+ more tools
+        Available Tools via OpenAI Agents:
+        - send_email (email)
+        - create_calendar_event (scheduling)
+        - send_slack_message (communication)
+        - create_contact (CRM contacts)
+        - create_deal (CRM opportunities)
+        - log_activity (CRM activity logging)
+        - search_contacts (CRM lookup)
         
         Please analyze this request and provide a detailed response in the following JSON format:
         {

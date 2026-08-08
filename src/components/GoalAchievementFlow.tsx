@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Goal } from '../types/goals';
-import { runComposioAgent } from '../agents/composioAgentRunner';
+import { runAgent } from '../agents/agentRunner';
 import { 
   Play, 
   CheckCircle, 
@@ -126,7 +126,7 @@ const GoalAchievementFlow: React.FC<GoalAchievementFlowProps> = ({
         if (realMode) {
           // Execute real agent
           try {
-            const result = await runComposioAgent(
+            const result = await runAgent(
               step.agent,
               `Execute goal: ${goal.title}. Step: ${step.description}`,
               step.tools

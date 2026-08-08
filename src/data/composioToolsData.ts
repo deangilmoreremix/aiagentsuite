@@ -104,7 +104,9 @@ export const composioToolCategories: ComposioToolCategory[] = [
   }
 ];
 
-// Comprehensive list of Composio integrations
+// Comprehensive list of OpenAI Agents tool integrations
+// Backed by the Agents SDK CRM tools: send_email, create_calendar_event,
+// send_slack_message, create_contact, create_deal, log_activity, search_contacts
 export const composioTools: ComposioTool[] = [
   // Email & Communication
   {

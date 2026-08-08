@@ -557,7 +557,7 @@ export const allGoals: Goal[] = [
     description: 'Visual "if this, then that" builder for complex business processes',
     priority: 'High',
     agentsRequired: ['Command Analyzer Agent', 'Function Trigger Agent', 'Structured Output Agent'],
-    toolsNeeded: ['supabase', 'composio', 'zapier'],
+    toolsNeeded: ['supabase', 'openai-agents', 'zapier'],
     estimatedSetupTime: '30 minutes',
     businessImpact: 'Build complex automations 10x faster than custom code',
     complexity: 'Advanced',

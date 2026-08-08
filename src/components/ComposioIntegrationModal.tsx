@@ -139,28 +139,28 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
               <Globe className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Composio Integration Hub</h2>
-              <p className="text-gray-300">Connect your AI agents to 250+ tools and services</p>
+              <h2 className="text-2xl font-bold text-white">OpenAI Agents Integration Hub</h2>
+              <p className="text-gray-300">Connect your AI agents to your CRM tools and services</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
             <div className={`px-3 py-1 rounded-full text-sm ${
-              apiConfig.composio.isConfigured 
+              apiConfig.openai.isConfigured 
                 ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                 : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
             }`}>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${
-                  apiConfig.composio.isConfigured ? 'bg-green-400' : 'bg-yellow-400'
+                  apiConfig.openai.isConfigured ? 'bg-green-400' : 'bg-yellow-400'
                 }`}></div>
                 <span>
-                  {apiConfig.composio.isConfigured ? 'API Configured' : 'API Not Configured'}
+                  {apiConfig.openai.isConfigured ? 'Agent Tools Available' : 'Agent Tools Unavailable'}
                 </span>
                 <Tooltip 
-                  content={apiConfig.composio.isConfigured 
-                    ? "Your Composio API key is configured" 
-                    : "Set up your Composio API key in settings to enable real tool integration"
+                  content={apiConfig.openai.isConfigured 
+                    ? "Your OpenAI API key is configured, so Agents SDK tools can run for real" 
+                    : "Set up your OpenAI API key in settings to enable real tool integration via the Agents SDK"
                   }
                   position="left"
                 />
@@ -321,7 +321,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
                         </button>
                         
                         <a
-                          href={`https://composio.dev/docs/integrations/${selectedTool.id}`}
+                          href="https://platform.openai.com/docs/guides/agents"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-medium border border-gray-600 text-gray-300 hover:text-white hover:border-gray-500 transition-colors"
@@ -358,7 +358,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
                         Security & Privacy
                       </h4>
                       <p className="text-gray-300 text-sm">
-                        Composio uses OAuth for secure access and never stores your credentials.
+                        OpenAI Agents use OAuth for secure access and never store your credentials.
                         All data is encrypted in transit and at rest.
                       </p>
                     </div>
@@ -385,7 +385,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
                         Auto-Refresh Tokens
                       </h4>
                       <p className="text-gray-300 text-sm">
-                        Composio automatically refreshes access tokens to ensure continuous 
+                        OpenAI Agents automatically refresh access tokens to ensure continuous 
                         operation without manual intervention.
                       </p>
                     </div>
@@ -639,8 +639,8 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
         <div className="p-6 border-t border-slate-700 bg-slate-800">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm">
-              Powered by <a href="https://composio.dev" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Composio.dev</a> 
-              - The universal API integration platform
+              Powered by <a href="https://platform.openai.com/docs/guides/agents" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">the OpenAI Agents SDK</a> 
+              - Native tool calling for your AI agents
             </p>
             
             <div className="flex gap-3">
@@ -659,7 +659,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
               )}
               
               <a
-                href="https://composio.dev/integrations" 
+                href="https://platform.openai.com/docs/guides/agents" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm"
