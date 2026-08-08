@@ -149,15 +149,17 @@ export class GPT5TaskOrchestrator {
           enableChainOfThought: true,
           temperature: 0.2,
           maxTokens: 3000, // Increased for GPT-5
-          qualityMode: 'accuracy',
-          outputFormat: 'json',
           qualityMode: 'accuracy'
         }
       );
       
       // Parse GPT-5 response
-      const analysisText = response.output_text || response.content || '';
-      const analysis = JSON.parse(analysisText) as GPT5TaskAnalysis;
+      const analysisText = response.output_text || '';
+      const extractJson = (text: string): string => {
+        const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        return fenced ? fenced[1].trim() : text.trim();
+      };
+      const analysis = JSON.parse(extractJson(analysisText)) as GPT5TaskAnalysis;
       analysis.taskId = `task-${Date.now()}`;
       
       console.log('✅ GPT-5 task analysis completed');
@@ -293,7 +295,11 @@ Focus on creating a plan that not only completes the task but does so with excep
     );
 
     const planText = response.output_text || '';
-    return JSON.parse(planText);
+    const extractJson = (text: string): string => {
+      const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+      return fenced ? fenced[1].trim() : text.trim();
+    };
+    return JSON.parse(extractJson(planText));
   }
 
   // Execute coordinated agent workflow
@@ -307,7 +313,7 @@ Focus on creating a plan that not only completes the task but does so with excep
       taskId: taskInput.id,
       userInput: taskInput.userProvidedData,
       crmContext: taskInput.crmContext,
-      intermediateResults: {},
+      intermediateResults: {} as Record<string, any>,
       businessMetrics: {}
     };
 
@@ -390,9 +396,7 @@ Focus on creating a plan that not only completes the task but does so with excep
 
     const result = await realApiService.openai.createChatCompletion(
       [{ role: 'user', content: stepPrompt }],
-      [], // Tool definitions would be added here
-      0.3,
-      1000
+      { temperature: 0.3, maxTokens: 1000 }
     );
 
     return result.choices[0]?.message?.content || 'Step completed';

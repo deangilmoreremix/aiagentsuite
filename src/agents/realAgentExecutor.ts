@@ -1,5 +1,5 @@
 import { realApiService } from '../services/realApiService';
-import { apiConfig, validateApiSetup } from '../config/apiConfig';
+import { validateApiSetup } from '../config/apiConfig';
 
 export interface RealAgentResult {
   success: boolean;
@@ -42,9 +42,9 @@ export async function executeRealAgent(
   
   // Merge default options with provided options
   const mergedOptions = { ...DEFAULT_AGENT_OPTIONS, ...options };
-  const { llmProvider, temperature, maxTokens, debug } = mergedOptions;
-  
-  if (debug) console.log(`🤖 Executing ${agentName} using ${llmProvider}...`);
+  const { temperature = 0.7, maxTokens = 1000, debug = false } = mergedOptions;
+
+  if (debug) console.log(`🤖 Executing ${agentName} using openai...`);
 
   try {
     // Validate API setup
@@ -53,49 +53,23 @@ export async function executeRealAgent(
       throw new Error(`Cannot execute real agent: ${validation.issues.join(', ')}`);
     }
 
-    // Determine if we can use the requested provider
-    const useGemini = llmProvider === 'gemini' && apiConfig.gemini.isConfigured;
-    const useOpenAI = !useGemini && apiConfig.openai.isConfigured;
-    
-    if (!useGemini && !useOpenAI) {
-      throw new Error('No available LLM provider configured. Please set up either OpenAI or Gemini API keys.');
-    }
-
-    const actualProvider = useGemini ? 'gemini' : 'openai';
-    if (debug) console.log(`Using ${actualProvider} as LLM provider`);
-
     // Prepare system message with agent description and context
     const systemPrompt = `You are ${agentName}, a specialized AI agent. Your task is to ${task}. 
                  Available tools: ${tools.join(', ')}. 
                  Context: ${context ? JSON.stringify(context) : 'None'}.
                  Provide specific, actionable steps and execute them using the available tools.`;
 
-    // Execution logic differs based on the provider
-    if (useGemini) {
-      // Execute using Gemini
-      return await executeWithGemini(
-        agentName,
-        systemPrompt,
-        task,
-        tools,
-        startTime,
-        apiCallsMade,
-        toolsUsed,
-        { temperature, maxTokens, debug }
-      );
-    } else {
-      // Execute using OpenAI
-      return await executeWithOpenAI(
-        agentName,
-        systemPrompt,
-        task,
-        tools,
-        startTime,
-        apiCallsMade,
-        toolsUsed,
-        { temperature, maxTokens, debug }
-      );
-    }
+    // Always execute with OpenAI
+    return await executeWithOpenAI(
+      agentName,
+      systemPrompt,
+      task,
+      tools,
+      startTime,
+      apiCallsMade,
+      toolsUsed,
+      { temperature, maxTokens, debug }
+    );
   } catch (error) {
     console.error(`Real agent execution failed for ${agentName}:`, error);
     
@@ -106,7 +80,7 @@ export async function executeRealAgent(
       executionTime: Date.now() - startTime,
       apiCallsMade,
       toolsUsed,
-      llmUsed: options.llmProvider || DEFAULT_AGENT_OPTIONS.llmProvider
+      llmUsed: 'openai'
     };
   }
 }
@@ -256,183 +230,6 @@ function parseToolParameters(parametersText: string): any {
   }
 }
 
-// Execute agent with Gemini's tool usage format
-async function executeWithGemini(
-  agentName: string,
-  systemPrompt: string,
-  task: string,
-  tools: string[],
-  startTime: number,
-  apiCallsMade: number,
-  toolsUsed: string[],
-  options: { temperature: number; maxTokens: number; debug: boolean }
-): Promise<RealAgentResult> {
-  const { debug, temperature, maxTokens } = options;
-  
-  // Generate tool definitions for Gemini
-  const geminiToolDefinitions = tools.map(tool => generateGeminiToolDefinition(tool));
-  
-  if (debug) {
-    console.log('Gemini Tool Definitions:', JSON.stringify(geminiToolDefinitions, null, 2));
-  }
-
-  // Gemini requires a different prompt structure for tool usage
-  const fullPrompt = `GPT-5 ENHANCED AGENT COORDINATION:
-  Apply advanced reasoning and strategic business intelligence.
-  
-  ${systemPrompt}
-
-GPT-5 REASONING FRAMEWORK:
-- Think through the business implications step-by-step
-- Consider optimization opportunities and strategic value
-- Apply advanced pattern recognition and business intelligence
-- Provide detailed rationale for your decisions
-
-When you need to use a tool, respond in the following format:
-
-<thinking>
-Your advanced GPT-5 reasoning: step-by-step analysis, business implications, strategic considerations, and optimization opportunities
-</thinking>
-
-<tool>
-{
-  "name": "tool_name",
-  "parameters": {
-    "param1": "value1",
-    "param2": "value2"
-  }
-}
-</tool>
-
-If you don't need to use a tool, respond without the <tool> tags.
-
-Here's your task: ${task}`;
-
-  if (debug) console.log('Gemini Prompt:', fullPrompt);
-
-  // Make Gemini API call
-  apiCallsMade++;
-  const geminiResponse = await realApiService.gemini.generateContent(
-    fullPrompt,
-    maxTokens,
-    temperature
-  );
-
-  if (!geminiResponse) {
-    throw new Error('No response from Gemini');
-  }
-
-  // Extract tool usage if present using regex pattern
-  const toolPattern = /<tool>([\s\S]*?)<\/tool>/g;
-  const thinkingPattern = /<thinking>([\s\S]*?)<\/thinking>/g;
-  
-  const toolMatches = [...geminiResponse.matchAll(toolPattern)];
-  const thinkingMatches = [...geminiResponse.matchAll(thinkingPattern)];
-  
-  // Extract thinking process if present
-  const thinking = thinkingMatches.length > 0 
-    ? thinkingMatches[0][1].trim()
-    : null;
-
-  // Clean the response by removing the special tags
-  let cleanedResponse = geminiResponse
-    .replace(toolPattern, '')
-    .replace(thinkingPattern, '')
-    .trim();
-
-  const executionResults: any[] = [];
-
-  // Process tool calls
-  for (const match of toolMatches) {
-    try {
-      const toolJson = match[1].trim();
-      const toolCall = JSON.parse(toolJson);
-      
-      const toolName = toolCall.name;
-      const parameters = toolCall.parameters;
-      
-      toolsUsed.push(toolName);
-      apiCallsMade++;
-
-      if (debug) {
-        console.log(`Executing Gemini tool: ${toolName}`);
-        console.log('Parameters:', parameters);
-      }
-
-      // Execute the tool call
-      const toolResult = await executeToolCall(toolName, parameters);
-      
-      executionResults.push({
-        tool: toolName,
-        parameters,
-        result: toolResult,
-        success: true
-      });
-
-    } catch (toolError) {
-      console.error('Tool execution failed:', toolError);
-      executionResults.push({
-        error: toolError instanceof Error ? toolError.message : 'Unknown error',
-        success: false
-      });
-    }
-  }
-
-  // If we have executed tools, make a follow-up call to summarize the results
-  if (executionResults.length > 0) {
-    const enhancedToolResultsPrompt = `${systemPrompt}
-
-ADVANCED RESULT SYNTHESIS:
-Apply sophisticated analysis to synthesize tool execution results into actionable intelligence.
-
-ORIGINAL TASK: ${task}
-
-TOOL EXECUTION RESULTS:
-${JSON.stringify(executionResults, null, 2)}
-
-SYNTHESIS REQUIREMENTS:
-Provide a comprehensive yet clear summary that includes:
-1. What was accomplished with specific business impact
-2. How results align with user objectives and expectations
-3. Quality assessment of the execution outcomes
-4. Strategic implications and opportunities identified
-5. Recommended next actions for value amplification
-6. Any insights or optimizations discovered during execution
-
-Use advanced reasoning to connect tactical execution to strategic business value.`;
-
-    apiCallsMade++;
-    const finalResponse = await realApiService.gemini.generateContent(
-      enhancedToolResultsPrompt,
-      qualityMode === 'accuracy' ? maxTokens * 1.3 : maxTokens,
-      qualityMode === 'accuracy' ? Math.max(0.1, temperature - 0.1) : temperature
-    );
-
-    cleanedResponse = finalResponse || cleanedResponse;
-  }
-
-  const executionTime = Date.now() - startTime;
-
-  return {
-    success: true,
-    agentName,
-    result: {
-      message: cleanedResponse,
-      thinking: thinking,
-      businessImpact: businessImpact,
-      toolExecutions: executionResults,
-      aiResponse: geminiResponse,
-      gpt5Enhanced: true,
-      qualityMode,
-      enhancedReasoning: thinking
-    },
-    executionTime,
-    apiCallsMade,
-    toolsUsed,
-    llmUsed: 'gemini'
-  };
-}
-
 // Execute a tool call with the appropriate service
 async function executeToolCall(toolName: string, parameters: any): Promise<any> {
   switch (toolName) {
@@ -465,7 +262,8 @@ async function executeToolCall(toolName: string, parameters: any): Promise<any> 
       
     default:
       // Generic Composio action
-      const [appName, actionName] = toolName.split('_');
+      const [appName, ...rest] = toolName.split('_');
+      const actionName = rest.join('_');
       return await realApiService.composio.executeAction(
         appName,
         actionName,
@@ -556,105 +354,6 @@ function generateOpenAIToolDefinition(toolName: string) {
         required: ['action']
       }
     }
-  };
-}
-
-// Generate tool definitions for Gemini (format is different from OpenAI)
-function generateGeminiToolDefinition(toolName: string) {
-  // Base definitions for common tools
-  const toolDefinitions: Record<string, any> = {
-    send_email: {
-      name: 'send_email',
-      description: 'Send an email via Gmail',
-      parameters: {
-        to: {
-          type: 'string',
-          description: 'Recipient email address'
-        },
-        subject: {
-          type: 'string',
-          description: 'Email subject'
-        },
-        body: {
-          type: 'string',
-          description: 'Email body content'
-        }
-      },
-      required: ['to', 'subject', 'body']
-    },
-    create_calendar_event: {
-      name: 'create_calendar_event',
-      description: 'Create a calendar event in Google Calendar',
-      parameters: {
-        title: {
-          type: 'string',
-          description: 'Event title'
-        },
-        startTime: {
-          type: 'string',
-          description: 'Start time (ISO format)'
-        },
-        endTime: {
-          type: 'string',
-          description: 'End time (ISO format)'
-        },
-        attendees: {
-          type: 'array',
-          description: 'Attendee email addresses',
-          items: {
-            type: 'string'
-          }
-        }
-      },
-      required: ['title', 'startTime', 'endTime']
-    },
-    send_slack_message: {
-      name: 'send_slack_message',
-      description: 'Send a message to a Slack channel',
-      parameters: {
-        channel: {
-          type: 'string',
-          description: 'Slack channel name or ID'
-        },
-        message: {
-          type: 'string',
-          description: 'Message content'
-        }
-      },
-      required: ['channel', 'message']
-    },
-    generate_speech: {
-      name: 'generate_speech',
-      description: 'Generate speech from text using ElevenLabs',
-      parameters: {
-        text: {
-          type: 'string',
-          description: 'Text to convert to speech'
-        },
-        voiceId: {
-          type: 'string',
-          description: 'Voice ID to use (optional)'
-        }
-      },
-      required: ['text']
-    }
-  };
-
-  // Return the definition for the tool or create a generic one
-  return toolDefinitions[toolName] || {
-    name: toolName,
-    description: `Execute ${toolName} action`,
-    parameters: {
-      action: {
-        type: 'string',
-        description: 'Action to perform'
-      },
-      parameters: {
-        type: 'object',
-        description: 'Action parameters'
-      }
-    },
-    required: ['action']
   };
 }
 

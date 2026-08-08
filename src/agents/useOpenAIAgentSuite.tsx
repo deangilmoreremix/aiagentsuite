@@ -1,20 +1,8 @@
-import OpenAI from "openai";
 import { realApiService } from "../services/realApiService";
 import { apiConfig, validateApiSetup } from "../config/apiConfig";
 
 // Initialize OpenAI client with error handling
 const validation = validateApiSetup();
-let openai: OpenAI | null = null;
-
-if (validation.canUseRealMode) {
-  openai = new OpenAI({ 
-    apiKey: apiConfig.openai.apiKey,
-    dangerouslyAllowBrowser: true 
-  });
-  console.log('✅ OpenAI client initialized with real API key');
-} else {
-  console.warn('⚠️ OpenAI API key not configured. Using demo mode.');
-}
 
 export const composioApps = [
   "gmail", "slack", "google_calendar", "zoom", "trello", "google_sheets",
@@ -24,7 +12,7 @@ export const composioApps = [
 
 export const composioAuthMap = Object.fromEntries(
   composioApps.map(app => [
-    `connect${app.replace(/(^|_)(\w)/g, (_, p1, p2) => p2.toUpperCase())}OAuth`,
+    `connect${app.replace(/(^|_)(\w)/g, (_, __, p2) => p2.toUpperCase())}OAuth`,
     async () => {
       try {
         if (apiConfig.composio.isConfigured) {
@@ -178,7 +166,7 @@ export async function runAgentForModule(agentName: string, task: string, app: st
   return await executeAgentWithTools(agentName, task, [app]);
 }
 
-function embedAgentResponseUI(toolsUsed: any, output: any) {
+function embedAgentResponseUI(_toolsUsed: any, output: any) {
   try {
     const container = document.querySelector("#agent-response-container");
     if (!container) {
@@ -223,11 +211,7 @@ function embedAgentResponseUI(toolsUsed: any, output: any) {
       emailBtn.innerText = "Send via Email";
       emailBtn.onclick = async () => {
         try {
-          await realApiService.composio.sendEmail({
-            to: "user@example.com",
-            subject: "Real AI Agent Response", 
-            body: content.innerText
-          });
+          await realApiService.composio.sendEmail("user@example.com", "Real AI Agent Response", content.innerText);
           alert("✅ Email sent via real API!");
         } catch (error) {
           alert("⚠️ Email send failed: " + error);

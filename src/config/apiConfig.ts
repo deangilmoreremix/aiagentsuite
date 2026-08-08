@@ -2,8 +2,8 @@
 export const apiConfig = {
   openai: {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-    defaultModel: 'gpt-5-main', // Updated for GPT-5
-    reasoningModel: 'gpt-5-thinking', // For complex reasoning tasks
+    defaultModel: 'gpt-4o', // Updated for GPT-4o
+    reasoningModel: 'o3-mini', // For complex reasoning tasks
     isConfigured: !!import.meta.env.VITE_OPENAI_API_KEY && 
                   import.meta.env.VITE_OPENAI_API_KEY !== 'your_openai_api_key_here' &&
                   import.meta.env.VITE_OPENAI_API_KEY.startsWith('sk-')

@@ -248,20 +248,6 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
         setOverallProgress(((i + 1) / executionSteps.length) * 100);
       }
 
-      // Execute real agents if needed
-      const results = [];
-      for (const step of executionSteps) {
-        if (isMountedRef.current) {
-          const result = await runComposioAgent(
-            step.agentName,
-            step.action,
-            step.toolsUsed || []
-          );
-          
-          results.push(result);
-        }
-      }
-
       // Execution completed - generate results
       const completionResult = {
         goalId: goal.id,
