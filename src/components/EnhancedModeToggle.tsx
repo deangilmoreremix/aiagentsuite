@@ -20,7 +20,7 @@ const EnhancedModeToggle: React.FC<EnhancedModeToggleProps> = ({
   const validation = {
     canUseRealMode: true, // This would come from your API config validation
     hasOpenAI: true,
-    hasComposio: false,
+    hasAgentTools: false,
     hasVoice: false
   };
 
@@ -167,11 +167,11 @@ const EnhancedModeToggle: React.FC<EnhancedModeToggleProps> = ({
               
               <div className="flex items-center justify-between p-2 bg-slate-700/30 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${validation.hasComposio ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
+                  <div className={`w-2 h-2 rounded-full ${validation.hasAgentTools ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
                   <span className="text-sm text-gray-300">OpenAI Agents</span>
                 </div>
-                <span className={`text-xs ${validation.hasComposio ? 'text-green-400' : 'text-yellow-400'}`}>
-                  {validation.hasComposio ? 'Connected' : 'Optional'}
+                <span className={`text-xs ${validation.hasAgentTools ? 'text-green-400' : 'text-yellow-400'}`}>
+                  {validation.hasAgentTools ? 'Connected' : 'Optional'}
                 </span>
               </div>
               

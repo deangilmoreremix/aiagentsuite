@@ -223,7 +223,7 @@ graph TB
     end
     
     subgraph "🔌 Integration Ecosystem"
-        Composio[Composio Platform<br/>🔗 50+ Integrations]
+        AgentsSDK[OpenAI Agents SDK<br/>🤖 Function Tools]
         Gmail[Gmail API<br/>📧 Email Processing]
         Calendar_API[Google Calendar<br/>📅 Scheduling]
         Slack[Slack API<br/>💬 Team Communication]
@@ -248,12 +248,12 @@ graph TB
     Voice_Agent --> Claude
     Email --> Custom
     
-    OpenAI --> Composio
+    OpenAI --> AgentsSDK
     Gemini --> Gmail
     Claude --> Calendar_API
     Custom --> Slack
     
-    Composio --> Supabase
+    AgentsSDK --> Supabase
     Gmail --> Vector
     Calendar_API --> Analytics
     Slack --> Cache
@@ -269,7 +269,7 @@ graph TB
 |----------------|-------------------|-------------------|----------------------|
 | **🧠 Cognitive Agents** | GPT-4o + Custom Training | Strategic thinking, planning | 94% decision accuracy |
 | **🗣️ Communication Agents** | Whisper + ElevenLabs | Voice, text, emotional intelligence | 97% sentiment accuracy |
-| **⚡ Execution Agents** | Composio + Real APIs | Tool integration, task execution | 98.2% success rate |
+| **⚡ Execution Agents** | OpenAI Agents SDK + Real APIs | Tool integration, task execution | 98.2% success rate |
 | **📊 Analysis Agents** | Custom ML + Vector DB | Data analysis, predictions | 91% forecast accuracy |
 | **🔄 Orchestration Agents** | Event-driven architecture | Workflow coordination | 99.1% uptime |
 
@@ -324,8 +324,8 @@ npm run build && npm run deploy
 
 | **Priority** | **Service** | **Setup Time** | **Business Impact** | **Complexity** |
 |-------------|-------------|----------------|-------------------|---------------|
-| 🔴 **Critical** | OpenAI GPT-4 | 2 min | Core AI functionality | ⭐ Simple |
-| 🟠 **High** | Composio Platform | 3 min | Tool integrations | ⭐⭐ Easy |
+| 🔴 **Critical** | OpenAI GPT-4o | 2 min | Core AI functionality | ⭐ Simple |
+| 🟠 **High** | OpenAI Agents SDK | 3 min | Tool integrations | ⭐⭐ Easy |
 | 🟡 **Medium** | Supabase Database | 5 min | Data persistence | ⭐⭐ Easy |
 | 🟢 **Optional** | ElevenLabs Voice | 2 min | Voice features | ⭐ Simple |
 
@@ -351,13 +351,15 @@ cp .env.example .env
 #### **Step 2: Core AI Configuration** *(3 minutes)*
 
 ```env
-# 🤖 OpenAI - Required for AI agents
+# 🤖 OpenAI - Required for AI agents (OpenAI Agents SDK)
 VITE_OPENAI_API_KEY=sk-your-openai-key-here
 # Get key: https://platform.openai.com/api-keys
+# Docs: https://platform.openai.com/docs/guides/agents
 
-# 🔗 Composio - Required for tool integrations  
-VITE_COMPOSIO_API_KEY=your-composio-key-here
-# Get key: https://app.composio.dev/
+# 🧠 Model override (optional) - Defaults to gpt-4o
+VITE_OPENAI_MODEL=gpt-4o
+# Reasoning model override (optional) - Defaults to gpt-4o
+# VITE_OPENAI_REASONING_MODEL=gpt-4o
 
 # 🎙️ ElevenLabs - Optional for voice features
 VITE_ELEVENLABS_API_KEY=your-elevenlabs-key-here
@@ -557,18 +559,35 @@ ai_technologies:
     emotion_detection: "Custom ML Models"
     
   integrations:
-    platform: "Composio (50+ tools)"
-    email: "Gmail API, Outlook API"
-    calendar: "Google Calendar, Outlook Calendar"
-    communication: "Slack, Microsoft Teams"
+    platform: "OpenAI Agents SDK (function tools)"
+    email: "Gmail API, Outlook API (recorded as CRM activity)"
+    calendar: "Google Calendar, Outlook Calendar (recorded as CRM activity)"
+    communication: "Slack, Microsoft Teams (recorded as CRM activity)"
     crm: "HubSpot, Salesforce, Pipedrive"
     
-  data_layer:
-    primary_db: "Supabase PostgreSQL"
-    vector_db: "Pinecone / Chroma"
-    cache: "Redis"
-    cdn: "Cloudflare"
-```
+   data_layer:
+     primary_db: "Supabase PostgreSQL"
+     vector_db: "Pinecone / Chroma"
+     cache: "Redis"
+     cdn: "Cloudflare"
+ ```
+
+### 🛠️ **Agent Tools (OpenAI Agents SDK)**
+
+The agent runtime is the [OpenAI Agents SDK](https://platform.openai.com/docs/guides/agents). It initializes the default client (`setDefaultOpenAIClient` with `dangerouslyAllowBrowser`) and runs an `Agent` built with the CRM function tools defined in `src/agents/crmTools.ts`.
+
+| Tool | Purpose | Behavior |
+|------|---------|----------|
+| `send_email` | Send an email message | Records a CRM activity (no external Gmail provider is wired) |
+| `create_calendar_event` | Create a calendar event | Records a CRM activity (no external calendar provider is wired) |
+| `send_slack_message` | Send a Slack message | Records a CRM activity (no external Slack provider is wired) |
+| `create_contact` | Create a CRM contact | Acts on Supabase when configured |
+| `update_contact` | Update a CRM contact | Acts on Supabase when configured |
+| `create_deal` | Create a deal/opportunity | Acts on Supabase when configured |
+| `log_activity` | Log a CRM activity | Acts on Supabase when configured |
+| `search_contacts` | Search CRM contacts | Reads from Supabase when configured |
+
+> **Note:** `send_email`, `create_calendar_event`, and `send_slack_message` currently record a CRM activity only — Composio was removed, so no external Gmail/Slack/Calendar provider is wired. The CRM-data tools (contacts, deals, activities) act on Supabase when `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are configured; otherwise they fall back to demo/in-memory data. The default model is `gpt-4o` (override with `VITE_OPENAI_MODEL`); the reasoning model defaults to `gpt-4o` (override with `VITE_OPENAI_REASONING_MODEL`).
 
 ### 🚀 **Performance Optimization**
 
@@ -823,7 +842,7 @@ timeline
                             : White-label options
 
     section Q2 2025
-        AI Model Evolution  : GPT-5 integration
+        AI Model Evolution  : OpenAI Agents SDK (gpt-4o) integration
                             : Custom model training
                             : Domain-specific agents
                             
@@ -1108,7 +1127,7 @@ privacy_policy:
 | **Partner** | **Technology** | **Integration** | **Impact** |
 |-------------|---------------|----------------|------------|
 | **🤖 OpenAI** | GPT-4o Language Model | Core AI Intelligence | Revolutionary AI capabilities |
-| **🔗 Composio** | Integration Platform | 50+ Tool Connections | Seamless tool ecosystem |
+| **🛠️ OpenAI Agents SDK** | Agent Runtime & Function Tools | Tool Execution | Autonomous task execution |
 | **🗄️ Supabase** | Backend Platform | Database & Auth | Scalable infrastructure |
 | **🎙️ ElevenLabs** | Voice Synthesis | Natural Speech | Human-like interactions |
 | **⚛️ React Team** | Frontend Framework | UI Development | Modern user experience |

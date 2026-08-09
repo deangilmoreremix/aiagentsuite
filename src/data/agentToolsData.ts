@@ -1,4 +1,4 @@
-export interface ComposioTool {
+export interface AgentTool {
   id: string;
   name: string;
   category: string;
@@ -11,7 +11,7 @@ export interface ComposioTool {
   authType?: 'oauth' | 'apiKey' | 'both';
 }
 
-export interface ComposioToolCategory {
+export interface AgentToolCategory {
   id: string;
   name: string;
   description: string;
@@ -21,7 +21,7 @@ export interface ComposioToolCategory {
 }
 
 // Tool categories
-export const composioToolCategories: ComposioToolCategory[] = [
+export const agentToolCategories: AgentToolCategory[] = [
   {
     id: 'email',
     name: 'Email & Communication',
@@ -107,7 +107,7 @@ export const composioToolCategories: ComposioToolCategory[] = [
 // Comprehensive list of OpenAI Agents tool integrations
 // Backed by the Agents SDK CRM tools: send_email, create_calendar_event,
 // send_slack_message, create_contact, create_deal, log_activity, search_contacts
-export const composioTools: ComposioTool[] = [
+export const agentTools: AgentTool[] = [
   // Email & Communication
   {
     id: 'gmail',
@@ -712,30 +712,30 @@ export const composioTools: ComposioTool[] = [
 // Helper functions
 
 // Get tools by category
-export const getToolsByCategory = (categoryId: string): ComposioTool[] => {
-  if (categoryId === 'all') return composioTools;
-  return composioTools.filter(tool => tool.category === categoryId);
+export const getToolsByCategory = (categoryId: string): AgentTool[] => {
+  if (categoryId === 'all') return agentTools;
+  return agentTools.filter(tool => tool.category === categoryId);
 };
 
 // Get tools by status
-export const getToolsByStatus = (status: 'active' | 'coming-soon'): ComposioTool[] => {
-  return composioTools.filter(tool => tool.status === status);
+export const getToolsByStatus = (status: 'active' | 'coming-soon'): AgentTool[] => {
+  return agentTools.filter(tool => tool.status === status);
 };
 
 // Get popular tools (top N by popularity score)
-export const getPopularTools = (limit = 10): ComposioTool[] => {
-  return [...composioTools]
+export const getPopularTools = (limit = 10): AgentTool[] => {
+  return [...agentTools]
     .filter(tool => tool.status === 'active')
     .sort((a, b) => (b.popularityScore || 0) - (a.popularityScore || 0))
     .slice(0, limit);
 };
 
 // Search tools by name or description
-export const searchTools = (query: string): ComposioTool[] => {
-  if (!query) return composioTools;
+export const searchTools = (query: string): AgentTool[] => {
+  if (!query) return agentTools;
   
   const lowercaseQuery = query.toLowerCase();
-  return composioTools.filter(
+  return agentTools.filter(
     tool => 
       tool.name.toLowerCase().includes(lowercaseQuery) || 
       tool.description.toLowerCase().includes(lowercaseQuery)

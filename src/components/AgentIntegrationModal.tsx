@@ -16,17 +16,17 @@ import {
   Link as LinkIcon,
   HelpCircle
 } from 'lucide-react';
-import { composioTools, composioToolCategories, getToolsByCategory, searchTools, ComposioTool } from '../data/composioToolsData';
+import { agentTools, agentToolCategories, getToolsByCategory, searchTools, AgentTool } from '../data/agentToolsData';
 import { apiConfig } from '../config/apiConfig';
 import Tooltip from './Tooltip';
 
-interface ComposioIntegrationModalProps {
+interface AgentIntegrationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onToolSelect?: (tool: ComposioTool) => void;
+  onToolSelect?: (tool: AgentTool) => void;
 }
 
-const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
+const AgentIntegrationModal: React.FC<AgentIntegrationModalProps> = ({
   isOpen,
   onClose,
   onToolSelect
@@ -37,13 +37,13 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
   const [popularOnly, setPopularOnly] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<Record<string, boolean>>({});
   const [isConnecting, setIsConnecting] = useState<Record<string, boolean>>({});
-  const [selectedTool, setSelectedTool] = useState<ComposioTool | null>(null);
+  const [selectedTool, setSelectedTool] = useState<AgentTool | null>(null);
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const searchInputRef = useRef<HTMLInputElement>(null);
   
   // Filter tools based on current filters
   const filteredTools = (() => {
-    let filtered = composioTools;
+    let filtered = agentTools;
     
     // Apply category filter
     if (selectedCategory !== 'all') {
@@ -69,7 +69,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
   })();
   
   // Categories with counts
-  const categoriesWithCounts = composioToolCategories.map(category => ({
+  const categoriesWithCounts = agentToolCategories.map(category => ({
     ...category,
     currentCount: getToolsByCategory(category.id).length,
     filteredCount: getToolsByCategory(category.id).filter(tool => {
@@ -106,7 +106,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
   }, [onClose, selectedTool]);
 
   // Simulate connecting to tool
-  const handleConnectTool = async (tool: ComposioTool) => {
+  const handleConnectTool = async (tool: AgentTool) => {
     if (isConnecting[tool.id]) return;
 
     setIsConnecting(prev => ({ ...prev, [tool.id]: true }));
@@ -216,7 +216,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
                     </div>
                     
                     <div className="text-blue-400 mb-6">
-                      {composioToolCategories.find(c => c.id === selectedTool.category)?.name}
+                      {agentToolCategories.find(c => c.id === selectedTool.category)?.name}
                     </div>
                     
                     <p className="text-gray-300 text-lg mb-6 leading-relaxed">
@@ -508,7 +508,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
 
             {/* Results Count */}
             <div className="mb-6 text-gray-300">
-              Showing <span className="font-semibold text-white">{filteredTools.length}</span> of {composioTools.length} integrations
+              Showing <span className="font-semibold text-white">{filteredTools.length}</span> of {agentTools.length} integrations
               {searchQuery && <span> matching "<span className="text-blue-400">{searchQuery}</span>"</span>}
             </div>
 
@@ -560,7 +560,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
                     
                     <h3 className="text-lg font-semibold text-white mb-1">{tool.name}</h3>
                     <div className="text-blue-400 text-sm mb-2">
-                      {composioToolCategories.find(c => c.id === tool.category)?.name}
+                      {agentToolCategories.find(c => c.id === tool.category)?.name}
                     </div>
                     <p className="text-gray-300 text-sm mb-3 line-clamp-2">
                       {tool.description}
@@ -621,7 +621,7 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
                       </div>
                       
                       <div className="text-blue-400 text-sm">
-                        {composioToolCategories.find(c => c.id === tool.category)?.name}
+                        {agentToolCategories.find(c => c.id === tool.category)?.name}
                       </div>
                       
                       {tool.status === 'active' && (
@@ -675,4 +675,4 @@ const ComposioIntegrationModal: React.FC<ComposioIntegrationModalProps> = ({
   );
 };
 
-export default ComposioIntegrationModal;
+export default AgentIntegrationModal;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, ExternalLink, Globe } from 'lucide-react';
-import ComposioIntegrationModal from './ComposioIntegrationModal';
+import AgentIntegrationModal from './AgentIntegrationModal';
 import Tooltip from './Tooltip';
 
 const integrations = [
@@ -244,7 +244,7 @@ const Integrations = () => {
       </div>
 
       {/* OpenAI Agents Integration Modal */}
-      <ComposioIntegrationModal 
+      <AgentIntegrationModal 
         isOpen={showAllIntegrations} 
         onClose={() => setShowAllIntegrations(false)}
       />

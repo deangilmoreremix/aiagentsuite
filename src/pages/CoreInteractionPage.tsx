@@ -7,7 +7,7 @@ import CRMWorkspace from '../components/CRMWorkspace';
 import Footer from '../components/Footer';
 import HowToUse from '../components/HowToUse';
 import ApiSetupGuide from '../components/ApiSetupGuide';
-import ComposioIntegrationModal from '../components/ComposioIntegrationModal';
+import AgentIntegrationModal from '../components/AgentIntegrationModal';
 import { getDefaultMode, logApiStatus } from '../config/apiConfig';
 import {
   ArrowRight,
@@ -26,7 +26,7 @@ const CoreInteractionPage = () => {
   const [globalRealMode, setGlobalRealMode] = useState(false);
   const [showHowToUse, setShowHowToUse] = useState(false);
   const [showApiSetup, setShowApiSetup] = useState(false);
-  const [showComposioModal, setShowComposioModal] = useState(false);
+  const [showAgentModal, setShowAgentModal] = useState(false);
   const [hasError, setHasError] = useState(false);
   const isMountedRef = useRef(true);
 
@@ -133,7 +133,7 @@ const CoreInteractionPage = () => {
 
         <Tooltip content="View all integrations" position="bottom">
           <button
-            onClick={() => setShowComposioModal(true)}
+            onClick={() => setShowAgentModal(true)}
             className="p-3 rounded-xl bg-purple-500/20 dark:bg-purple-400/20 border border-purple-400/30 dark:border-purple-300/30 text-purple-600 dark:text-purple-200 hover:bg-purple-500/30 dark:hover:bg-purple-400/30 transition-all duration-300"
           >
             <Globe className="h-5 w-5" />
@@ -360,9 +360,9 @@ const CoreInteractionPage = () => {
         }}
       />
 
-      <ComposioIntegrationModal
-        isOpen={showComposioModal}
-        onClose={() => setShowComposioModal(false)}
+      <AgentIntegrationModal
+        isOpen={showAgentModal}
+        onClose={() => setShowAgentModal(false)}
       />
     </div>
   );

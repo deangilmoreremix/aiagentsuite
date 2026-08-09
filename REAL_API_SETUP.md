@@ -14,14 +14,17 @@ This guide will help you configure your AI Agent Suite to use real APIs instead 
   4. Copy the key (starts with `sk-`)
   5. Add to `.env`: `VITE_OPENAI_API_KEY=sk-your-key-here`
 
-### 2. Composio API Key (Required)
-- **Purpose**: Enables tool integrations (Gmail, Calendar, Slack, etc.)
-- **Get it from**: https://app.composio.dev/
+### 2. OpenAI Agents SDK (Required)
+- **Purpose**: Powers all AI agent intelligence, tool execution, and natural language processing via the OpenAI Agents SDK
+- **Get it from**: https://platform.openai.com/api-keys
+- **Docs**: https://platform.openai.com/docs/guides/agents
 - **Steps**:
-  1. Sign up for Composio account
+  1. Sign up for an OpenAI account
   2. Navigate to API Keys section
-  3. Generate a new API key
-  4. Add to `.env`: `VITE_COMPOSIO_API_KEY=your-composio-key`
+  3. Create a new secret key
+  4. Copy the key (starts with `sk-`)
+  5. Add to `.env`: `VITE_OPENAI_API_KEY=sk-your-key-here`
+- **Model**: Defaults to `gpt-4o`. Override with `VITE_OPENAI_MODEL` (e.g. `gpt-4o-mini`). The reasoning model defaults to `gpt-4o` and can be overridden with `VITE_OPENAI_REASONING_MODEL`.
 
 ### 3. ElevenLabs API Key (Optional)
 - **Purpose**: AI voice generation and text-to-speech
@@ -53,13 +56,12 @@ This guide will help you configure your AI Agent Suite to use real APIs instead 
 
 2. **Fill in your API keys**:
    ```env
-   # OpenAI - Required for AI agents
-   VITE_OPENAI_API_KEY=sk-your-openai-key
+    # OpenAI - Required for AI agents (OpenAI Agents SDK)
+    VITE_OPENAI_API_KEY=sk-your-openai-key
+    # Optional model override (defaults to gpt-4o)
+    VITE_OPENAI_MODEL=gpt-4o
 
-   # Composio - Required for tool integrations  
-   VITE_COMPOSIO_API_KEY=your-composio-key
-
-   # ElevenLabs - Optional for voice features
+    # ElevenLabs - Optional for voice features
    VITE_ELEVENLABS_API_KEY=your-elevenlabs-key
 
    # Supabase - Required for CRM data
@@ -75,30 +77,24 @@ This guide will help you configure your AI Agent Suite to use real APIs instead 
    npm run dev
    ```
 
-## 🔧 Tool Integrations via Composio
+## 🔧 Agent Tool Integrations (OpenAI Agents SDK)
 
-Once you have Composio configured, you can connect these tools:
+The agent runtime is the OpenAI Agents SDK (`src/agents/openaiAgents.ts`). It builds an `Agent` with the CRM function tools defined in `src/agents/crmTools.ts` and runs it. See https://platform.openai.com/docs/guides/agents for the SDK model and tool concepts.
 
-### Core Integrations
-- **Gmail**: Email sending/receiving
-- **Google Calendar**: Meeting scheduling  
-- **Slack**: Team communication
-- **Zoom**: Video meetings
-- **Google Sheets**: Data management
+The following function tools are available to the agent:
 
-### Business Tools
-- **HubSpot/Salesforce**: CRM integration
-- **Stripe**: Payment processing
-- **Shopify**: E-commerce
-- **Trello**: Project management
-- **Typeform**: Form management
+| Tool | Purpose | Behavior |
+|------|---------|----------|
+| `send_email` | Send an email message | Records a CRM activity (no external Gmail provider is wired) |
+| `create_calendar_event` | Create a calendar event | Records a CRM activity (no external calendar provider is wired) |
+| `send_slack_message` | Send a Slack message | Records a CRM activity (no external Slack provider is wired) |
+| `create_contact` | Create a CRM contact | Acts on Supabase when configured |
+| `update_contact` | Update a CRM contact | Acts on Supabase when configured |
+| `create_deal` | Create a deal/opportunity | Acts on Supabase when configured |
+| `log_activity` | Log a CRM activity | Acts on Supabase when configured |
+| `search_contacts` | Search CRM contacts | Reads from Supabase when configured |
 
-### Setup Process
-1. Go to Composio dashboard
-2. Navigate to "Integrations" 
-3. Connect each tool you want to use
-4. Grant necessary permissions
-5. Tools will appear in your agent execution options
+> **Note:** `send_email`, `create_calendar_event`, and `send_slack_message` currently record a CRM activity only — Composio was removed, so no external Gmail/Slack/Calendar provider is wired. The CRM-data tools (contacts, deals, activities) act on Supabase when `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are configured; otherwise they fall back to demo/in-memory data.
 
 ## 🚀 Switching to Live Mode
 
@@ -120,12 +116,10 @@ Once your APIs are configured:
 
 ### Rate Limits
 - OpenAI: Depends on your plan (usually 3-60 RPM)
-- Composio: Check your plan limits
 - ElevenLabs: Free tier has monthly character limits
 
 ### Costs
 - **OpenAI**: ~$0.002 per agent execution
-- **Composio**: Free tier includes 1000 actions/month
 - **ElevenLabs**: Free tier includes 10,000 characters/month
 - **Supabase**: Free tier includes 500MB database
 
@@ -142,9 +136,9 @@ Once your APIs are configured:
 - Consider adding delays between rapid executions
 
 ### Tool connection failures
-- Verify Composio account has connected integrations
-- Check tool permissions are granted properly
-- Some tools require OAuth setup in Composio dashboard
+- Verify `VITE_OPENAI_API_KEY` is valid and starts with `sk-`
+- Check the browser console for OpenAI Agents SDK client initialization errors
+- Confirm Supabase is configured when CRM-data tools report failures
 
 ### Connection test failures
 - Check internet connection
@@ -157,11 +151,6 @@ Once your APIs are configured:
 - Monitor at: https://platform.openai.com/usage
 - Track costs and requests per model
 - Set usage limits to avoid surprises
-
-### Composio Usage  
-- Check dashboard for action counts
-- Monitor connected tool usage
-- Upgrade plan as needed
 
 ## 🎯 Best Practices
 

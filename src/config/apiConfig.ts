@@ -2,8 +2,8 @@
 export const apiConfig = {
   openai: {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-    defaultModel: 'gpt-5-main', // Updated for GPT-5
-    reasoningModel: 'gpt-5-thinking', // For complex reasoning tasks
+    defaultModel: import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o',
+    reasoningModel: import.meta.env.VITE_OPENAI_REASONING_MODEL || 'gpt-4o',
     isConfigured: !!import.meta.env.VITE_OPENAI_API_KEY && 
                   import.meta.env.VITE_OPENAI_API_KEY !== 'your_openai_api_key_here' &&
                   import.meta.env.VITE_OPENAI_API_KEY.startsWith('sk-')
@@ -50,8 +50,8 @@ export const validateApiSetup = () => {
     isValid: issues.length === 0,
     issues,
     warnings,
-    // At least one LLM provider is required for real mode
-    canUseRealMode: apiConfig.openai.isConfigured || apiConfig.gemini.isConfigured,
+    // Real mode runs on OpenAI (Agents SDK and all LLM calls)
+    canUseRealMode: apiConfig.openai.isConfigured,
     hasOpenAI: apiConfig.openai.isConfigured,
     hasGemini: apiConfig.gemini.isConfigured,
     hasVoice: apiConfig.elevenlabs.isConfigured,
