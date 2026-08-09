@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { Agent, run, setDefaultOpenAIClient } from '@openai/agents';
+import { Agent, run, setDefaultOpenAIClient, MCPServerSSE, type MCPServer } from '@openai/agents';
 import { apiConfig } from '../config/apiConfig';
 import { crmTools } from './crmTools';
 
@@ -17,6 +17,30 @@ if (apiConfig.openai.isConfigured && apiConfig.openai.apiKey) {
     console.warn('OpenAI Agents SDK client initialization failed:', error);
   }
 }
+
+/**
+ * Remote MCP servers made available to every agent built in this module.
+ *
+ * When `VITE_MCP_SERVER_URL` is set, the MCP server is expected to provide the
+ * external-action capabilities (email / calendar / slack). `crmTools` drops its
+ * local stand-ins for those actions in that case, so the model sees exactly one
+ * implementation of each capability.
+ *
+ * Note: `MCPServerSSEOptions` has no `headers` field. The SSE transport takes
+ * custom headers via `requestInit`, which the MCP client applies both to the
+ * initial SSE stream request and to the follow-up JSON-RPC POSTs.
+ */
+const mcpServers: MCPServer[] = apiConfig.mcp.isConfigured
+  ? [
+      new MCPServerSSE({
+        name: apiConfig.mcp.name,
+        url: apiConfig.mcp.url,
+        ...(apiConfig.mcp.token
+          ? { requestInit: { headers: { Authorization: `Bearer ${apiConfig.mcp.token}` } } }
+          : {})
+      })
+    ]
+  : [];
 
 function resolveModel(): string {
   const configured = apiConfig.openai.defaultModel;
@@ -52,7 +76,8 @@ export async function runAgentWithTools(params: {
     name,
     instructions,
     model: model ?? resolveModel(),
-    tools: tools ? crmTools : []
+    tools: tools ? crmTools : [],
+    mcpServers
   });
 
   const result = await run(agent, input);
@@ -133,7 +158,8 @@ function collectToolCalls(newItems: unknown): AgentToolCall[] {
 /**
  * Streaming counterpart to {@link runAgentWithTools}.
  *
- * Builds the exact same `Agent` (same model resolution + `crmTools`) but runs it
+ * Builds the exact same `Agent` (same model resolution + `crmTools` +
+ * `mcpServers`) but runs it
  * with the SDK's streaming mode: `run(agent, input, { stream: true })` resolves
  * to a `StreamedRunResult`, which is an `AsyncIterable<RunStreamEvent>`.
  *
@@ -156,7 +182,8 @@ export async function runAgentWithToolsStreaming(params: {
     name,
     instructions,
     model: model ?? resolveModel(),
-    tools: tools ? crmTools : []
+    tools: tools ? crmTools : [],
+    mcpServers
   });
 
   const stream = await run(agent, input, { stream: true });

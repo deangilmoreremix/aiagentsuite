@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Goal } from '../types/goals';
 import { runAgent } from '../agents/agentRunner';
+import { runAgentWithToolsStreaming } from '../agents/openaiAgents';
 import CRMWorkspace from './CRMWorkspace';
 import Tooltip from './Tooltip';
 import {
@@ -68,6 +69,9 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
   const [showCRMView, setShowCRMView] = useState(true);
   const [goalResults, setGoalResults] = useState<any>(null);
   const [showHelp, setShowHelp] = useState(false);
+  // Progressive output for the step that is currently streaming from the agent.
+  const [streamingStepId, setStreamingStepId] = useState<string | null>(null);
+  const [streamingText, setStreamingText] = useState('');
 
   const isMountedRef = useRef(true);
 
@@ -175,31 +179,54 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
         }));
 
         if (realMode) {
-          // Execute real agents
+          // Execute real agents with streaming output
           try {
-            const result = await runAgent(
-              step.agentName,
-              `Goal: ${goal.title}. Task: ${step.action}`,
-              step.toolsUsed || goal.toolsNeeded
-            );
+            const stepTools = step.toolsUsed || goal.toolsNeeded;
+
+            setStreamingStepId(step.id);
+            setStreamingText('');
+
+            let streamedText = '';
+            const result = await runAgentWithToolsStreaming({
+              name: step.agentName,
+              instructions: `You are ${step.agentName}. Your task: ${step.action}. Available tools: ${stepTools.join(', ')}.
+                Use the available tools when the task requires external actions and provide a clear final answer.`,
+              input: `Goal: ${goal.title}. Task: ${step.action}`,
+              tools: stepTools.length > 0,
+              onText: (delta) => {
+                streamedText += delta;
+                if (isMountedRef.current) {
+                  setStreamingText(streamedText);
+                }
+              }
+            });
+
+            const finalOutput = result.output || streamedText;
+            const invokedTools = result.toolCalls.map(call => call.name).filter(Boolean);
 
             setExecutionSteps(prev => prev.map((s, index) => 
               index === i ? { 
                 ...s, 
                 status: 'completed', 
                 completionTime: new Date(),
-                result: result.success ? result.result : result.error,
+                result: finalOutput,
+                toolsUsed: Array.from(new Set([...(s.toolsUsed ?? []), ...invokedTools])),
                 thinking: `Successfully executed ${step.agentName} with real tools and APIs`
               } : s
             ));
+            setStreamingStepId(null);
+            setStreamingText('');
 
             setLiveActivity(prev => [
-              `✅ ${step.agentName}: ${result.success ? 'Completed successfully' : 'Completed with issues'}`,
+              `✅ ${step.agentName}: ${finalOutput ? 'Completed successfully' : 'Completed with issues'}`,
               `💼 Real business impact: ${step.crmImpact}`,
               ...prev.slice(0, 8)
             ]);
 
           } catch (error) {
+            setStreamingStepId(null);
+            setStreamingText('');
+
             setExecutionSteps(prev => prev.map((s, index) => 
               index === i ? { 
                 ...s, 
@@ -609,6 +636,20 @@ const LiveGoalExecution: React.FC<LiveGoalExecutionProps> = ({
                       </div>
 
                       <p className="text-gray-300 mb-3">{step.action}</p>
+
+                      {/* Live streamed agent output */}
+                      {streamingStepId === step.id && streamingText && (
+                        <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-3 mb-3">
+                          <div className="text-xs font-medium text-blue-400 mb-1 flex items-center gap-2">
+                            <Activity className="h-3 w-3" />
+                            Streaming output:
+                          </div>
+                          <div className="text-sm text-gray-200 whitespace-pre-wrap">
+                            {streamingText}
+                            <span className="inline-block w-1.5 h-4 ml-1 align-middle bg-blue-400 animate-pulse" />
+                          </div>
+                        </div>
+                      )}
 
                       {/* CRM Impact */}
                       {step.crmImpact && (

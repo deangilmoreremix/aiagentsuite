@@ -1,10 +1,15 @@
 import { tool } from '@openai/agents';
 import { z } from 'zod';
+import { apiConfig } from '../config/apiConfig';
 import { supabaseService } from '../services/supabaseClient';
 
 // CRM-domain function tools implemented on top of the OpenAI Agents SDK.
 // External channels (email / calendar / slack) are recorded as CRM activities
 // since this build has no external provider; data actions hit Supabase when configured.
+//
+// When an MCP server is configured (`apiConfig.mcp.isConfigured`), those three
+// external actions are fulfilled by the MCP server's tools instead and are
+// therefore omitted from the exported `crmTools` array.
 
 async function recordActivity(type: string, title: string, description: string) {
   if (supabaseService.isAvailable()) {
@@ -94,102 +99,125 @@ async function doSearchContacts(p: { query: string }) {
   return { results: matches };
 }
 
+// External-action tools. These are local stand-ins that only record a CRM
+// activity, so they are offered to the model ONLY when no MCP server is
+// configured. When `apiConfig.mcp.isConfigured` is true the MCP server provides
+// the real email / calendar / slack capabilities and these are left out of
+// `crmTools` to avoid shadowing them with duplicate tool names.
+const sendEmailTool = tool({
+  name: 'send_email',
+  description: 'Send an email message to a recipient (recorded as a CRM activity).',
+  parameters: z.object({
+    to: z.string(),
+    subject: z.string(),
+    body: z.string()
+  }),
+  async execute(p) {
+    return doSendEmail(p);
+  }
+});
+
+const createCalendarEventTool = tool({
+  name: 'create_calendar_event',
+  description: 'Create a calendar event.',
+  parameters: z.object({
+    title: z.string(),
+    startTime: z.string(),
+    endTime: z.string(),
+    attendees: z.array(z.string()).optional()
+  }),
+  async execute(p) {
+    return doCreateCalendarEvent(p);
+  }
+});
+
+const sendSlackMessageTool = tool({
+  name: 'send_slack_message',
+  description: 'Send a message to a Slack channel.',
+  parameters: z.object({
+    channel: z.string(),
+    message: z.string()
+  }),
+  async execute(p) {
+    return doSendSlackMessage(p);
+  }
+});
+
+// Local CRM-data tools. Always available — the MCP server does not own CRM data.
+const createContactTool = tool({
+  name: 'create_contact',
+  description: 'Create a new contact in the CRM.',
+  parameters: z.object({
+    first_name: z.string(),
+    last_name: z.string(),
+    email: z.string().optional(),
+    company: z.string().optional()
+  }),
+  async execute(p) {
+    return doCreateContact(p);
+  }
+});
+
+const updateContactTool = tool({
+  name: 'update_contact',
+  description: 'Update an existing contact.',
+  parameters: z.object({
+    id: z.string(),
+    updates: z.record(z.string(), z.any())
+  }),
+  async execute(p) {
+    return doUpdateContact(p);
+  }
+});
+
+const createDealTool = tool({
+  name: 'create_deal',
+  description: 'Create a new deal/opportunity in the CRM.',
+  parameters: z.object({
+    title: z.string(),
+    value: z.number().optional(),
+    customer_id: z.string().optional()
+  }),
+  async execute(p) {
+    return doCreateDeal(p);
+  }
+});
+
+const logActivityTool = tool({
+  name: 'log_activity',
+  description: 'Log a CRM activity.',
+  parameters: z.object({
+    customer_id: z.string(),
+    type: z.string(),
+    title: z.string(),
+    description: z.string().optional()
+  }),
+  async execute(p) {
+    return doLogActivity(p);
+  }
+});
+
+const searchContactsTool = tool({
+  name: 'search_contacts',
+  description: 'Search contacts in the CRM by name, email, or company.',
+  parameters: z.object({
+    query: z.string()
+  }),
+  async execute(p) {
+    return doSearchContacts(p);
+  }
+});
+
 export const crmTools = [
-  tool({
-    name: 'send_email',
-    description: 'Send an email message to a recipient (recorded as a CRM activity).',
-    parameters: z.object({
-      to: z.string(),
-      subject: z.string(),
-      body: z.string()
-    }),
-    async execute(p) {
-      return doSendEmail(p);
-    }
-  }),
-  tool({
-    name: 'create_calendar_event',
-    description: 'Create a calendar event.',
-    parameters: z.object({
-      title: z.string(),
-      startTime: z.string(),
-      endTime: z.string(),
-      attendees: z.array(z.string()).optional()
-    }),
-    async execute(p) {
-      return doCreateCalendarEvent(p);
-    }
-  }),
-  tool({
-    name: 'send_slack_message',
-    description: 'Send a message to a Slack channel.',
-    parameters: z.object({
-      channel: z.string(),
-      message: z.string()
-    }),
-    async execute(p) {
-      return doSendSlackMessage(p);
-    }
-  }),
-  tool({
-    name: 'create_contact',
-    description: 'Create a new contact in the CRM.',
-    parameters: z.object({
-      first_name: z.string(),
-      last_name: z.string(),
-      email: z.string().optional(),
-      company: z.string().optional()
-    }),
-    async execute(p) {
-      return doCreateContact(p);
-    }
-  }),
-  tool({
-    name: 'update_contact',
-    description: 'Update an existing contact.',
-    parameters: z.object({
-      id: z.string(),
-      updates: z.record(z.string(), z.any())
-    }),
-    async execute(p) {
-      return doUpdateContact(p);
-    }
-  }),
-  tool({
-    name: 'create_deal',
-    description: 'Create a new deal/opportunity in the CRM.',
-    parameters: z.object({
-      title: z.string(),
-      value: z.number().optional(),
-      customer_id: z.string().optional()
-    }),
-    async execute(p) {
-      return doCreateDeal(p);
-    }
-  }),
-  tool({
-    name: 'log_activity',
-    description: 'Log a CRM activity.',
-    parameters: z.object({
-      customer_id: z.string(),
-      type: z.string(),
-      title: z.string(),
-      description: z.string().optional()
-    }),
-    async execute(p) {
-      return doLogActivity(p);
-    }
-  }),
-  tool({
-    name: 'search_contacts',
-    description: 'Search contacts in the CRM by name, email, or company.',
-    parameters: z.object({
-      query: z.string()
-    }),
-    async execute(p) {
-      return doSearchContacts(p);
-    }
-  })
+  // Email / calendar / slack are fulfilled by the MCP server when one is configured.
+  ...(apiConfig.mcp.isConfigured
+    ? []
+    : [sendEmailTool, createCalendarEventTool, sendSlackMessageTool]),
+  createContactTool,
+  updateContactTool,
+  createDealTool,
+  logActivityTool,
+  searchContactsTool
 ];
 
 // Direct (non-agent) invocation used by the legacy tool-execution switch.

@@ -18,7 +18,7 @@ import { contextualMemoryService } from '../services/contextualMemoryService';
 import { proactiveAssistantService } from '../services/proactiveAssistantService';
 import { enhancedNLUService } from '../services/enhancedNLUService';
 import { emotionalVoiceService } from '../services/emotionalVoiceService';
-import { realApiService } from '../services/realApiService';
+import { runAgentWithToolsStreaming } from '../agents/openaiAgents';
 import Tooltip from './Tooltip';
 
 interface Message {
@@ -66,6 +66,9 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  // Live text streamed from the agent run (rendered as a provisional AI bubble
+  // until the run resolves and the final message is committed).
+  const [streamingText, setStreamingText] = useState('');
   const [proactiveSuggestions, setProactiveSuggestions] = useState<ProactiveSuggestion[]>([]);
   const [commandSuggestions, setCommandSuggestions] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -133,7 +136,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, streamingText]);
 
   // Update conversation summary when messages change
   useEffect(() => {
@@ -188,6 +191,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
     setInputValue('');
     setIsProcessing(true);
     setCommandSuggestions([]);
+    setStreamingText('');
 
     const qualityMode = 'balanced';
 
@@ -253,21 +257,23 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
           Please provide a helpful response that addresses the user's request using the available context.
         `;
 
-        const response = await realApiService.openai.generateAIResponse(
+        // Stream the agent run so the console renders progressive output
+        // instead of waiting for one final blob.
+        let streamedText = '';
+        const agentRun = await runAgentWithToolsStreaming({
+          name: 'Enhanced AI Assistant',
           instructions,
-          enhancedInput,
-          {
-            taskType: 'complex_reasoning',
-            complexity: 'intermediate', 
-            enableChainOfThought: true,
-            maxTokens: 800, // Increased for GPT-5
-            qualityMode: 'balanced',
-            previousResponseId: contextSummaryResult.lastResponseId,
-            store: true
+          input: enhancedInput,
+          onText: (delta) => {
+            streamedText += delta;
+            if (isMountedRef.current) {
+              setStreamingText(streamedText);
+            }
           }
-        );
-        
-        const result = response.output_text || 'I apologize, but I encountered an error processing your request.';
+        });
+
+        const result = agentRun.output || streamedText || 'I apologize, but I encountered an error processing your request.';
+        const invokedTools = agentRun.toolCalls.map(call => call.name).filter(Boolean);
 
         // Remove thinking message
         setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id));
@@ -299,12 +305,15 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
           confidence: parsedCommand.confidence,
           emotionalTone: emotionalContext.conversationTone,
           audioUrl: audioUrl || undefined,
-          toolsUsed: parsedCommand.suggestedTools,
-          reasoning: response.reasoning,
+          toolsUsed: Array.from(new Set([...(parsedCommand.suggestedTools ?? []), ...invokedTools])),
+          reasoning: invokedTools.length > 0 ? `Tools invoked during streaming run: ${invokedTools.join(', ')}` : undefined,
           qualityMode
         };
 
+        // Commit the final message and drop the provisional streaming bubble in
+        // the same update so the text never flickers.
         setMessages(prev => [...prev, aiResponse]);
+        setStreamingText('');
         await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', []);
 
         // Play audio if available
@@ -329,6 +338,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
+      setStreamingText('');
       setIsProcessing(false);
     }
   };
@@ -592,7 +602,27 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
             </div>
           ))}
           
-          {isProcessing && (
+          {streamingText && (
+            <div className="flex gap-3 justify-start">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                <Bot className="h-4 w-4 text-white" />
+              </div>
+
+              <div className="max-w-sm">
+                <div className="flex items-center gap-2 text-xs font-medium text-blue-400 mb-1">
+                  <span>Enhanced AI Assistant</span>
+                  <span className="bg-blue-500/20 px-2 py-1 rounded-full animate-pulse">streaming</span>
+                </div>
+
+                <div className="px-4 py-3 rounded-xl text-sm whitespace-pre-wrap bg-white dark:bg-slate-700/50 text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-slate-600/30 shadow-sm">
+                  {streamingText}
+                  <span className="inline-block w-1.5 h-4 ml-1 align-middle bg-blue-400 animate-pulse" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isProcessing && !streamingText && (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>

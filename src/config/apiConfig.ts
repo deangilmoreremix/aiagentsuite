@@ -18,6 +18,15 @@ export const apiConfig = {
     isConfigured: !!import.meta.env.VITE_GEMINI_API_KEY &&
                   import.meta.env.VITE_GEMINI_API_KEY !== 'your_gemini_api_key_here'
   },
+  // Remote OpenAI MCP server (optional). When configured, the external-action
+  // tools (email / calendar / slack) are fulfilled by the MCP server instead of
+  // the local function tools in `src/agents/crmTools.ts`.
+  mcp: {
+    url: import.meta.env.VITE_MCP_SERVER_URL,
+    name: import.meta.env.VITE_MCP_SERVER_NAME || 'openai-mcp',
+    token: import.meta.env.VITE_MCP_SERVER_TOKEN,
+    isConfigured: !!import.meta.env.VITE_MCP_SERVER_URL
+  },
   supabase: {
     url: import.meta.env.VITE_SUPABASE_URL,
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
