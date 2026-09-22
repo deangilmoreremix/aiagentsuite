@@ -18,6 +18,7 @@ import {
   Download,
   Eye,
   Bot,
+  Brain,
   Database,
   FileText,
   Mail,

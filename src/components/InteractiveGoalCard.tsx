@@ -18,7 +18,8 @@ import {
   Sparkles,
   GitBranch,
   Info,
-  HelpCircle
+   HelpCircle,
+   AlertTriangle
 } from 'lucide-react';
 import { runComposioAgent } from '../agents/composioAgentRunner';
 import Tooltip from './Tooltip';

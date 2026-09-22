@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Lightbulb, 
   TrendingUp, 
@@ -19,7 +19,8 @@ import {
   Award,
   Info,
   Bell,
-  Settings
+  Settings,
+  DollarSign
 } from 'lucide-react';
 import { proactiveAssistantService } from '../services/proactiveAssistantService';
 import Tooltip from './Tooltip';

@@ -44,6 +44,9 @@ interface Message {
   confidence?: number;
   emotionalTone?: string;
   audioUrl?: string;
+  gpt5Enhanced?: boolean;
+  reasoning?: string;
+  qualityMode?: string;
 }
 
 interface ProactiveSuggestion {
@@ -150,7 +153,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         try {
           const summary = await contextualMemoryService.getContextualSummary();
           if (isMountedRef.current) {
-            setConversationSummary(summary);
+            setConversationSummary(summary.summary);
           }
         } catch (error) {
           console.error('Failed to update conversation summary:', error);
@@ -294,6 +297,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
           );
         }
 
+        const qualityMode = 'balanced';
         const aiResponse: Message = {
           id: (Date.now() + 2).toString(),
           type: 'ai',
@@ -312,7 +316,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
         };
 
         setMessages(prev => [...prev, aiResponse]);
-        await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', [], response.id);
+        await contextualMemoryService.addMessage('ai', enhancedResponse, 'GPT-5 Enhanced AI Assistant', []);
 
         // Play audio if available
         if (audioUrl) {
@@ -322,7 +326,7 @@ const EnhancedAIConsole: React.FC<EnhancedAIConsoleProps> = ({
 
       } else {
         // Demo mode with enhanced simulation
-        const simulatedResponse = await this.generateEnhancedDemo(currentInput);
+        const simulatedResponse = await generateEnhancedDemo(currentInput);
         setMessages(prev => [...prev, simulatedResponse]);
       }
 

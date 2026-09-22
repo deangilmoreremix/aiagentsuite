@@ -118,7 +118,7 @@ export class AgentLearningService {
           maxTokens: 2000,
           outputFormat: 'json',
           qualityMode: 'accuracy',
-          fewShotExamples: learningExamples,
+          fewShotExamples: [],
           store: true
         }
       );

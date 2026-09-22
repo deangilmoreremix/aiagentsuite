@@ -18,6 +18,7 @@ export interface AgentOptions {
   temperature?: number; // Controls randomness (0.0-1.0)
   maxTokens?: number; // Max tokens to generate
   debug?: boolean; // Enable detailed logging
+  qualityMode?: 'speed' | 'balanced' | 'accuracy'; // Quality vs speed tradeoff
 }
 
 // Default options
@@ -25,7 +26,8 @@ const DEFAULT_AGENT_OPTIONS: AgentOptions = {
   llmProvider: 'openai', // Default to OpenAI
   temperature: 0.7,
   maxTokens: 1000,
-  debug: false
+  debug: false,
+  qualityMode: 'balanced'
 };
 
 // Execute real AI agents with actual API calls
@@ -42,7 +44,7 @@ export async function executeRealAgent(
   
   // Merge default options with provided options
   const mergedOptions = { ...DEFAULT_AGENT_OPTIONS, ...options };
-  const { llmProvider, temperature, maxTokens, debug } = mergedOptions;
+  const { llmProvider, temperature = 0.7, maxTokens = 1000, debug = false, qualityMode = 'balanced' } = mergedOptions;
   
   if (debug) console.log(`🤖 Executing ${agentName} using ${llmProvider}...`);
 
@@ -73,7 +75,7 @@ export async function executeRealAgent(
     // Execution logic differs based on the provider
     if (useGemini) {
       // Execute using Gemini
-      return await executeWithGemini(
+       return await executeWithGemini(
         agentName,
         systemPrompt,
         task,
@@ -81,7 +83,7 @@ export async function executeRealAgent(
         startTime,
         apiCallsMade,
         toolsUsed,
-        { temperature, maxTokens, debug }
+        { temperature, maxTokens, debug, qualityMode }
       );
     } else {
       // Execute using OpenAI
@@ -93,20 +95,20 @@ export async function executeRealAgent(
         startTime,
         apiCallsMade,
         toolsUsed,
-        { temperature, maxTokens, debug }
+        { temperature, maxTokens, debug, qualityMode }
       );
     }
   } catch (error) {
     console.error(`Real agent execution failed for ${agentName}:`, error);
     
-    return {
+     return {
       success: false,
       agentName,
       error: error instanceof Error ? error.message : 'Unknown error',
       executionTime: Date.now() - startTime,
       apiCallsMade,
       toolsUsed,
-      llmUsed: options.llmProvider || DEFAULT_AGENT_OPTIONS.llmProvider
+      llmUsed: (options.llmProvider || DEFAULT_AGENT_OPTIONS.llmProvider) as 'openai' | 'gemini'
     };
   }
 }
@@ -120,7 +122,7 @@ async function executeWithOpenAI(
   startTime: number,
   apiCallsMade: number,
   toolsUsed: string[],
-  options: { temperature: number; maxTokens: number; debug: boolean }
+  options: { temperature: number; maxTokens: number; debug: boolean; qualityMode?: string }
 ): Promise<RealAgentResult> {
   const { debug, temperature, maxTokens } = options;
   
@@ -265,9 +267,9 @@ async function executeWithGemini(
   startTime: number,
   apiCallsMade: number,
   toolsUsed: string[],
-  options: { temperature: number; maxTokens: number; debug: boolean }
+  options: { temperature: number; maxTokens: number; debug: boolean; qualityMode: 'speed' | 'balanced' | 'accuracy' }
 ): Promise<RealAgentResult> {
-  const { debug, temperature, maxTokens } = options;
+  const { debug, temperature, maxTokens, qualityMode } = options;
   
   // Generate tool definitions for Gemini
   const geminiToolDefinitions = tools.map(tool => generateGeminiToolDefinition(tool));
@@ -412,6 +414,8 @@ Use advanced reasoning to connect tactical execution to strategic business value
   }
 
   const executionTime = Date.now() - startTime;
+
+  const businessImpact = `Executed with ${tools.length} tools, ${executionResults.length} results, quality mode: ${qualityMode}.`;
 
   return {
     success: true,

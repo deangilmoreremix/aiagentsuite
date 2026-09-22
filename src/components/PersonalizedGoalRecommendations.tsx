@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Target, 
   Star, 
@@ -15,7 +15,8 @@ import {
   Eye,
   Sparkles,
   Info,
-  DollarSign
+  DollarSign,
+  AlertTriangle
 } from 'lucide-react';
 import { personalizedGoalService } from '../services/personalizedGoalService';
 import { Goal } from '../types/goals';

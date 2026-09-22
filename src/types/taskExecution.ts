@@ -181,6 +181,7 @@ export interface EnhancedTaskInput {
 
 export interface GPT5TaskAnalysis {
   taskId: string;
+  taskType?: string;
   feasibilityScore: number;
   requiredInformation: RequiredTaskField[];
   suggestedAgents: AgentRecommendation[];

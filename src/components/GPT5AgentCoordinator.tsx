@@ -19,7 +19,8 @@ import {
   Database,
   MessageSquare,
   Eye,
-  TrendingUp
+  TrendingUp,
+  Calendar
 } from 'lucide-react';
 import { EnhancedTaskInput } from '../types/taskExecution';
 import { gpt5TaskOrchestrator } from '../services/gpt5TaskOrchestrator';

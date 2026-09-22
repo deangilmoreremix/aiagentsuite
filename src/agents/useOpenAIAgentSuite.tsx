@@ -223,11 +223,11 @@ function embedAgentResponseUI(toolsUsed: any, output: any) {
       emailBtn.innerText = "Send via Email";
       emailBtn.onclick = async () => {
         try {
-          await realApiService.composio.sendEmail({
-            to: "user@example.com",
-            subject: "Real AI Agent Response", 
-            body: content.innerText
-          });
+          await realApiService.composio.sendEmail(
+            "user@example.com",
+            "Real AI Agent Response", 
+            content.innerText
+          );
           alert("✅ Email sent via real API!");
         } catch (error) {
           alert("⚠️ Email send failed: " + error);

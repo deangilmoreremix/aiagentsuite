@@ -129,7 +129,7 @@ export class DataValidationService {
     issues: DataIssue[], 
     confirmationCallback?: (issue: DataIssue) => Promise<boolean>
   ): Promise<{ fixed: number; skipped: number; errors: string[] }> {
-    const results = { fixed: 0, skipped: 0, errors: [] };
+    const results = { fixed: 0, skipped: 0, errors: [] as string[] };
 
     for (const issue of issues) {
       try {

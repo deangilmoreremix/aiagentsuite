@@ -29,6 +29,7 @@ interface CRMContext {
   lastActivity?: any;
   userIntent?: string;
   businessContext: string;
+  lastResponseId?: string;
 }
 
 interface UserProfile {
