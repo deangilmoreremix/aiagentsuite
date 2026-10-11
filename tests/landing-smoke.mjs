@@ -11,7 +11,10 @@ function check(name, ok, extra = '') {
 }
 
 const browser = await chromium.launch();
-const page = await browser.newPage();
+const context = await browser.newContext({
+  ignoreHTTPSErrors: process.env.SMOKE_IGNORE_HTTPS === '1',
+});
+const page = await context.newPage();
 
 page.on('console', (msg) => {
   if (msg.type() === 'error') errors.push('console.error: ' + msg.text());
