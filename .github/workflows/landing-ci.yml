@@ -31,13 +31,15 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Start preview server
+      - name: Preview server + landing-page smoke test
         run: |
-          npm run preview -- --port 4173 --strictPort &
+          npx vite preview --port 4173 --strictPort &
+          PREVIEW_PID=$!
           for i in $(seq 1 30); do
             if curl -sf http://localhost:4173/ > /dev/null; then echo "preview ready"; break; fi
             sleep 1
           done
-
-      - name: Landing-page smoke test
-        run: SMOKE_URL=http://localhost:4173 npm run test:smoke
+          SMOKE_URL=http://localhost:4173 npm run test:smoke
+          STATUS=$?
+          kill $PREVIEW_PID 2>/dev/null || true
+          exit $STATUS
