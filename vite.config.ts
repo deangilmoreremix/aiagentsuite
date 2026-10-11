@@ -10,4 +10,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  // Never emit source maps for production builds (avoids shipping any
+  // build-time-inlined configuration or code in map files).
+  build: {
+    sourcemap: false,
+  },
 });

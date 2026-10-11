@@ -1,24 +1,10 @@
-import OpenAI from "openai";
 import { realApiService } from "../services/realApiService";
 import { apiConfig, validateApiSetup } from "../config/apiConfig";
 
-// Initialize OpenAI client with error handling
-let openai: OpenAI | null = null;
-
-if (apiConfig.openai.isConfigured) {
-  try {
-    openai = new OpenAI({
-      apiKey: apiConfig.openai.apiKey,
-      dangerouslyAllowBrowser: true
-    });
-    console.log('✅ OpenAI client initialized with real API key');
-  } catch (err) {
-    openai = null;
-    console.error('⚠️ OpenAI client initialization failed. Falling back to demo mode:', err);
-  }
-} else {
-  console.warn('⚠️ OpenAI API key not configured. Using demo mode.');
-}
+// NOTE: AI provider credentials are handled entirely server-side (Netlify
+// Functions). The browser never holds an OpenAI/provider API key; realApiService
+// routes requests through /api/llm and the app stays in demo mode until
+// GET /api/status reports a server-side provider is configured.
 
 export const composioApps = [
   "gmail", "slack", "google_calendar", "zoom", "trello", "google_sheets",

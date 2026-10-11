@@ -57,6 +57,26 @@ try {
   const hasGoals = await page.locator('text=/Business Goals|Goal/i').first().isVisible().catch(() => false);
   check('Goal explorer present', hasGoals);
 
+  // 7b. AI console executes a command (exercises the server-proxied demo path:
+  //     generateText -> POST /api/llm -> graceful simulated fallback when no
+  //     serverless key is configured). Enter submits via the input's handler.
+  try {
+    const consoleInput = page.locator('input[placeholder*="Demo Mode"], input[placeholder*="Ask anything"]').first();
+    if (await consoleInput.count()) {
+      const lenBefore = (await page.locator('#root').innerText()).length;
+      await consoleInput.fill('Find 3 hot leads and draft follow-up emails');
+      await consoleInput.press('Enter');
+      await page.waitForTimeout(2500);
+      const afterText = (await page.locator('#root').innerText());
+      const executed = /hot leads|Simulated response|draft follow-up/i.test(afterText);
+      check('AI console executes a command (demo)', executed, afterText.slice(-220).replace(/\n/g, ' '));
+    } else {
+      check('AI console executes a command (demo)', false, 'input not located');
+    }
+  } catch (e) {
+    check('AI console executes a command (demo)', false, e.message);
+  }
+
   // 8. Navigate to advanced features route
   await page.goto(BASE + '/features-analytics', { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(1500);

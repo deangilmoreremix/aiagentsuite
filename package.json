@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:smoke": "node tests/landing-smoke.mjs"
+    "test:smoke": "node tests/landing-smoke.mjs",
+    "test:secrets": "node tests/no-secrets.mjs",
+    "test:functions": "node tests/functions.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

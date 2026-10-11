@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import HowToUse from '../components/HowToUse';
 import ApiSetupGuide from '../components/ApiSetupGuide';
 import ComposioIntegrationModal from '../components/ComposioIntegrationModal';
-import { getDefaultMode, logApiStatus } from '../config/apiConfig';
+import { getDefaultMode, logApiStatus, refreshProviderStatus } from '../config/apiConfig';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -48,7 +48,12 @@ const CoreInteractionPage = () => {
         setGlobalRealMode(defaultMode);
       }
       logApiStatus();
-      
+      refreshProviderStatus().then(() => {
+        if (isMountedRef.current) {
+          setGlobalRealMode(getDefaultMode());
+        }
+      });
+
       console.log('✅ Core page initialization complete');
     } catch (error) {
       console.error('❌ Core page initialization failed:', error);

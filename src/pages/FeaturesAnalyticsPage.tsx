@@ -9,7 +9,7 @@ import AgentLearningPanel from '../components/AgentLearningPanel';
 import TaskExecutionEntry from '../components/TaskExecutionEntry';
 import Footer from '../components/Footer';
 import ThemeToggle from '../components/ThemeToggle';
-import { getDefaultMode } from '../config/apiConfig';
+import { getDefaultMode, refreshProviderStatus } from '../config/apiConfig';
 import { 
   ArrowLeft, 
   BarChart3, 
@@ -44,7 +44,9 @@ const FeaturesAnalyticsPage = () => {
     
     const defaultMode = getDefaultMode();
     setGlobalRealMode(defaultMode);
-    
+
+    refreshProviderStatus().then(() => setGlobalRealMode(getDefaultMode()));
+
     console.log('✅ Advanced page initialization complete');
   }, []);
 

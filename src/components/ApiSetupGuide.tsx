@@ -67,59 +67,59 @@ const ApiSetupGuide: React.FC<ApiSetupGuideProps> = ({ isOpen, onClose, onSetupC
   const apiServices = [
     {
       name: 'OpenAI',
-      key: 'VITE_OPENAI_API_KEY',
+      key: 'OPENAI_API_KEY',
       description: 'Powers AI agent intelligence with GPT-4 or other OpenAI models',
       setupUrl: 'https://platform.openai.com/api-keys',
       isConfigured: apiConfig.openai.isConfigured,
-      currentValue: apiConfig.openai.apiKey,
+      currentValue: apiConfig.openai.isConfigured ? '(configured on server)' : undefined,
       instructions: [
         'Go to OpenAI Platform',
         'Sign in or create an account',
         'Navigate to API Keys section',
         'Create a new secret key',
-        'Copy and paste it into your .env file'
+        'Add it in Netlify > Site configuration > Environment variables (server-side, never a VITE_ key)'
       ],
       helpText: 'OpenAI provides powerful LLM capabilities for AI agents. You need either OpenAI or Gemini for Live Mode.'
     },
     {
       name: 'Gemini',
-      key: 'VITE_GEMINI_API_KEY',
+      key: 'GEMINI_API_KEY',
       description: 'Alternative LLM provider using Google\'s Gemini models',
       setupUrl: 'https://aistudio.google.com/app/apikey',
       isConfigured: apiConfig.gemini.isConfigured,
-      currentValue: apiConfig.gemini.apiKey,
+      currentValue: apiConfig.gemini.isConfigured ? '(configured on server)' : undefined,
       instructions: [
         'Go to Google AI Studio',
         'Sign in with your Google account',
         'Navigate to the API Keys section',
         'Create a new API key',
-        'Copy and paste it into your .env file'
+        'Add it in Netlify > Site configuration > Environment variables (server-side, never a VITE_ key)'
       ],
       helpText: 'Gemini is Google\'s alternative to OpenAI, providing advanced LLM capabilities. You need either OpenAI or Gemini for Live Mode.'
     },
     {
       name: 'Composio',
-      key: 'VITE_COMPOSIO_API_KEY',
+      key: 'COMPOSIO_API_KEY',
       description: 'Required for tool integrations (Gmail, Calendar, Slack, etc.)',
       setupUrl: 'https://app.composio.dev/',
       isConfigured: apiConfig.composio.isConfigured,
-      currentValue: apiConfig.composio.apiKey,
+      currentValue: apiConfig.composio.isConfigured ? '(configured on server)' : undefined,
       instructions: [
         'Go to Composio Dashboard',
         'Sign up for an account',
         'Navigate to API Keys section',
         'Generate a new API key',
-        'Copy and paste it into your .env file'
+        'Add it in Netlify > Site configuration > Environment variables (server-side, never a VITE_ key)'
       ],
       helpText: 'Composio enables integration with 50+ business tools like Gmail, Calendar, Slack, etc. Without this, tool actions will be simulated.'
     },
     {
       name: 'ElevenLabs',
-      key: 'VITE_ELEVENLABS_API_KEY',
+      key: 'ELEVENLABS_API_KEY',
       description: 'Optional: For AI voice generation and text-to-speech features',
       setupUrl: 'https://elevenlabs.io/',
       isConfigured: apiConfig.elevenlabs.isConfigured,
-      currentValue: apiConfig.elevenlabs.apiKey,
+      currentValue: apiConfig.elevenlabs.isConfigured ? '(configured on server)' : undefined,
       optional: true,
       instructions: [
         'Go to ElevenLabs website',
