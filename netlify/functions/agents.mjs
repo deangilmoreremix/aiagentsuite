@@ -4,6 +4,7 @@
 // labeled simulated result without any paid API call.
 import { runAgent, runWorkflow } from '../../server/agents/orchestrator.mjs';
 import { getServiceClient } from '../../server/supabase/serviceClient.mjs';
+import { resolveApprovals } from '../../server/agents/approvals.mjs';
 
 const json = (statusCode, body) => ({
   statusCode,
@@ -45,12 +46,23 @@ export async function handler(event) {
     return json(401, { status: 'unauthenticated', message: 'Real execution requires a signed-in user (Bearer token).' });
   }
 
-  const context = {
+  const identity = {
     tenantId: user?.id || null,
     userId: user?.id || null,
     mode,
-    approvals: Array.isArray(body.approvals) ? body.approvals : [],
   };
+
+  // Approvals are SERVER-VERIFIED: the client sends approvalIds (references to
+  // approval_requests rows) which are validated against the tenant/user/status
+  // and consumed once. A client-supplied action-name array is never trusted.
+  const approvalIds = Array.isArray(body.approvalIds) ? body.approvalIds.filter((x) => typeof x === 'string') : [];
+  let approvedActions = new Set();
+  try {
+    approvedActions = await resolveApprovals(identity, approvalIds);
+  } catch {
+    approvedActions = new Set();
+  }
+  const context = { ...identity, approvedActions };
 
   try {
     if (body.workflowKey) {

@@ -27,7 +27,7 @@ export async function runAgentTask(agentKey: string, input: string, opts: RunOpt
   const res = await fetch('/api/agents', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ agentKey, input, mode: opts.mode || 'demo', approvals: opts.approvals || [] }),
+    body: JSON.stringify({ agentKey, input, mode: opts.mode || 'demo', approvalIds: opts.approvals || [] }),
   });
   return res.json();
 }
@@ -38,7 +38,7 @@ export async function runWorkflowTask(workflowKey: string, input: string, opts: 
   const res = await fetch('/api/agents', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ workflowKey, input, mode: opts.mode || 'demo', approvals: opts.approvals || [] }),
+    body: JSON.stringify({ workflowKey, input, mode: opts.mode || 'demo', approvalIds: opts.approvals || [] }),
   });
   return res.json();
 }

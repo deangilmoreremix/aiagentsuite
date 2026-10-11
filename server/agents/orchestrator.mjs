@@ -84,7 +84,7 @@ export async function runAgent({ agentKey, input, context }) {
     setDefaultOpenAIKey(OPENAI_API_KEY);
     const agent = buildAgent(agentKey);
     const runner = new Runner();
-    const result = await runner.run(agent, String(input), { context: { tenantId: context?.tenantId, userId: context?.userId, mode, approvals: context?.approvals || [] } });
+    const result = await runner.run(agent, String(input), { context: { tenantId: context?.tenantId, userId: context?.userId, mode, approvedActions: context?.approvedActions instanceof Set ? context.approvedActions : new Set() } });
     const toolCalls = extractToolCalls(result);
     const run = await recordAgentRun({ tenantId: context?.tenantId, userId: context?.userId, agentKey, status: 'completed', mode, input, result: { output: result.finalOutput, toolCalls } });
     return {
@@ -123,9 +123,10 @@ export async function runWorkflow({ workflowKey, input, context }) {
   const mode = context?.mode === 'real' ? 'real' : 'demo';
   const steps = [];
   let carried = input;
+  const approved = context?.approvedActions instanceof Set ? context.approvedActions : new Set(Array.isArray(context?.approvedActions) ? context.approvedActions : []);
 
   for (const step of plan) {
-    if (step.requiresApproval && context && !(context.approvals || []).includes(step.requiresApproval)) {
+    if (step.requiresApproval && !approved.has(step.requiresApproval)) {
       steps.push({ agentKey: step.agentKey, label: step.label, status: 'awaiting_approval', approvalAction: step.requiresApproval });
       return { status: 'awaiting_approval', workflowKey, mode, steps, completedThrough: steps.length - 1 };
     }

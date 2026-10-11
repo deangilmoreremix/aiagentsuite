@@ -1,19 +1,25 @@
 // Extract the per-run execution context from an Agents SDK RunContext.
-// The caller (Netlify function) supplies { tenantId, userId, mode, approvals }.
+// Authorization comes from a server-verified Set of approved action names
+// (built in netlify/functions/agents.mjs from DB approval records). A client
+// can never grant an approval by simply listing an action name.
 import { integrations, llmReady } from './config.mjs';
+
+function toActionSet(v) {
+  if (v instanceof Set) return v;
+  if (Array.isArray(v)) return new Set(v);
+  return new Set();
+}
 
 export function getRunContext(runContext) {
   const raw = (runContext && runContext.context) || {};
+  const approvedActions = toActionSet(raw.approvedActions);
   return {
     tenantId: raw.tenantId || null,
     userId: raw.userId || null,
     mode: raw.mode === 'real' ? 'real' : 'demo',
-    approvals: Array.isArray(raw.approvals) ? raw.approvals : [],
-    // Approval is required (and hard-gated here) for consequential actions.
-    isApproved: (action) => {
-      const key = String(action || '').toLowerCase();
-      return raw.approvals.some((a) => String(a).toLowerCase() === key);
-    },
+    approvedActions,
+    // Approval is only satisfied by a server-verified record (see approvals.mjs).
+    isApproved: (action) => approvedActions.has(String(action)),
     llmReady,
     integrations,
   };

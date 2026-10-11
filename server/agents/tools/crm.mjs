@@ -38,8 +38,8 @@ export function createCrmTools() {
         const { ctx, sb } = crmContext(runCtx);
         if (!sb) return blocked('search_contacts');
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
-        let q = sb.from('contacts').select('id, name, email, phone, company, status, score, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
-        q = q.or(`name.ilike.%${args.query}%,email.ilike.%${args.query}%,company.ilike.%${args.query}%`);
+        let q = sb.from('contacts').select('id, first_name, last_name, email, phone, company, status, lead_score, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
+        q = q.or(`first_name.ilike.%${args.query}%,last_name.ilike.%${args.query}%,email.ilike.%${args.query}%,company.ilike.%${args.query}%`);
         const { data, error } = await q;
         if (error) return res({ ok: false, status: 'error', error: error.message });
         return res({ ok: true, count: data.length, contacts: data });
@@ -101,8 +101,8 @@ export function createCrmTools() {
         const { ctx, sb } = crmContext(runCtx);
         if (!sb) return blocked('search_deals');
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
-        let q = sb.from('deals').select('id, contact_id, title, stage, amount, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
-        if (args.stage) q = q.eq('stage', args.stage);
+        let q = sb.from('deals').select('id, contact_id, title, stage_id, value, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
+        if (args.stage) q = q.eq('stage_id', args.stage);
         if (args.query) q = q.ilike('title', `%${args.query}%`);
         const { data, error } = await q;
         if (error) return res({ ok: false, status: 'error', error: error.message });
@@ -173,9 +173,9 @@ export function createCrmTools() {
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
         const gated = needsApproval(ctx, 'crm:update_lead_score');
         if (gated) return gated;
-        const { data, error } = await sb.from('contacts').update({ score: args.score }).eq('tenant_id', ctx.tenantId).eq('id', args.id).select('id, score').single();
+        const { data, error } = await sb.from('contacts').update({ lead_score: args.score }).eq('tenant_id', ctx.tenantId).eq('id', args.id).select('id, lead_score').single();
         if (error) return res({ ok: false, status: 'error', error: error.message });
-        return res({ ok: true, status: 'completed', id: data.id, confirmedScore: data.score, reason: args.reason || null });
+        return res({ ok: true, status: 'completed', id: data.id, confirmedScore: data.lead_score, reason: args.reason || null });
       },
     }),
 
