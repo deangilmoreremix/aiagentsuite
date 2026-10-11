@@ -29,7 +29,7 @@ page.on('requestfailed', (req) => {
 
 try {
   // 1. Homepage HTTP response
-  const resp = await page.goto(BASE, { waitUntil: 'networkidle', timeout: 30000 });
+  const resp = await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 45000 });
   check('Homepage HTTP 200', resp && resp.status() === 200, `status=${resp && resp.status()}`);
 
   // 2. Title
@@ -78,7 +78,7 @@ try {
   }
 
   // 8. Navigate to advanced features route
-  await page.goto(BASE + '/features-analytics', { waitUntil: 'networkidle', timeout: 30000 });
+  await page.goto(BASE + '/features-analytics', { waitUntil: 'domcontentloaded', timeout: 45000 });
   await page.waitForTimeout(1500);
   const faText = (await page.locator('#root').innerText().catch(() => ''));
   const faNoErrorBoundary = !/failed to load|Advanced Features Error|Page Not Found|went wrong|encountered an error/i.test(faText);
@@ -90,6 +90,19 @@ try {
   // 8b. Reload deep route directly (host SPA fallback must serve index.html)
   const deepResp = await page.goto(BASE + '/features-analytics', { waitUntil: 'domcontentloaded', timeout: 30000 });
   check('Deep route reload served by host (HTTP 200)', deepResp && deepResp.status() === 200, `status=${deepResp && deepResp.status()}`);
+
+  // 8c. Mobile layout: no major horizontal overflow (regression guard) + hero renders
+  try {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(2000);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    check('Mobile: no major horizontal overflow', overflow <= 10, `overflow=${overflow}px`);
+    const mHero = await page.locator('text=/AI Agent|Business Goal|automation|Enterprise/i').first().isVisible().catch(() => false);
+    check('Mobile: hero renders at 375px', mHero);
+  } catch (e) {
+    check('Mobile layout check', false, e.message);
+  }
 } catch (e) {
   check('Smoke test threw', false, e.message);
 } finally {

@@ -59,6 +59,16 @@ check('No canary/secret patterns in dist bundle', leaked.length === 0, leaked.sl
 const maps = distFiles.filter((f) => f.endsWith('.map'));
 check('No source maps emitted in dist', maps.length === 0, maps.slice(0, 3).join(', '));
 
+// 4) Server-only Agents SDK / service-role code must never reach the client ------
+const SDK_MARKERS = ['@openai/agents', 'agents-core', 'setDefaultOpenAIKey', 'SUPABASE_SERVICE_ROLE_KEY', 'ToolExecuteArgument'];
+const sdkLeak = [];
+for (const f of distFiles) {
+  if (!/\.(js|css|html)$/.test(f)) continue;
+  const content = readFileSync(f, 'utf8');
+  for (const m of SDK_MARKERS) if (content.includes(m)) sdkLeak.push(`${f}: ${m}`);
+}
+check('No server-side Agents SDK / service-role code in client bundle', sdkLeak.length === 0, sdkLeak.slice(0, 4).join(' | '));
+
 const failed = results.filter((r) => !r.ok);
 console.log(`\nNO-SECRETS SUMMARY: ${results.length - failed.length}/${results.length} checks passed`);
 process.exit(failed.length ? 1 : 0);

@@ -390,7 +390,7 @@ const CRMWorkspace: React.FC<CRMWorkspaceProps> = ({
       )}
 
       {/* CRM Navigation */}
-      <div className="flex space-x-4 mb-6 border-b border-slate-700/50">
+      <div className="flex flex-wrap gap-x-4 gap-y-2 mb-6 border-b border-slate-700/50">
         {[
           { id: 'contacts', label: 'Contacts', icon: Users, count: contacts.length },
           { id: 'deals', label: 'Deals', icon: Target, count: deals.length },

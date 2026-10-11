@@ -439,7 +439,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
                   position="top"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {['all', 'High', 'Medium', 'Low'].map(priority => (
                   <button
                     key={priority}
@@ -470,7 +470,7 @@ const InteractiveGoalExplorer: React.FC<InteractiveGoalExplorerProps> = ({
                   position="top"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {['all', 'Simple', 'Intermediate', 'Advanced'].map(complexity => (
                   <button
                     key={complexity}
