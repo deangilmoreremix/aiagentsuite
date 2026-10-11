@@ -11,7 +11,7 @@ export async function recordAgentRun({ tenantId, userId, agentKey, status, mode,
   if (!sb) return noop('supabase_not_configured');
   try {
     const { data, error } = await sb
-      .from('agent_runs')
+      .from('agentx_runs')
       .insert({
         tenant_id: tenantId,
         user_id: userId,
@@ -38,7 +38,7 @@ export async function recordToolExecution({ tenantId, runId, agentKey, tool, arg
   if (!sb) return noop('supabase_not_configured');
   try {
     const { data, error } = await sb
-      .from('tool_executions')
+      .from('agentx_tool_executions')
       .insert({ tenant_id: tenantId, run_id: runId, agent_key: agentKey, tool, args, result, status })
       .select('id')
       .single();
@@ -54,7 +54,7 @@ export async function requestApproval({ tenantId, runId, agentKey, action, paylo
   if (!sb) return noop('supabase_not_configured');
   try {
     const { data, error } = await sb
-      .from('approval_requests')
+      .from('agentx_approvals')
       .insert({ tenant_id: tenantId, run_id: runId, agent_key: agentKey, action, payload, status: 'pending' })
       .select('id')
       .single();
@@ -70,7 +70,7 @@ export async function recordWorkflowRun({ tenantId, userId, workflowKey, status,
   if (!sb) return noop('supabase_not_configured');
   try {
     const { data, error } = await sb
-      .from('workflow_runs')
+      .from('agentx_workflow_runs')
       .insert({ tenant_id: tenantId, user_id: userId, workflow_key: workflowKey, status, steps, mode })
       .select('id')
       .single();
@@ -86,7 +86,7 @@ export async function getWorkflowStatus({ tenantId, workflowRunId }) {
   if (!sb) return { persisted: false, reason: 'supabase_not_configured' };
   try {
     const { data, error } = await sb
-      .from('workflow_runs')
+      .from('agentx_workflow_runs')
       .select('id, workflow_key, status, steps, mode, created_at')
       .eq('tenant_id', tenantId)
       .eq('id', workflowRunId)
@@ -106,7 +106,7 @@ export async function alreadyPerformed({ tenantId, action, idempotencyKey }) {
   if (!sb) return false;
   try {
     const { data } = await sb
-      .from('tool_executions')
+      .from('agentx_tool_executions')
       .select('id')
       .eq('tenant_id', tenantId)
       .eq('tool', action)

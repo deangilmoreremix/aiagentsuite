@@ -5,6 +5,7 @@
 import { runAgent, runWorkflow } from '../../server/agents/orchestrator.mjs';
 import { getServiceClient } from '../../server/supabase/serviceClient.mjs';
 import { resolveApprovals } from '../../server/agents/approvals.mjs';
+import { getTenantIdForUser } from '../../server/supabase/tenancy.mjs';
 
 const json = (statusCode, body) => ({
   statusCode,
@@ -41,13 +42,23 @@ export async function handler(event) {
   const { user } = await authenticate(event);
   const mode = body.mode === 'real' ? 'real' : 'demo';
 
-  // Authenticated + tenant-scoped for real execution (per-user tenant isolation).
+  // Authenticated + tenant-scoped for real execution.
   if (mode === 'real' && !user) {
     return json(401, { status: 'unauthenticated', message: 'Real execution requires a signed-in user (Bearer token).' });
   }
 
+  // tenant_id is NOT auth.uid(): resolve the real tenant via the verified
+  // ownership model (tenant_members). Real execution requires membership.
+  let tenantId = null;
+  if (mode === 'real') {
+    tenantId = await getTenantIdForUser(user.id);
+    if (!tenantId) {
+      return json(403, { status: 'no_tenant', message: 'Authenticated user is not a member of any tenant.' });
+    }
+  }
+
   const identity = {
-    tenantId: user?.id || null,
+    tenantId,
     userId: user?.id || null,
     mode,
   };

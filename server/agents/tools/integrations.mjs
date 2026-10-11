@@ -16,7 +16,7 @@ async function recordTool({ ctx, tool: name, args, result, status, idempotencyKe
   const sb = getServiceClient();
   if (!sb) return;
   try {
-    await sb.from('tool_executions').insert({
+    await sb.from('agentx_tool_executions').insert({
       tenant_id: ctx.tenantId, agent_key: ctx._agentKey || null, tool: name, args, result,
       status, idempotency_key: idempotencyKey || null,
     });
@@ -34,7 +34,7 @@ export function createEmailTools() {
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
         const sb = getServiceClient();
         if (!sb) return res({ ok: true, status: 'draft_unsaved', note: 'Supabase not configured; draft not persisted', draft: args });
-        const { data, error } = await sb.from('email_drafts').insert({
+        const { data, error } = await sb.from('agentx_email_drafts').insert({
           tenant_id: ctx.tenantId, recipient: args.to, subject: args.subject, body: args.body,
           contact_id: args.contactId || null, status: 'draft',
         }).select('id').single();
@@ -82,7 +82,7 @@ export function createEmailTools() {
         const ctx = getRunContext(runCtx);
         const sb = getServiceClient();
         if (!sb) return res({ ok: false, status: 'integration_required', integration: 'supabase' });
-        const { data, error } = await sb.from('tool_executions').select('tool, status, result, created_at').eq('tenant_id', ctx.tenantId).eq('tool', 'send_approved_email').order('created_at', { ascending: false }).limit(5);
+        const { data, error } = await sb.from('agentx_tool_executions').select('tool, status, result, created_at').eq('tenant_id', ctx.tenantId).eq('tool', 'send_approved_email').order('created_at', { ascending: false }).limit(5);
         if (error) return res({ ok: false, status: 'error', error: error.message });
         return res({ ok: true, records: data });
       },

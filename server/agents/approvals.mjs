@@ -12,7 +12,7 @@ export async function consumeApprovals(db, { tenantId, userId, approvalIds }) {
   const ids = approvalIds.filter((x) => typeof x === 'string');
   try {
     const { data, error } = await db
-      .from('approval_requests')
+      .from('agentx_approvals')
       .update({ status: 'consumed', resolved_by: userId || null, resolved_at: new Date().toISOString() })
       .eq('tenant_id', tenantId)
       .in('id', ids)

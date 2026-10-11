@@ -11,7 +11,7 @@
     "test:smoke": "node tests/landing-smoke.mjs",
     "test:secrets": "node tests/no-secrets.mjs",
     "test:functions": "node tests/functions.mjs",
-    "test:agents": "node tests/agents-registry.mjs && node tests/agents-orchestrator.mjs && node tests/agents-tools.mjs && node tests/agents-approvals.mjs"
+    "test:agents": "node tests/agents-registry.mjs && node tests/agents-orchestrator.mjs && node tests/agents-tools.mjs && node tests/agents-approvals.mjs && node tests/agents-tenancy.mjs"
   },
   "dependencies": {
     "@openai/agents": "^0.3.0",
