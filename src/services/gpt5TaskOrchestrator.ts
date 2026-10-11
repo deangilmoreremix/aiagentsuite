@@ -150,8 +150,7 @@ export class GPT5TaskOrchestrator {
           temperature: 0.2,
           maxTokens: 3000, // Increased for GPT-5
           qualityMode: 'accuracy',
-          outputFormat: 'json',
-          qualityMode: 'accuracy'
+          outputFormat: 'json'
         }
       );
       

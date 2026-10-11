@@ -3,15 +3,19 @@ import { realApiService } from "../services/realApiService";
 import { apiConfig, validateApiSetup } from "../config/apiConfig";
 
 // Initialize OpenAI client with error handling
-const validation = validateApiSetup();
 let openai: OpenAI | null = null;
 
-if (validation.canUseRealMode) {
-  openai = new OpenAI({ 
-    apiKey: apiConfig.openai.apiKey,
-    dangerouslyAllowBrowser: true 
-  });
-  console.log('✅ OpenAI client initialized with real API key');
+if (apiConfig.openai.isConfigured) {
+  try {
+    openai = new OpenAI({
+      apiKey: apiConfig.openai.apiKey,
+      dangerouslyAllowBrowser: true
+    });
+    console.log('✅ OpenAI client initialized with real API key');
+  } catch (err) {
+    openai = null;
+    console.error('⚠️ OpenAI client initialization failed. Falling back to demo mode:', err);
+  }
 } else {
   console.warn('⚠️ OpenAI API key not configured. Using demo mode.');
 }

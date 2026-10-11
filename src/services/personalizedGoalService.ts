@@ -179,7 +179,6 @@ export class PersonalizedGoalService {
           maxTokens: 4000,
           outputFormat: 'json',
           qualityMode: 'accuracy',
-          fewShotExamples,
           store: true
         }
       );
