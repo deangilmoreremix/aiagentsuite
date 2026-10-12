@@ -41,16 +41,30 @@ export function buildAgent(key) {
 
 function extractToolCalls(result) {
   const calls = [];
+  const byId = new Map();
   try {
     const items = result?.newItems || result?.history || [];
     for (const it of items) {
       const raw = it?.rawItem || it;
-      if (raw?.type === 'function_call') {
-        calls.push({ name: raw.name, arguments: raw.arguments, callId: raw.callId });
+      const type = raw?.type || it?.type;
+      if (type === 'function_call') {
+        const call = { name: raw.name, arguments: raw.arguments, callId: raw.callId, output: undefined };
+        calls.push(call);
+        if (raw.callId) byId.set(raw.callId, call);
+      } else if (type === 'function_call_result' || type === 'function_call_output') {
+        const callId = raw?.callId || raw?.call_id;
+        const out = raw?.output ?? raw?.result;
+        if (callId && byId.has(callId)) {
+          byId.get(callId).output = typeof out === 'string' ? out : safeStringify(out);
+        }
       }
     }
   } catch { /* best-effort */ }
   return calls;
+}
+
+function safeStringify(v) {
+  try { return JSON.stringify(v); } catch { return String(v); }
 }
 
 /**

@@ -38,7 +38,7 @@ export function createCrmTools() {
         const { ctx, sb } = crmContext(runCtx);
         if (!sb) return blocked('search_contacts');
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
-        let q = sb.from('contacts').select('id, first_name, last_name, email, phone, company, status, lead_score, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
+        let q = sb.from('agentx_contacts').select('id, first_name, last_name, email, phone, company, status, lead_score, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
         q = q.or(`first_name.ilike.%${args.query}%,last_name.ilike.%${args.query}%,email.ilike.%${args.query}%,company.ilike.%${args.query}%`);
         const { data, error } = await q;
         if (error) return res({ ok: false, status: 'error', error: error.message });
@@ -54,7 +54,7 @@ export function createCrmTools() {
         const { ctx, sb } = crmContext(runCtx);
         if (!sb) return blocked('get_contact');
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
-        const { data, error } = await sb.from('contacts').select('*').eq('tenant_id', ctx.tenantId).eq('id', args.id).single();
+        const { data, error } = await sb.from('agentx_contacts').select('*').eq('tenant_id', ctx.tenantId).eq('id', args.id).single();
         if (error) return res({ ok: false, status: 'error', error: error.message });
         return res({ ok: true, contact: data });
       },
@@ -70,7 +70,15 @@ export function createCrmTools() {
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
         const gated = needsApproval(ctx, 'crm:create_contact');
         if (gated) return gated;
-        const { data, error } = await sb.from('contacts').insert({ tenant_id: ctx.tenantId, ...args }).select('id').single();
+        const parts = String(args.name || '').trim().split(/\s+/);
+        const { data, error } = await sb.from('agentx_contacts').insert({
+          tenant_id: ctx.tenantId,
+          first_name: parts.shift() || null,
+          last_name: parts.length ? parts.join(' ') : null,
+          email: args.email || null,
+          phone: args.phone || null,
+          company: args.company || null,
+        }).select('id').single();
         if (error) return res({ ok: false, status: 'error', error: error.message });
         return res({ ok: true, status: 'completed', id: data.id });
       },
@@ -87,7 +95,7 @@ export function createCrmTools() {
         const gated = needsApproval(ctx, 'crm:update_contact');
         if (gated) return gated;
         const { id, ...patch } = args;
-        const { data, error } = await sb.from('contacts').update(patch).eq('tenant_id', ctx.tenantId).eq('id', id).select('id').single();
+        const { data, error } = await sb.from('agentx_contacts').update(patch).eq('tenant_id', ctx.tenantId).eq('id', id).select('id').single();
         if (error) return res({ ok: false, status: 'error', error: error.message });
         return res({ ok: true, status: 'completed', id: data.id, updated: patch });
       },
@@ -101,8 +109,8 @@ export function createCrmTools() {
         const { ctx, sb } = crmContext(runCtx);
         if (!sb) return blocked('search_deals');
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
-        let q = sb.from('deals').select('id, contact_id, title, stage_id, value, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
-        if (args.stage) q = q.eq('stage_id', args.stage);
+        let q = sb.from('agentx_deals').select('id, contact_id, title, stage, amount, created_at').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
+        if (args.stage) q = q.eq('stage', args.stage);
         if (args.query) q = q.ilike('title', `%${args.query}%`);
         const { data, error } = await q;
         if (error) return res({ ok: false, status: 'error', error: error.message });
@@ -121,9 +129,31 @@ export function createCrmTools() {
         const gated = needsApproval(ctx, 'crm:update_deal');
         if (gated) return gated;
         const { id, ...patch } = args;
-        const { data, error } = await sb.from('deals').update(patch).eq('tenant_id', ctx.tenantId).eq('id', id).select('id').single();
+        const { data, error } = await sb.from('agentx_deals').update(patch).eq('tenant_id', ctx.tenantId).eq('id', id).select('id').single();
         if (error) return res({ ok: false, status: 'error', error: error.message });
         return res({ ok: true, status: 'completed', id: data.id, updated: patch });
+      },
+    }),
+
+    tool({
+      name: 'create_deal',
+      description: 'Create a CRM deal/opportunity. Requires approval "crm:create_deal".',
+      parameters: z.object({ title: z.string(), contactId: z.string().optional(), stage: z.string().optional(), amount: z.number().optional() }),
+      execute: async (args, runCtx) => {
+        const { ctx, sb } = crmContext(runCtx);
+        if (!sb) return blocked('create_deal');
+        if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
+        const gated = needsApproval(ctx, 'crm:create_deal');
+        if (gated) return gated;
+        const { data, error } = await sb.from('agentx_deals').insert({
+          tenant_id: ctx.tenantId,
+          title: args.title,
+          contact_id: args.contactId || null,
+          stage: args.stage || 'prospecting',
+          amount: args.amount ?? null,
+        }).select('id').single();
+        if (error) return res({ ok: false, status: 'error', error: error.message });
+        return res({ ok: true, status: 'completed', id: data.id });
       },
     }),
 
@@ -138,7 +168,7 @@ export function createCrmTools() {
         const gated = needsApproval(ctx, 'crm:create_task');
         if (gated) return gated;
         const { data, error } = await sb
-          .from('tasks')
+          .from('agentx_tasks')
           .insert({ tenant_id: ctx.tenantId, title: args.title, contact_id: args.contactId || null, due_date: args.dueDate || null, status: 'pending' })
           .select('id')
           .single();
@@ -155,7 +185,7 @@ export function createCrmTools() {
         const { ctx, sb } = crmContext(runCtx);
         if (!sb) return blocked('get_tasks');
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
-        let q = sb.from('tasks').select('id, title, status, due_date, contact_id').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
+        let q = sb.from('agentx_tasks').select('id, title, status, due_date, contact_id').eq('tenant_id', ctx.tenantId).limit(args.limit || 20);
         if (args.status) q = q.eq('status', args.status);
         const { data, error } = await q;
         if (error) return res({ ok: false, status: 'error', error: error.message });
@@ -173,8 +203,10 @@ export function createCrmTools() {
         if (!ctx.tenantId) return res({ ok: false, status: 'error', error: 'tenant_required' });
         const gated = needsApproval(ctx, 'crm:update_lead_score');
         if (gated) return gated;
-        const { data, error } = await sb.from('contacts').update({ lead_score: args.score }).eq('tenant_id', ctx.tenantId).eq('id', args.id).select('id, lead_score').single();
+        const { data, error } = await sb.from('agentx_contacts').update({ lead_score: args.score }).eq('tenant_id', ctx.tenantId).eq('id', args.id).select('id, lead_score').single();
         if (error) return res({ ok: false, status: 'error', error: error.message });
+        // Append score history (separate table); failure here does not fake the confirmed score.
+        await sb.from('agentx_lead_scores').insert({ tenant_id: ctx.tenantId, contact_id: data.id, score: args.score, reason: args.reason || null });
         return res({ ok: true, status: 'completed', id: data.id, confirmedScore: data.lead_score, reason: args.reason || null });
       },
     }),
@@ -190,7 +222,7 @@ export function createCrmTools() {
         const gated = needsApproval(ctx, 'crm:record_activity');
         if (gated) return gated;
         const { data, error } = await sb
-          .from('activities')
+          .from('agentx_activities')
           .insert({ tenant_id: ctx.tenantId, contact_id: args.contactId || null, deal_id: args.dealId || null, type: args.type, note: args.note })
           .select('id')
           .single();

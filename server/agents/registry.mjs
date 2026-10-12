@@ -20,7 +20,7 @@ export const AGENTS = [
   },
   {
     key: 'ai_ae', name: 'AI Account Executive Agent', role: 'Advance opportunities',
-    tools: ['search_deals', 'update_deal', 'create_task', 'record_activity'],
+    tools: ['search_deals', 'create_deal', 'update_deal', 'create_task', 'record_activity'],
     requiredIntegrations: { supabase: true },
     instructions: 'You are the AI Account Executive. Analyze deals, recommend next sales actions, prepare proposals, and (only when approved) update deal stages and create tasks. Base everything on the CRM tools.',
   },

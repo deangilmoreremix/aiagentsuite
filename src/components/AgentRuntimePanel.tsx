@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AGENT_CATALOG } from '../agents/agentCatalog';
-import { fetchAgentStatus, runAgentTask, runWorkflowTask } from '../agents/agentClient';
+import { fetchAgentStatus, runAgentTask, runWorkflowTask, signIn, signOut, getSessionEmail, createApproval, approveApproval } from '../agents/agentClient';
 import type { AgentRunResult, AgentStatusResponse } from '../agents/agentCatalog';
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -26,12 +26,18 @@ const AgentRuntimePanel: React.FC = () => {
   const [input, setInput] = useState<string>('Find the top 3 hottest leads and draft follow-ups');
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<AgentRunResult | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [signedEmail, setSignedEmail] = useState('');
+  const [authMsg, setAuthMsg] = useState('');
+  const [selfTest, setSelfTest] = useState<{ running: boolean; steps: any[] }>({ running: false, steps: [] });
 
   useEffect(() => {
     let alive = true;
     fetchAgentStatus()
       .then((s) => { if (alive) setStatus(s); })
       .catch(() => { if (alive) setStatusError('Agent runtime status unavailable (deploy with Netlify functions).'); });
+    getSessionEmail().then((e) => { if (alive && e) setSignedEmail(e); }).catch(() => {});
     return () => { alive = false; };
   }, []);
 
@@ -65,6 +71,67 @@ const AgentRuntimePanel: React.FC = () => {
     }
   };
 
+  const signInNow = async () => {
+    setAuthMsg('');
+    const r = await signIn(email, password);
+    if (r.ok) {
+      setSignedEmail(email);
+      setPassword('');
+      setAuthMsg('Signed in. You can now run the activation self-test.');
+    } else {
+      setAuthMsg(r.error || 'Sign-in failed');
+    }
+  };
+
+  const signOutNow = async () => {
+    await signOut();
+    setSignedEmail('');
+    setAuthMsg('Signed out.');
+  };
+
+  // Controlled, owner-only activation self-test. The owner signs in through this
+  // in-app form; the session token is used only in-memory as an Authorization
+  // header and is never displayed or logged. Approvals are created and approved
+  // here (persisted server-side, single-use) so the run is genuinely authorized.
+  const APPROVALS_NEEDED = ['crm:create_contact', 'crm:update_lead_score', 'crm:create_deal', 'crm:update_deal', 'crm:create_task', 'crm:record_activity'];
+  const runSelfTest = async () => {
+    setSelfTest({ running: true, steps: [] });
+    const push = (s: any) => setSelfTest((p) => ({ ...p, steps: [...p.steps, s] }));
+    try {
+      // 1) create + approve the required consequential actions (server-verified).
+      const approvedIds: string[] = [];
+      for (const action of APPROVALS_NEEDED) {
+        const id = await createApproval(action);
+        await approveApproval(id);
+        approvedIds.push(id);
+        push({ label: `Approved: ${action}`, status: 'completed' });
+      }
+      // 2) real OpenAI response (should NOT be a simulated response).
+      push({ label: 'Running real OpenAI check (Objection Handler)', status: 'running' });
+      const real = await runAgentTask('objection_handler', 'A prospect says "your product is too expensive for our budget." Give a tailored, honest reply and a next step.', { mode: 'real' });
+      push({
+        label: 'Real OpenAI response',
+        status: real.status,
+        detail: (real.output || '').slice(0, 400),
+        simulated: /\[Demo mode\]/.test(real.output || '') || real.status === 'completed_demo',
+        runId: real.runId || null,
+      });
+      // 3) multi-agent workflow (SDR -> scoring -> AE -> email prep) on test data.
+      const wf = await runWorkflowTask('qualify_lead', 'Create and qualify a test contact: Dana Rivera, dana@example.com, +1-555-0100, Acme. Score the lead, open a test deal, and draft a follow-up email. Do not send any email.', { mode: 'real', approvals: approvedIds });
+      (wf.steps || []).forEach((s: any) => push({
+        label: `${s.agentKey} — ${s.label || ''}`.trim(),
+        status: s.status,
+        detail: (s.output || '').slice(0, 300),
+        blockedIntegrations: s.blockedIntegrations,
+      }));
+      push({ label: 'Workflow overall', status: wf.status, detail: (wf as any).message || (wf as any).error || '' });
+    } catch (e: any) {
+      push({ label: 'Self-test error', status: 'failed', detail: e?.message || String(e) });
+    } finally {
+      setSelfTest((p) => ({ ...p, running: false }));
+    }
+  };
+
   return (
     <section className="max-w-6xl mx-auto px-6 py-12">
       <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2">AI Agent Runtime</h2>
@@ -79,6 +146,47 @@ const AgentRuntimePanel: React.FC = () => {
           </span>
         ))}
         {statusError && <span className="text-xs px-2 py-1 rounded border bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/40">{statusError}</span>}
+      </div>
+
+      {/* Owner activation self-test (in-app sign-in; no JWT pasting) */}
+      <div className="mb-8 p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
+        <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Owner activation self-test</h3>
+        {signedEmail ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm text-slate-600 dark:text-slate-300">Signed in as {signedEmail}</span>
+            <button onClick={runSelfTest} disabled={selfTest.running} className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm disabled:opacity-50">
+              {selfTest.running ? 'Running…' : 'Run activation self-test'}
+            </button>
+            <button onClick={signOutNow} className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-300">Sign out</button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-end gap-2">
+            <div>
+              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Email</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Password</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm" />
+            </div>
+            <button onClick={signInNow} className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm">Sign in</button>
+            {authMsg && <span className="text-xs text-slate-500 dark:text-slate-400">{authMsg}</span>}
+          </div>
+        )}
+        {selfTest.steps.length > 0 && (
+          <ul className="mt-3 space-y-1">
+            {selfTest.steps.map((s, i) => (
+              <li key={i} className="text-sm flex flex-wrap items-baseline gap-2">
+                <Badge status={s.status} />
+                <span className="text-slate-700 dark:text-slate-300">{s.label}{s.simulated ? ' (SIMULATED — not a real model response!)' : ''}</span>
+                {s.runId ? <span className="text-slate-400">· run {String(s.runId).slice(0, 8)}</span> : null}
+                {s.blockedIntegrations?.length ? <span className="text-amber-600 dark:text-amber-400">· needs {s.blockedIntegrations.join(', ')}</span> : null}
+                {s.detail ? <span className="text-slate-500 dark:text-slate-400 break-all block w-full">— {s.detail}</span> : null}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Sign in with your own account. Your password/token are used only in this browser session and are never logged. The self-test writes only test records in your own tenant.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
