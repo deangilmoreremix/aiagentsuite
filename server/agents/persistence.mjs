@@ -6,7 +6,7 @@ import { getServiceClient } from '../supabase/serviceClient.mjs';
 const ok = (data) => ({ persisted: true, data });
 const noop = (reason) => ({ persisted: false, reason });
 
-export async function recordAgentRun({ tenantId, userId, agentKey, status, mode, input, result, error, traceId, idempotencyKey }) {
+export async function recordAgentRun({ tenantId, userId, agentKey, status, mode, input, result, error, traceId, idempotencyKey, runRef }) {
   const sb = getServiceClient();
   if (!sb) return noop('supabase_not_configured');
   try {
@@ -23,6 +23,7 @@ export async function recordAgentRun({ tenantId, userId, agentKey, status, mode,
         error,
         trace_id: traceId,
         idempotency_key: idempotencyKey || null,
+        run_ref: runRef || null,
       })
       .select('id')
       .single();

@@ -90,7 +90,7 @@ export async function runAgent({ agentKey, input, context }) {
   }
 
   if (!integrations.openaiLLM) {
-    await recordAgentRun({ tenantId: context?.tenantId, userId: context?.userId, agentKey, status: 'integration_required', mode, input, error: 'openai_not_configured' });
+    await recordAgentRun({ tenantId: context?.tenantId, userId: context?.userId, agentKey, status: 'integration_required', mode, input, error: 'openai_not_configured', runRef: context?.runRef });
     return { status: 'integration_required', agentKey, agentName: def.name, integration: 'openai', message: 'Real mode requires a server-side OpenAI key.' };
   }
 
@@ -100,7 +100,7 @@ export async function runAgent({ agentKey, input, context }) {
     const runner = new Runner();
     const result = await runner.run(agent, String(input), { context: { tenantId: context?.tenantId, userId: context?.userId, mode, approvedActions: context?.approvedActions instanceof Set ? context.approvedActions : new Set() } });
     const toolCalls = extractToolCalls(result);
-    const run = await recordAgentRun({ tenantId: context?.tenantId, userId: context?.userId, agentKey, status: 'completed', mode, input, result: { output: result.finalOutput, toolCalls } });
+    const run = await recordAgentRun({ tenantId: context?.tenantId, userId: context?.userId, agentKey, status: 'completed', mode, input, result: { output: result.finalOutput, toolCalls }, runRef: context?.runRef });
     return {
       status: 'completed',
       agentKey,
@@ -112,7 +112,7 @@ export async function runAgent({ agentKey, input, context }) {
       blockedIntegrations: readiness.blockedIntegrations,
     };
   } catch (e) {
-    await recordAgentRun({ tenantId: context?.tenantId, userId: context?.userId, agentKey, status: 'failed', mode, input, error: String(e?.message || e) });
+    await recordAgentRun({ tenantId: context?.tenantId, userId: context?.userId, agentKey, status: 'failed', mode, input, error: String(e?.message || e), runRef: context?.runRef });
     return { status: 'failed', agentKey, agentName: def.name, error: String(e?.message || e) };
   }
 }

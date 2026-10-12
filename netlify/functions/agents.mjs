@@ -64,16 +64,18 @@ export async function handler(event) {
   };
 
   // Approvals are SERVER-VERIFIED: the client sends approvalIds (references to
-  // approval_requests rows) which are validated against the tenant/user/status
-  // and consumed once. A client-supplied action-name array is never trusted.
+  // agentx_approvals rows) which are validated against the tenant/user/status
+  // and consumed once (bound to this execution via runRef). A client-supplied
+  // action-name array is never trusted.
+  const runRef = crypto.randomUUID();
   const approvalIds = Array.isArray(body.approvalIds) ? body.approvalIds.filter((x) => typeof x === 'string') : [];
   let approvedActions = new Set();
   try {
-    approvedActions = await resolveApprovals(identity, approvalIds);
+    approvedActions = await resolveApprovals(identity, approvalIds, runRef);
   } catch {
     approvedActions = new Set();
   }
-  const context = { ...identity, approvedActions };
+  const context = { ...identity, approvedActions, runRef };
 
   try {
     if (body.workflowKey) {
