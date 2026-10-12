@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AGENT_CATALOG } from '../agents/agentCatalog';
-import { fetchAgentStatus, runAgentTask, runWorkflowTask, signIn, signOut, getSessionEmail, createApproval, approveApproval } from '../agents/agentClient';
+import { fetchAgentStatus, runAgentTask, runWorkflowTask, signIn, signOut, getSessionEmail, createApproval, approveApproval, fetchExecutionHistory } from '../agents/agentClient';
 import type { AgentRunResult, AgentStatusResponse } from '../agents/agentCatalog';
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -94,9 +94,27 @@ const AgentRuntimePanel: React.FC = () => {
   // header and is never displayed or logged. Approvals are created and approved
   // here (persisted server-side, single-use) so the run is genuinely authorized.
   const APPROVALS_NEEDED = ['crm:create_contact', 'crm:update_lead_score', 'crm:create_deal', 'crm:update_deal', 'crm:create_task', 'crm:record_activity'];
+  const push = (s: any) => setSelfTest((p) => ({ ...p, steps: [...p.steps, s] }));
+
+  const readHistory = async () => {
+    push({ label: 'Reading durable execution history (read-back)', status: 'running' });
+    try {
+      const h = await fetchExecutionHistory();
+      push({
+        label: `Execution history: ${h.runs.length} run(s), ${h.toolExecutions.length} tool execution(s)`,
+        status: 'completed',
+        detail: [
+          ...h.runs.slice(0, 6).map((r) => `run ${String(r.id).slice(0, 8)} · ${r.agent_key} · ${r.status} · ${r.created_at}`),
+          ...h.toolExecutions.slice(0, 8).map((t) => `tool ${String(t.id).slice(0, 8)} · ${t.tool} · ${t.status} · ${t.result ? String(t.result).slice(0, 60) : ''}`),
+        ].join(' | '),
+      });
+    } catch (e: any) {
+      push({ label: 'Execution history', status: 'failed', detail: e?.message || String(e) });
+    }
+  };
+
   const runSelfTest = async () => {
     setSelfTest({ running: true, steps: [] });
-    const push = (s: any) => setSelfTest((p) => ({ ...p, steps: [...p.steps, s] }));
     try {
       // 1) create + approve the required consequential actions (server-verified).
       const approvedIds: string[] = [];
@@ -115,22 +133,28 @@ const AgentRuntimePanel: React.FC = () => {
         detail: (real.output || '').slice(0, 400),
         simulated: /\[Demo mode\]/.test(real.output || '') || real.status === 'completed_demo',
         runId: real.runId || null,
+        toolCalls: real.toolCalls,
       });
-      // 3) multi-agent workflow (SDR -> scoring -> AE -> email prep) on test data.
-      const wf = await runWorkflowTask('qualify_lead', 'Create and qualify a test contact: Dana Rivera, dana@example.com, +1-555-0100, Acme. Score the lead, open a test deal, and draft a follow-up email. Do not send any email.', { mode: 'real', approvals: approvedIds });
+      // 3) multi-agent workflow on clearly-identifiable test data (never customer data).
+      const tag = `SELFTEST-${Date.now().toString(36)}`;
+      const wf = await runWorkflowTask('qualify_lead', `Test ${tag}: create and qualify a test contact named "${tag} Contact" (email ${tag}@example.com, phone +1-555-0100, company Acme Test). Score the lead, open a test deal titled "${tag} Deal", and create a follow-up task "${tag} follow-up". Draft (do NOT send) a follow-up email.`, { mode: 'real', approvals: approvedIds });
       (wf.steps || []).forEach((s: any) => push({
         label: `${s.agentKey} — ${s.label || ''}`.trim(),
         status: s.status,
         detail: (s.output || '').slice(0, 300),
+        toolCalls: s.toolCalls,
         blockedIntegrations: s.blockedIntegrations,
       }));
       push({ label: 'Workflow overall', status: wf.status, detail: (wf as any).message || (wf as any).error || '' });
+      // 4) read back what actually persisted.
+      await readHistory();
     } catch (e: any) {
       push({ label: 'Self-test error', status: 'failed', detail: e?.message || String(e) });
     } finally {
       setSelfTest((p) => ({ ...p, running: false }));
     }
   };
+
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-12">
@@ -182,6 +206,11 @@ const AgentRuntimePanel: React.FC = () => {
                 {s.runId ? <span className="text-slate-400">· run {String(s.runId).slice(0, 8)}</span> : null}
                 {s.blockedIntegrations?.length ? <span className="text-amber-600 dark:text-amber-400">· needs {s.blockedIntegrations.join(', ')}</span> : null}
                 {s.detail ? <span className="text-slate-500 dark:text-slate-400 break-all block w-full">— {s.detail}</span> : null}
+                {s.toolCalls?.length ? (
+                  <span className="block w-full mt-1 text-xs text-slate-500 dark:text-slate-400 break-all">
+                    tools: {s.toolCalls.map((t: any) => `${t.name}${t.output ? ' => ' + String(t.output).slice(0, 90) : ''}`).join('  •  ')}
+                  </span>
+                ) : null}
               </li>
             ))}
           </ul>

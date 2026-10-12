@@ -76,6 +76,16 @@ export async function approveApproval(id: string): Promise<void> {
   if (!res.ok) throw new Error(`approval_resolve_${res.status}`);
 }
 
+// Read-back of durable run + tool-execution records (real DB ids) for the
+// caller's tenant — proves what actually persisted.
+export async function fetchExecutionHistory(): Promise<{ runs: any[]; toolExecutions: any[] }> {
+  const token = await getAccessToken();
+  if (!token) throw new Error('unauthenticated');
+  const res = await fetch('/api/agent-history?limit=25', { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`history ${res.status}`);
+  return res.json();
+}
+
 interface RunOptions {
   mode?: 'demo' | 'real';
   approvals?: string[];

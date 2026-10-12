@@ -145,7 +145,7 @@ export async function runWorkflow({ workflowKey, input, context }) {
       return { status: 'awaiting_approval', workflowKey, mode, steps, completedThrough: steps.length - 1 };
     }
     const r = await runAgent({ agentKey: step.agentKey, input: carried, context });
-    steps.push({ agentKey: step.agentKey, label: step.label, status: r.status, output: r.output, blockedIntegrations: r.blockedIntegrations, error: r.error });
+    steps.push({ agentKey: step.agentKey, label: step.label, status: r.status, output: r.output, toolCalls: r.toolCalls, blockedIntegrations: r.blockedIntegrations, error: r.error });
     if (r.status === 'failed' || r.status === 'error' || r.status === 'integration_required') {
       return { status: r.status === 'completed_demo' ? 'completed' : r.status, workflowKey, mode, steps, failureAt: step.agentKey, message: r.message || r.error };
     }
