@@ -9,8 +9,7 @@
 --
 -- Ownership: agent-customer IDs are tenant-scoped. RLS grants access to members
 -- of the row's tenant via tenant_members. Service-role writes bypass RLS.
-
-create extension if not exists "pgcrypto";
+-- (gen_random_uuid() is built-in on modern PostgreSQL; no extension required.)
 
 -- ---------------------------------------------------------------- contacts --
 create table if not exists agentx_contacts (
@@ -89,17 +88,22 @@ alter table agentx_activities enable row level security;
 alter table agentx_lead_scores enable row level security;
 alter table agentx_tasks enable row level security;
 
-do $$ declare t text;
-begin
-  foreach t in array array['agentx_contacts','agentx_deals','agentx_activities','agentx_lead_scores','agentx_tasks']
-  loop
-    execute format('create policy "member select" on %s for select using (
-      exists (select 1 from tenant_members tm where tm.tenant_id = %I.tenant_id and tm.user_id = auth.uid()))', t, t);
-    execute format('create policy "member insert" on %s for insert with check (
-      exists (select 1 from tenant_members tm where tm.tenant_id = %I.tenant_id and tm.user_id = auth.uid()))', t, t);
-    execute format('create policy "member update" on %s for update using (
-      exists (select 1 from tenant_members tm where tm.tenant_id = %I.tenant_id and tm.user_id = auth.uid()))', t, t);
-  end loop;
+do $$ begin
+  create policy "member select" on agentx_contacts for select using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_contacts.tenant_id and tm.user_id = auth.uid()));
+  create policy "member insert" on agentx_contacts for insert with check (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_contacts.tenant_id and tm.user_id = auth.uid()));
+  create policy "member update" on agentx_contacts for update using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_contacts.tenant_id and tm.user_id = auth.uid()));
+  create policy "member select" on agentx_deals for select using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_deals.tenant_id and tm.user_id = auth.uid()));
+  create policy "member insert" on agentx_deals for insert with check (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_deals.tenant_id and tm.user_id = auth.uid()));
+  create policy "member update" on agentx_deals for update using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_deals.tenant_id and tm.user_id = auth.uid()));
+  create policy "member select" on agentx_activities for select using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_activities.tenant_id and tm.user_id = auth.uid()));
+  create policy "member insert" on agentx_activities for insert with check (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_activities.tenant_id and tm.user_id = auth.uid()));
+  create policy "member update" on agentx_activities for update using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_activities.tenant_id and tm.user_id = auth.uid()));
+  create policy "member select" on agentx_lead_scores for select using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_lead_scores.tenant_id and tm.user_id = auth.uid()));
+  create policy "member insert" on agentx_lead_scores for insert with check (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_lead_scores.tenant_id and tm.user_id = auth.uid()));
+  create policy "member update" on agentx_lead_scores for update using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_lead_scores.tenant_id and tm.user_id = auth.uid()));
+  create policy "member select" on agentx_tasks for select using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_tasks.tenant_id and tm.user_id = auth.uid()));
+  create policy "member insert" on agentx_tasks for insert with check (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_tasks.tenant_id and tm.user_id = auth.uid()));
+  create policy "member update" on agentx_tasks for update using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_tasks.tenant_id and tm.user_id = auth.uid()));
 exception when duplicate_object then null; end $$;
 
 -- ============================ ROLLBACK (owner) ============================

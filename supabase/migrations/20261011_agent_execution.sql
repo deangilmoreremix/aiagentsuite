@@ -12,7 +12,6 @@
 --
 -- ROLLBACK (non-destructive): drop table the agentx_* tables only (see bottom).
 
-create extension if not exists "pgcrypto";
 
 create table if not exists agentx_runs (
   id uuid primary key default gen_random_uuid(),
