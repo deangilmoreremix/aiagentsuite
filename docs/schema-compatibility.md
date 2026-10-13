@@ -15,7 +15,7 @@ and no secrets/keys were printed while producing this report.
 | Data exposure | None. No table rows were queried; no keys, tokens, or connection strings were read or printed. |
 | Result | ~152 tables exist in the project. It hosts a DIFFERENT application (observed: `business_cards`, `voice_projects`, `os_leads`, `jobs`, `node_runs`, …). The repo's assumed CRM tables are absent. |
 | Known limitation | The `auth` schema is NOT exposed via anon REST — `auth.users` is not introspectable this way. Nothing below depends on it. |
-| Repo cross-checks | Tool/table targets cited from code (`server/agents/tools/crm.mjs`, `server/agents/tools/integrations.mjs`, `server/agents/tools/workflow.mjs`, `server/agents/persistence.mjs`, `server/agents/approvals.mjs`, `netlify/functions/agents.mjs`); migration under review: `supabase/migrations/20261011_agent_execution.sql`. |
+| Repo cross-checks | Tool/table targets cited from code (`server/agents/tools/crm.mjs`, `server/agents/tools/integrations.mjs`, `server/agents/tools/workflow.mjs`, `server/agents/persistence.mjs`, `server/agents/approvals.mjs`, `netlify/functions/agents.mjs`); migration under review: `supabase/migrations/20261014020000_agent_execution.sql`. |
 
 **Consequence of the limitation:** claims about `auth.users` structure are explicitly *not* made;
 the tenancy model is derived from the public tables in §3 instead.
@@ -49,7 +49,7 @@ the tenancy model is derived from the public tables in §3 instead.
 | `task_executions` | migration `20250818151037_falling_moon.sql` | **ABSENT (PGRST205)** |
 | `enhanced_task_executions` | migration `20250818161747_blue_king.sql` | **ABSENT (PGRST205)** |
 | `activities` | crm.mjs `record_activity` (crm.mjs:193) | **Not present in the verified set — treat as ABSENT** until proven otherwise (it was not observed; the repo historically wrote to `sales_activities`, also absent). |
-| `agent_runs`, `tool_executions`, `approval_requests`, `email_drafts` | `server/agents/persistence.mjs`, `approvals.mjs`, `integrations.mjs` | **Absent pending the additive migration** (`supabase/migrations/20261011_agent_execution.sql`, NOT yet applied). They were not observed during verification; pre-flight must re-confirm absence before any apply (see migration dry-run doc). |
+| `agent_runs`, `tool_executions`, `approval_requests`, `email_drafts` | `server/agents/persistence.mjs`, `approvals.mjs`, `integrations.mjs` | **Absent pending the additive migration** (`supabase/migrations/20261014020000_agent_execution.sql`, NOT yet applied). They were not observed during verification; pre-flight must re-confirm absence before any apply (see migration dry-run doc). |
 
 ### 2.3 What this invalidates in the repo's assumptions
 

@@ -21,7 +21,7 @@ check('CRM tools include create_deal', () => {
 });
 
 check('CRM migration provisions agentx_ CRM tables with tenant FK', () => {
-  const p = 'supabase/migrations/20261012_agentx_crm.sql';
+  const p = 'supabase/migrations/20261014020100_agentx_crm.sql';
   assert(existsSync(p), 'migration file missing');
   const sql = readFileSync(p, 'utf8');
   for (const tbl of ['agentx_contacts', 'agentx_deals', 'agentx_activities', 'agentx_lead_scores', 'agentx_tasks']) {

@@ -22,7 +22,7 @@ These must be confirmed with admin SQL **before** apply (information_schema and 
 - **Backup / PITR state** and any last-minute concurrent migrations.
 
 ## 3. Verified migration & recovery plan
-- **Order (run once each):** `20261011_agent_execution.sql` → `20261012_agentx_crm.sql`.
+- **Order (run once each):** `20261014020000_agent_execution.sql` → `20261014020100_agentx_crm.sql`.
 - **Idempotent:** `create table if not exists` + guarded policies; re-execution verified safe (staging). No `pgcrypto` extension required (built-in `gen_random_uuid()` on PG13+); no `FOREACH` dependency.
 - **Additive only:** 10 new `agentx_*` tables + indexes + RLS; nothing existing is created, modified, renamed, or dropped. Co-tenant apps (`workflow_runs`, `tasks`, `jobs`, `leads`, …) are untouched (proven by the decoy test).
 - **Recovery:** take a **Supabase backup / PITR snapshot immediately before apply** (recommended even though the change is additive). **After real records exist, do NOT use `DROP TABLE` as a rollback** — that would delete agent data. Rollback in that case is a **forward fix** (or an archive-out-then-drop), plus restore-from-snapshot if a hard revert is required. Pre-records-only rollback = `drop table if exists` the 10 `agentx_*` tables (documented in `docs/production-change-manifest.md`).

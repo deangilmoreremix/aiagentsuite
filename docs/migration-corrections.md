@@ -32,5 +32,5 @@ Then run the app's in-app activation self-test (sign in → AI Agent Runtime →
 
 ## Apply preconditions (owner)
 1. **Establish a recovery point** (backup/PITR snapshot) — preflight confirmed recoverability is NOT yet established; do not apply without it.
-2. Apply `20261011_agent_execution.sql` then `20261012_agentx_crm.sql` (read-only rehearsal already run on embedded PG).
+2. Apply `20261014020000_agent_execution.sql` then `20261014020100_agentx_crm.sql` (read-only rehearsal already run on embedded PG).
 3. Rollback **only before records exist**: `drop table if exists` the 10 `agentx_*` tables. After real records, forward-fix or restore from snapshot — never drop.

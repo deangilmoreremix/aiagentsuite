@@ -16,8 +16,8 @@
 | Purpose of this document | The owner's review artifact for the production SQL. **This document is NOT authorization** — see §10. |
 | Current gate | **Awaiting explicit owner authorization** (§10). Do not run any SQL until signed off. |
 
-The two migrations are reviewed in full at `supabase/migrations/20261011_agent_execution.sql` and
-`supabase/migrations/20261012_agentx_crm.sql` (read in full for this manifest). They create
+The two migrations are reviewed in full at `supabase/migrations/20261014020000_agent_execution.sql` and
+`supabase/migrations/20261014020100_agentx_crm.sql` (read in full for this manifest). They create
 **10 additive tables**, all `agentx_`-namespaced. **No existing table is created, modified, dropped, or
 renamed**, and neither file writes a single row. Every table carries
 `tenant_id uuid not null references tenants(id)`, indexes, timestamps, and membership-based RLS.
@@ -67,12 +67,12 @@ Run the two files **once each, in this dependency order**, via the **Supabase St
 (SQL Editor → New query → paste the full file → Run) or via **psql as the project admin**:
 
 ```bash
-psql "$DB_URL" -f supabase/migrations/20261011_agent_execution.sql
-psql "$DB_URL" -f supabase/migrations/20261012_agentx_crm.sql
+psql "$DB_URL" -f supabase/migrations/20261014020000_agent_execution.sql
+psql "$DB_URL" -f supabase/migrations/20261014020100_agentx_crm.sql
 ```
 
-Order rationale: file 1 (`20261011_agent_execution.sql`) creates the agent-execution tables and the
-idempotency index; file 2 (`20261012_agentx_crm.sql`) creates the CRM tables, which reference
+Order rationale: file 1 (`20261014020000_agent_execution.sql`) creates the agent-execution tables and the
+idempotency index; file 2 (`20261014020100_agentx_crm.sql`) creates the CRM tables, which reference
 `tenants(id)` and `agentx_contacts(id)` among themselves. Both reference the pre-existing shared
 tables `tenants(id)` and `tenant_members(user_id, tenant_id)`.
 
@@ -85,7 +85,7 @@ run the committed files verbatim.
 
 ## 3. New objects created
 
-### 3.1 From `supabase/migrations/20261011_agent_execution.sql` (execution)
+### 3.1 From `supabase/migrations/20261014020000_agent_execution.sql` (execution)
 
 **Tables (5):** `agentx_runs`, `agentx_tool_executions`, `agentx_approvals`
 (`status` default `pending`; values `pending | approved | consumed | rejected`),
@@ -106,7 +106,7 @@ exists (select 1 from tenant_members tm
         where tm.tenant_id = <table>.tenant_id and tm.user_id = auth.uid())
 ```
 
-### 3.2 From `supabase/migrations/20261012_agentx_crm.sql` (CRM)
+### 3.2 From `supabase/migrations/20261014020100_agentx_crm.sql` (CRM)
 
 **Tables (5):** `agentx_contacts`, `agentx_deals`, `agentx_activities`, `agentx_lead_scores`,
 `agentx_tasks`.
@@ -210,7 +210,7 @@ select pid, state, left(query, 100) as query
 **Stop conditions:** if any of (a)/(a2) returns rows, or (b) is null/missing columns, or (c) is
 below 130000 — **do not apply**; resolve first. For (d): confirm no other operator/migration is
 concurrently creating `agentx_*` objects (in this repo, only
-`supabase/migrations/20261011_agent_execution.sql` and `supabase/migrations/20261012_agentx_crm.sql`
+`supabase/migrations/20261014020000_agent_execution.sql` and `supabase/migrations/20261014020100_agentx_crm.sql`
 define `agentx_*` objects; all other `agentx_*` references are runtime application code).
 
 ---
@@ -343,11 +343,11 @@ Or per file (execution and CRM have no cross-file FKs, so either order is depend
 CRM group also drops cleanly on its own since `agentx_contacts` is dropped last within it):
 
 ```sql
--- execution (20261011_agent_execution.sql)
+-- execution (20261014020000_agent_execution.sql)
 drop table if exists agentx_email_drafts, agentx_workflow_runs,
   agentx_approvals, agentx_tool_executions, agentx_runs;
 
--- CRM (20261012_agentx_crm.sql)
+-- CRM (20261014020100_agentx_crm.sql)
 drop table if exists agentx_tasks, agentx_lead_scores, agentx_activities,
   agentx_deals, agentx_contacts;
 ```
@@ -375,8 +375,8 @@ may be run until the owner explicitly approves below.**
 | Signature | |
 | Date (UTC) | |
 
-By signing, the owner confirms they have reviewed `supabase/migrations/20261011_agent_execution.sql`
-and `supabase/migrations/20261012_agentx_crm.sql` in full and authorizes executing them once each,
+By signing, the owner confirms they have reviewed `supabase/migrations/20261014020000_agent_execution.sql`
+and `supabase/migrations/20261014020100_agentx_crm.sql` in full and authorizes executing them once each,
 in the §2 order, against the shared project `bzxohkrxcwodllketcpz`.
 
 ---
@@ -407,7 +407,7 @@ nothing is fabricated. They do not block the CRM/approval path of the self-test.
 - No secrets, keys, tokens, or connection strings were read or printed while producing this document.
 - No code, SQL, or migration file was modified while producing this document.
 
-*Sources reviewed: `supabase/migrations/20261011_agent_execution.sql`,
-`supabase/migrations/20261012_agentx_crm.sql`, `tests/migrations.mjs`,
+*Sources reviewed: `supabase/migrations/20261014020000_agent_execution.sql`,
+`supabase/migrations/20261014020100_agentx_crm.sql`, `tests/migrations.mjs`,
 `docs/schema-compatibility.md`, `docs/migration-dryrun.md`. Companion documents:
 `docs/phase4-activation.md` (activation state and self-test procedure).*

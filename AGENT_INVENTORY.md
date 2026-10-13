@@ -17,7 +17,7 @@ server/agents/tools/{crm,integrations,workflow}.mjs // Zod tool registry
 server/supabase/serviceClient.mjs          // server-only Supabase (service role)
 netlify/functions/agents.mjs               // POST /api/agents (auth-gated real execution)
 netlify/functions/agent-status.mjs         // GET /api/agent-status (booleans, no secrets)
-supabase/migrations/20261011_agent_execution.sql   // durable tables + RLS
+supabase/migrations/20261014020000_agent_execution.sql   // durable tables + RLS
 ```
 
 - **Demo mode:** returns an explicitly-labelED `[Demo mode] …` result; mutates no data; no paid API call.
@@ -78,7 +78,7 @@ To make an agent fully operational for **real external actions**, set the server
 - **Twilio:** `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` → enables AI Dialer, SMS, WhatsApp.
 - **ElevenLabs:** `ELEVENLABS_API_KEY` → Voice output.
 - **Enrichment:** `ENRICHMENT_PROVIDER`, `ENRICHMENT_API_KEY` → Lead Enrichment.
-- **Supabase (server):** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` → enables all real CRM writes + persistence (apply `supabase/migrations/20261011_agent_execution.sql`).
+- **Supabase (server):** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` → enables all real CRM writes + persistence (apply `supabase/migrations/20261014020000_agent_execution.sql`).
 - **OpenAI (server):** `OPENAI_API_KEY` (+ optional `AGENT_MODEL`) → real LLM for all agents.
 
 Drafts, CRM writes, scoring, workflows, tasks, and reasoning are real and need only OpenAI + Supabase (server). Sending/telephony/voice/enrichment are blocked until their providers are connected and are reported as such.

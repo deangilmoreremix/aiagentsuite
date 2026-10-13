@@ -10,8 +10,8 @@ authorization.
 | Claim | Actual state |
 |---|---|
 | Tables created in project `bzxohkrxcwodllketcpz` | **NONE.** Nothing was applied. |
-| `supabase/migrations/20261011_agent_execution.sql` | File exists, reviewed, **NOT applied** to any live database. |
-| `supabase/migrations/20261012_agentx_crm.sql` | File exists, reviewed, **NOT applied** to any live database. |
+| `supabase/migrations/20261014020000_agent_execution.sql` | File exists, reviewed, **NOT applied** to any live database. |
+| `supabase/migrations/20261014020100_agentx_crm.sql` | File exists, reviewed, **NOT applied** to any live database. |
 | A live agent run against production data | **DID NOT HAPPEN.** No live RLS test and no live-DB test was executed. |
 | Live verification of the production schema | Read-only introspection only (no rows, no writes, no secrets read or printed). |
 
@@ -92,7 +92,7 @@ Both files are **purely additive**: they only create `agentx_*` objects, referen
 `tenants(id uuid)` table, and enable membership-based RLS. Neither file alters, renames, or drops
 any pre-existing object, and neither file writes any row.
 
-### 2.1 `supabase/migrations/20261011_agent_execution.sql` — durable execution persistence
+### 2.1 `supabase/migrations/20261014020000_agent_execution.sql` — durable execution persistence
 
 `create extension if not exists "pgcrypto";` (for `gen_random_uuid()`).
 
@@ -117,7 +117,7 @@ The policies are created inside a `do $$ ... exception when duplicate_object the
 block, so the block is re-runnable. The server functions **write** with the service role, which
 bypasses RLS; the policies protect authenticated/anon client access.
 
-### 2.2 `supabase/migrations/20261012_agentx_crm.sql` — namespaced agent CRM schema
+### 2.2 `supabase/migrations/20261014020100_agentx_crm.sql` — namespaced agent CRM schema
 
 `create extension if not exists "pgcrypto";`
 
@@ -166,11 +166,11 @@ block re-runnable.
 ### 2.4 Documented rollback (non-destructive, owner-run)
 
 ```sql
--- file 20261012_agentx_crm.sql (reverse order to respect FKs)
+-- file 20261014020100_agentx_crm.sql (reverse order to respect FKs)
 drop table if exists agentx_tasks, agentx_lead_scores, agentx_activities,
   agentx_deals, agentx_contacts;
 
--- file 20261011_agent_execution.sql
+-- file 20261014020000_agent_execution.sql
 drop table if exists agentx_email_drafts, agentx_workflow_runs,
   agentx_approvals, agentx_tool_executions, agentx_runs;
 ```
@@ -256,7 +256,7 @@ results below are therefore **static verification only**, and an isolated stagin
 |---|---|---|
 | **Name collision** | **PASS — no collision.** All ten `agentx_*` table names, the unique index name `agentx_tool_exec_idem_uidx`, and the nine CRM index names are absent from the project (~152 tables), verified by two independent signals (anon OpenAPI schema description + `PGRST205` select probes). | §1.3 |
 | **FK type match** | **PASS.** Every `tenant_id uuid … references tenants(id)` matches the verified `tenants.id uuid` PK. Intra-migration FKs (`agentx_deals.contact_id → agentx_contacts.id`, `agentx_activities.{contact_id,deal_id}`, `agentx_lead_scores.contact_id`, `agentx_tasks.contact_id`) are all uuid→uuid. Note `workspaces.id` is **text** and is deliberately not referenced by any agentx table. | §1.2, §2.1, §2.2 |
-| **Dependency order** | **PASS.** `20261011_agent_execution.sql` (execution tables) must be applied **before** `20261012_agentx_crm.sql`, which references `tenants(id)` and creates `agentx_contacts` (itself referenced by the other four CRM tables). Within file 2, `agentx_contacts` is created before `agentx_deals` / `agentx_activities` / `agentx_lead_scores` / `agentx_tasks`. `pgcrypto` is created idempotently in both files. | §2.2 |
+| **Dependency order** | **PASS.** `20261014020000_agent_execution.sql` (execution tables) must be applied **before** `20261014020100_agentx_crm.sql`, which references `tenants(id)` and creates `agentx_contacts` (itself referenced by the other four CRM tables). Within file 2, `agentx_contacts` is created before `agentx_deals` / `agentx_activities` / `agentx_lead_scores` / `agentx_tasks`. `pgcrypto` is created idempotently in both files. | §2.2 |
 | **Idempotency / re-runnability** | **PASS.** All DDL uses `if not exists`; both policy blocks swallow `duplicate_object`; the unique index is `create unique index if not exists`. Re-running either file is a no-op. | §2.3 |
 | **No destructive statements** | **PASS.** Neither file contains `alter table … drop`, `drop table`, `truncate`, `delete`, `insert`, `update`, or any reference to a non-`agentx_` table. `grep` for `create table` returns only the ten `agentx_*` tables. | §2 |
 | **RLS enablement** | **PASS (static).** All ten tables get `enable row level security` plus membership-based policies; no policy uses `tenant_id = auth.uid()`. | §2.1, §2.2 |
@@ -374,11 +374,11 @@ incorrect and is corrected here so the apply operation is unambiguous.
 
 ### 7.1 Objects that will be created
 
-**File `supabase/migrations/20261011_agent_execution.sql` (5 tables + 1 index + 5 RLS policies):**
+**File `supabase/migrations/20261014020000_agent_execution.sql` (5 tables + 1 index + 5 RLS policies):**
 `agentx_runs`, `agentx_tool_executions`, `agentx_approvals`, `agentx_workflow_runs`,
 `agentx_email_drafts`, index `agentx_tool_exec_idem_uidx`.
 
-**File `supabase/migrations/20261012_agentx_crm.sql` (5 tables + 9 indexes + 15 RLS policies):**
+**File `supabase/migrations/20261014020100_agentx_crm.sql` (5 tables + 9 indexes + 15 RLS policies):**
 `agentx_contacts`, `agentx_deals`, `agentx_activities`, `agentx_lead_scores`, `agentx_tasks`,
 indexes `agentx_contacts_tenant_idx`, `agentx_contacts_email_uidx`, `agentx_deals_tenant_idx`,
 `agentx_deals_contact_idx`, `agentx_activities_tenant_idx`, `agentx_activities_contact_idx`,

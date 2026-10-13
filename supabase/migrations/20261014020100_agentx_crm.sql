@@ -1,7 +1,7 @@
 -- AI Agent Suite: namespaced CRM schema (corrected).
 --
 -- Owner-authorized (pending), ADDITIVE migration for the SHARED project
--- bzxohkrxcwodllketcpz (PostgreSQL 17.6). Requires 20261011_agent_execution.sql
+-- bzxohkrxcwodllketcpz (PostgreSQL 17.6). Requires 20261014020000_agent_execution.sql
 -- semantics (tenants/tenant_members + agentx_contacts target). Additive only.
 --
 -- Corrections: same-tenant COMPOSITE foreign keys ((tenant_id, x_id) must match

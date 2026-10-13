@@ -1,4 +1,4 @@
-# Migration Dry-Run + Rollback Plan — `supabase/migrations/20261011_agent_execution.sql` (tenancy-corrected)
+# Migration Dry-Run + Rollback Plan — `supabase/migrations/20261014020000_agent_execution.sql` (tenancy-corrected)
 
 **Companion to `docs/schema-compatibility.md`.** This document is a PLAN only. It does not create,
 modify, or apply any migration, and no secrets are printed.
@@ -15,7 +15,7 @@ modify, or apply any migration, and no secrets are printed.
 
 ## 1. What the current committed migration does — and the deltas required
 
-### 1.1 Current file (`20261011_agent_execution.sql`, 86 lines) — as committed
+### 1.1 Current file (`20261014020000_agent_execution.sql`, 86 lines) — as committed
 
 - `create extension if not exists "pgcrypto"` (line 6).
 - Five new tables via `create table if not exists`: `agent_runs`, `tool_executions`,

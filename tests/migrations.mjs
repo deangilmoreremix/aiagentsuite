@@ -15,8 +15,8 @@ const check = async (name, fn) => {
   catch (e) { results.push(false); console.log('FAIL - ' + name + ' :: ' + (e?.message || e)); }
 };
 const scalar = async (pg, sql) => (await pg.query(sql)).rows[0].n;
-const MIG_EXEC = readFileSync('supabase/migrations/20261011_agent_execution.sql', 'utf8');
-const MIG_CRM = readFileSync('supabase/migrations/20261012_agentx_crm.sql', 'utf8');
+const MIG_EXEC = readFileSync('supabase/migrations/20261014020000_agent_execution.sql', 'utf8');
+const MIG_CRM = readFileSync('supabase/migrations/20261014020100_agentx_crm.sql', 'utf8');
 
 const TA = 'aaaaaaaa-1111-4111-8111-111111111111';
 const TB = 'bbbbbbbb-2222-4222-8222-222222222222';
