@@ -10,18 +10,23 @@
     "preview": "vite preview",
     "test:smoke": "node tests/landing-smoke.mjs",
     "test:secrets": "node tests/no-secrets.mjs",
-    "test:functions": "node tests/functions.mjs"
+    "test:functions": "node tests/functions.mjs",
+    "test:agents": "node tests/agents-registry.mjs && node tests/agents-orchestrator.mjs && node tests/agents-tools.mjs && node tests/agents-approvals.mjs && node tests/agents-tenancy.mjs && node tests/agents-schema.mjs",
+    "test:migrations": "node tests/migrations.mjs"
   },
   "dependencies": {
+    "@openai/agents": "^0.3.0",
     "@supabase/supabase-js": "^2.39.0",
     "composio-core": "^0.1.16",
     "lucide-react": "^0.344.0",
     "openai": "^4.63.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0"
+    "react-router-dom": "^6.26.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@eslint/js": "^9.9.1",
     "@playwright/test": "^1.64.0",
     "@types/react": "^18.3.5",

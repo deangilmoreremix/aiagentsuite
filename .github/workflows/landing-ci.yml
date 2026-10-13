@@ -31,6 +31,12 @@ jobs:
       - name: Serverless function unit tests
         run: npm run test:functions
 
+      - name: Agent registry/orchestrator/tool tests
+        run: npm run test:agents
+
+      - name: Migration tests (real embedded Postgres)
+        run: npm run test:migrations
+
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 

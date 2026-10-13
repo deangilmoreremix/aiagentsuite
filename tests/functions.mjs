@@ -4,6 +4,8 @@
 import assert from 'node:assert/strict';
 import { handler as statusH } from '../netlify/functions/status.mjs';
 import { handler as llmH } from '../netlify/functions/llm.mjs';
+import { handler as approvalsH } from '../netlify/functions/agent-approvals.mjs';
+import { handler as historyH } from '../netlify/functions/agent-history.mjs';
 
 const results = [];
 const check = async (n, fn) => {
@@ -67,6 +69,16 @@ await check('llm never echoes a provider key (fail-closed)', async () => {
   } finally {
     delete process.env.OPENAI_API_KEY;
   }
+});
+
+await check('agent-approvals endpoint fails closed (503) when server Supabase is not configured', async () => {
+  const r = await approvalsH({ httpMethod: 'GET' });
+  assert.equal(r.statusCode, 503);
+});
+
+await check('agent-history endpoint fails closed (503) when server Supabase is not configured', async () => {
+  const r = await historyH({ httpMethod: 'GET' });
+  assert.equal(r.statusCode, 503);
 });
 
 const failed = results.filter((x) => x === false).length;

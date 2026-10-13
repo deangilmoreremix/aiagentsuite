@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import HowToUse from '../components/HowToUse';
 import ApiSetupGuide from '../components/ApiSetupGuide';
 import ComposioIntegrationModal from '../components/ComposioIntegrationModal';
+import AgentRuntimePanel from '../components/AgentRuntimePanel';
 import { getDefaultMode, logApiStatus, refreshProviderStatus } from '../config/apiConfig';
 import { 
   ArrowRight, 
@@ -349,6 +350,9 @@ const CoreInteractionPage = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* AI Agent Runtime — honest live agent status + execution (server-side SDK) */}
+      <AgentRuntimePanel />
 
       {/* Modals */}
       <HowToUse
