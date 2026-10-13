@@ -115,7 +115,7 @@ drop policy if exists "member select" on agentx_email_drafts;
 create policy "member select" on agentx_email_drafts for select using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_email_drafts.tenant_id and tm.user_id = auth.uid()));
 
 -- ------------------------------------------------------------------ grants --
-revoke all on agentx_runs, agentx_tool_executions, agentx_approvals, agentx_workflow_runs, agentx_email_drafts from anon;
+revoke all on agentx_runs, agentx_tool_executions, agentx_approvals, agentx_workflow_runs, agentx_email_drafts from anon, authenticated;
 grant select, insert, update on agentx_runs, agentx_tool_executions, agentx_approvals, agentx_workflow_runs, agentx_email_drafts to authenticated;
 
 -- ============================ ROLLBACK (owner) ============================

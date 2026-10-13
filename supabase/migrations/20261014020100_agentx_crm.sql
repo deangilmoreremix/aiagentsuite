@@ -124,7 +124,7 @@ drop policy if exists "member update" on agentx_tasks;
 create policy "member update" on agentx_tasks for update using (exists (select 1 from tenant_members tm where tm.tenant_id = agentx_tasks.tenant_id and tm.user_id = auth.uid()));
 
 -- ------------------------------------------------------------------ grants --
-revoke all on agentx_contacts, agentx_deals, agentx_activities, agentx_lead_scores, agentx_tasks from anon;
+revoke all on agentx_contacts, agentx_deals, agentx_activities, agentx_lead_scores, agentx_tasks from anon, authenticated;
 grant select, insert, update on agentx_contacts, agentx_deals, agentx_activities, agentx_lead_scores, agentx_tasks to authenticated;
 
 -- ============================ ROLLBACK (owner) ============================
